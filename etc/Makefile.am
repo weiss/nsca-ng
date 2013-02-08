@@ -25,7 +25,7 @@
 ## ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 ## POSSIBILITY OF SUCH DAMAGE.
 
-EXTRA_DIST = nsca-ng.conf send_nsca.conf valgrind.supp
+EXTRA_DIST = nsca-ng.cfg send_nsca.cfg valgrind.supp
 
 if BUILD_CLIENT
 install-data-local: install-nsca-client-conf
@@ -41,34 +41,34 @@ endif
 
 install-nsca-client-conf:
 	$(AM_V_at)$(MKDIR_P) '$(DESTDIR)$(sysconfdir)'
-	$(AM_V_at)if [ -r '$(DESTDIR)$(sysconfdir)/send_nsca.conf' ]; then \
-	    echo 'Preserving the installed send_nsca.conf file.'; \
+	$(AM_V_at)if [ -r '$(DESTDIR)$(sysconfdir)/send_nsca.cfg' ]; then \
+	    echo 'Preserving the installed send_nsca.cfg file.'; \
 	else \
-	    $(INSTALL_DATA) '$(srcdir)/send_nsca.conf' \
+	    $(INSTALL_DATA) '$(srcdir)/send_nsca.cfg' \
 	      '$(DESTDIR)$(sysconfdir)'; \
 	fi
 
 install-nsca-server-conf:
 	$(AM_V_at)$(MKDIR_P) '$(DESTDIR)$(sysconfdir)'
-	$(AM_V_at)if [ -r '$(DESTDIR)$(sysconfdir)/nsca-ng.conf' ]; then \
-	    echo 'Preserving the installed nsca-ng.conf file.'; \
+	$(AM_V_at)if [ -r '$(DESTDIR)$(sysconfdir)/nsca-ng.cfg' ]; then \
+	    echo 'Preserving the installed nsca-ng.cfg file.'; \
 	else \
-	    $(INSTALL_DATA) '$(srcdir)/nsca-ng.conf' \
+	    $(INSTALL_DATA) '$(srcdir)/nsca-ng.cfg' \
 	      '$(DESTDIR)$(sysconfdir)'; \
 	fi
 
 uninstall-nsca-client-conf:
-	$(AM_V_at)if cmp -s '$(srcdir)/send_nsca.conf' \
-	  '$(DESTDIR)$(sysconfdir)/send_nsca.conf'; then \
-	    rm -f '$(DESTDIR)$(sysconfdir)/send_nsca.conf'; \
+	$(AM_V_at)if cmp -s '$(srcdir)/send_nsca.cfg' \
+	  '$(DESTDIR)$(sysconfdir)/send_nsca.cfg'; then \
+	    rm -f '$(DESTDIR)$(sysconfdir)/send_nsca.cfg'; \
 	else \
-	    echo 'Preserving the installed send_nsca.conf file.'; \
+	    echo 'Preserving the installed send_nsca.cfg file.'; \
 	fi
 
 uninstall-nsca-server-conf:
-	$(AM_V_at)if cmp -s '$(srcdir)/nsca-ng.conf' \
-	  '$(DESTDIR)$(sysconfdir)/nsca-ng.conf'; then \
-	    rm -f '$(DESTDIR)$(sysconfdir)/nsca-ng.conf'; \
+	$(AM_V_at)if cmp -s '$(srcdir)/nsca-ng.cfg' \
+	  '$(DESTDIR)$(sysconfdir)/nsca-ng.cfg'; then \
+	    rm -f '$(DESTDIR)$(sysconfdir)/nsca-ng.cfg'; \
 	else \
-	    echo 'Preserving the installed nsca-ng.conf file.'; \
+	    echo 'Preserving the installed nsca-ng.cfg file.'; \
 	fi

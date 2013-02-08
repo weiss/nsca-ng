@@ -56,11 +56,11 @@ m4_define([NSCA_CHECK],
 
   dnl Optionally create configuration files.
   m4_ifval([$6],
-    [AT_CAPTURE_FILE([client.conf])
-     AT_DATA([client.conf], [m4_n([$6])])])
+    [AT_CAPTURE_FILE([client.cfg])
+     AT_DATA([client.cfg], [m4_n([$6])])])
   m4_ifval([$7],
-    [AT_CAPTURE_FILE([server.conf])
-     AT_DATA([server.conf], [m4_n([$7])])])
+    [AT_CAPTURE_FILE([server.cfg])
+     AT_DATA([server.cfg], [m4_n([$7])])])
 
   dnl We append a newline to STDOUT/STDERR, unless a literal was specified.
   m4_set_add_all([nsca_at_literals], [ignore], [ignore-nolog], [stdout],

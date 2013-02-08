@@ -23,16 +23,16 @@
 .\" ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 .\" POSSIBILITY OF SUCH DAMAGE.
 .
-.TH send_nsca.conf 5 "@date@" "Version @version@" "The NSCA\-ng Manual"
+.TH send_nsca.cfg 5 "@date@" "Version @version@" "The NSCA\-ng Manual"
 .
 .SH NAME
 .
-.B send_nsca.conf
+.B send_nsca.cfg
 \- NSCA\-ng client configuration file
 .
 .SH SYNOPSIS
 .
-.B @sysconfdir@/send_nsca.conf
+.B @sysconfdir@/send_nsca.cfg
 .
 .SH DESCRIPTION
 .
@@ -41,7 +41,7 @@ The
 process reads configuration data from the file specified with
 .B \-c
 on the command line or from
-.IR @sysconfdir@/send_nsca.conf .
+.IR @sysconfdir@/send_nsca.cfg .
 .
 .SS File Format
 .
@@ -168,7 +168,7 @@ will be offered.
 .SH EXAMPLES
 .
 The
-.B @sysconfdir@/send_nsca.conf
+.B @sysconfdir@/send_nsca.cfg
 file might look similar to the following example.
 .
 .PP
@@ -192,14 +192,14 @@ timeout = 10
 .
 Please set the permissions appropriately to make sure that only
 authorized users can access the
-.B @sysconfdir@/send_nsca.conf
+.B @sysconfdir@/send_nsca.cfg
 file.
 .
 .SH "SEE ALSO"
 .
 .BR send_nsca (8),
 .BR nsca\-ng (8),
-.BR nsca\-ng.conf (5),
+.BR nsca\-ng.cfg (5),
 .
 .PP
 .I http://www.nagios.org/developerinfo/externalcommands/

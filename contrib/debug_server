@@ -13,7 +13,7 @@
 set -e
 set -u
 
-default_config_file='/etc/send_nsca.conf'
+default_config_file='/etc/send_nsca.cfg'
 default_port='5668'
 
 die()

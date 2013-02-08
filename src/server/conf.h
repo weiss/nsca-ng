@@ -36,7 +36,7 @@
 
 # include "system.h"
 
-# define DEFAULT_CONF_FILE SYSCONFDIR "/nsca-ng.conf"
+# define DEFAULT_CONF_FILE SYSCONFDIR "/nsca-ng.cfg"
 # define DEFAULT_PORT "5668"
 
 cfg_t *conf_parse(const char *);

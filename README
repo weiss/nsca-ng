@@ -106,8 +106,8 @@ instructions.
 Configuration
 -------------
 
-The NSCA-ng client is configured using the send_nsca.conf(5) file, the
-NSCA-ng server uses the nsca-ng.conf(5) file.  Examples of these files are
+The NSCA-ng client is configured using the send_nsca.cfg(5) file, the
+NSCA-ng server uses the nsca-ng.cfg(5) file.  Examples of these files are
 installed if they don't already exist.
 
 	IMPORTANT:  Please set the permissions of the configuration
@@ -130,7 +130,7 @@ Detailed information regarding the build and installation process can be
 found in the file `INSTALL'.
 
 The NSCA-ng usage and configuration is documented in the nsca-ng(8),
-send_nsca(8), nsca-ng.conf(5), and send_nsca.conf(5) manual pages.  The
+send_nsca(8), nsca-ng.cfg(5), and send_nsca.cfg(5) manual pages.  The
 commands `nsca-ng -h' and `send_nsca -h' spit out short summaries of the
 available command line options.
 

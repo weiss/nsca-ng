@@ -23,16 +23,16 @@
 .\" ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 .\" POSSIBILITY OF SUCH DAMAGE.
 .
-.TH nsca\-ng.conf 5 "@date@" "Version @version@" "The NSCA\-ng Manual"
+.TH nsca\-ng.cfg 5 "@date@" "Version @version@" "The NSCA\-ng Manual"
 .
 .SH NAME
 .
-.B nsca\-ng.conf
+.B nsca\-ng.cfg
 \- NSCA\-ng server configuration file
 .
 .SH SYNOPSIS
 .
-.B @sysconfdir@/nsca\-ng.conf
+.B @sysconfdir@/nsca\-ng.cfg
 .
 .SH DESCRIPTION
 .
@@ -41,7 +41,7 @@ The
 process reads configuration data from the file specified with
 .B \-c
 on the command line or from
-.IR @sysconfdir@/nsca\-ng.conf .
+.IR @sysconfdir@/nsca\-ng.cfg .
 .
 .SS File Format
 .
@@ -341,7 +341,7 @@ a given command.
 .SH EXAMPLES
 .
 The
-.B @sysconfdir@/nsca\-ng.conf
+.B @sysconfdir@/nsca\-ng.cfg
 file might look similar to the following example.
 .
 .PP
@@ -412,14 +412,14 @@ authorize "*" {
 .
 Please set the permissions appropriately to make sure that only
 authorized users can access the
-.B @sysconfdir@/nsca\-ng.conf
+.B @sysconfdir@/nsca\-ng.cfg
 file.
 .
 .SH "SEE ALSO"
 .
 .BR nsca\-ng (8),
 .BR send_nsca (8),
-.BR send_nsca.conf (5),
+.BR send_nsca.cfg (5),
 .BR regex (7)
 .
 .PP

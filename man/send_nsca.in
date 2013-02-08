@@ -117,7 +117,7 @@ provided command by
 Read the configuration from the specified
 .I file
 instead of using the default configuration file
-.IR @sysconfdir@/send_nsca.conf .
+.IR @sysconfdir@/send_nsca.cfg .
 .
 .TP
 .BI \-D\  delay
@@ -134,7 +134,7 @@ to connect to the server immediately.
 If this option is specified, the
 .B delay
 setting in the
-.BR send_nsca.conf (5)
+.BR send_nsca.cfg (5)
 file is ignored.
 .
 .TP
@@ -175,7 +175,7 @@ attempts to communicate with \(lqlocalhost\(rq.
 This option takes precedence over the
 .B server
 setting in the
-.BR send_nsca.conf (5)
+.BR send_nsca.cfg (5)
 file.
 .
 .TP
@@ -202,7 +202,7 @@ This option is provided for compatibility with
 If it's specified, the
 .B timeout
 setting in the
-.BR send_nsca.conf (5)
+.BR send_nsca.cfg (5)
 file is ignored.
 .
 .TP
@@ -216,7 +216,7 @@ number instead of using the default
 This option takes precedence over the
 .B port
 setting in the
-.BR send_nsca.conf (5)
+.BR send_nsca.cfg (5)
 file.
 .
 .TP
@@ -265,17 +265,17 @@ utility exits 0 on success, and >0 if an error occurs.
 .SH FILES
 .
 .TP
-.I @sysconfdir@/send_nsca.conf
+.I @sysconfdir@/send_nsca.cfg
 .
 The
-.BR send_nsca.conf (5)
+.BR send_nsca.cfg (5)
 configuration file.
 .
 .SH "SEE ALSO"
 .
-.BR send_nsca.conf (5),
+.BR send_nsca.cfg (5),
 .BR nsca\-ng (8),
-.BR nsca\-ng.conf (5)
+.BR nsca\-ng.cfg (5)
 .
 .PP
 .I http://www.nagios.org/developerinfo/externalcommands/

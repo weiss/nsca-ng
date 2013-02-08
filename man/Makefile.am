@@ -32,10 +32,10 @@ edit = sed \
   -e 's|[@]date[@]|$(RELEASE_DATE)|g'
 
 man8_MANS = nsca-ng.man send_nsca.man
-man5_MANS = nsca-ng.conf.man send_nsca.conf.man
+man5_MANS = nsca-ng.cfg.man send_nsca.cfg.man
 
-PDF_FILES = nsca-ng.pdf nsca-ng.conf.pdf send_nsca.pdf send_nsca.conf.pdf
-EXTRA_DIST = nsca-ng.in send_nsca.in nsca-ng.conf.in send_nsca.conf.in
+PDF_FILES = nsca-ng.pdf nsca-ng.cfg.pdf send_nsca.pdf send_nsca.cfg.pdf
+EXTRA_DIST = nsca-ng.in send_nsca.in nsca-ng.cfg.in send_nsca.cfg.in
 CLEANFILES = $(man8_MANS) $(man5_MANS) $(PDF_FILES)
 
 .in.man:

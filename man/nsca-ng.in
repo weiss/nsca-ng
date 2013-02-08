@@ -89,7 +89,7 @@ appended in order to override the default port (5668) used by
 If this option is specified, the
 .B listen
 setting in the
-.BR nsca\-ng.conf (5)
+.BR nsca\-ng.cfg (5)
 file is ignored.
 .
 .TP
@@ -107,7 +107,7 @@ submits commands into
 This option takes precedence over the
 .B command_file
 setting in the
-.BR nsca\-ng.conf (5)
+.BR nsca\-ng.cfg (5)
 file.
 .
 .TP
@@ -116,7 +116,7 @@ file.
 Read the configuration from the specified
 .I file
 instead of using the default configuration file
-.IR @sysconfdir@/nsca\-ng.conf .
+.IR @sysconfdir@/nsca\-ng.cfg .
 .
 .TP
 .B \-F
@@ -150,7 +150,7 @@ is 3.
 If this option is specified, the
 .B log_level
 setting in the
-.BR nsca\-ng.conf (5)
+.BR nsca\-ng.cfg (5)
 file is ignored.
 .
 .TP
@@ -172,7 +172,7 @@ is written.
 This option takes precedence over the
 .B pid_file
 setting in the
-.BR nsca\-ng.conf (5)
+.BR nsca\-ng.cfg (5)
 file.
 .
 .TP
@@ -200,17 +200,17 @@ Print version information to the standard output and exit.
 .SH FILES
 .
 .TP
-.I @sysconfdir@/nsca\-ng.conf
+.I @sysconfdir@/nsca\-ng.cfg
 .
 The
-.BR nsca\-ng.conf (5)
+.BR nsca\-ng.cfg (5)
 configuration file.
 .
 .SH "SEE ALSO"
 .
-.BR nsca\-ng.conf (5),
+.BR nsca\-ng.cfg (5),
 .BR send_nsca (8),
-.BR send_nsca.conf (5)
+.BR send_nsca.cfg (5)
 .
 .PP
 .I http://www.nagios.org/developerinfo/externalcommands/

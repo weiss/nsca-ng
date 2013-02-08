@@ -34,7 +34,7 @@
 
 # include "system.h"
 
-# define DEFAULT_CONF_FILE SYSCONFDIR "/send_nsca.conf"
+# define DEFAULT_CONF_FILE SYSCONFDIR "/send_nsca.cfg"
 
 typedef struct conf_s conf;
 

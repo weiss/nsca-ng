@@ -3,7 +3,7 @@ NSCA-ng's `contrib' Directory
 
 This directory contains a collection of scripts that may be useful.  All
 scripts except for `nsca-ng.init' allow for specifying the path to the
-send_nsca.conf(5) file via `-c <path>'.  Other send_nsca(8) options can be
+send_nsca.cfg(5) file via `-c <path>'.  Other send_nsca(8) options can be
 specified by setting the environment variable SEND_NSCA_ARGS.  All scripts
 print usage information when called with the `-h' option.
 
@@ -22,7 +22,7 @@ print usage information when called with the `-h' option.
 	standard output.  Requires s_client(1) from OpenSSL 1.0.0 or newer,
 	and xxd(1).  Example invocation:
 
-	$ debug_server -c /etc/send_nsca.conf
+	$ debug_server -c /etc/send_nsca.cfg
 
 * disable_notifications
 

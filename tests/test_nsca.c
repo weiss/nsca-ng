@@ -36,8 +36,8 @@
 #define LISTEN_PORT "12345" /* Don't interfere with a poduction server. */
 #define COMMAND_FILE "fifo"
 #define SERVER_PID_FILE "server.pid"
-#define CLIENT_CONF_FILE "client.conf"
-#define SERVER_CONF_FILE "server.conf"
+#define CLIENT_CONF_FILE "client.cfg"
+#define SERVER_CONF_FILE "server.cfg"
 #define TIMEOUT 10
 
 #define DEFAULT_CLIENT_CONF "# Created by " PROGRAM_NAME "\n"   \
