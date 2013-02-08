@@ -1,0 +1,287 @@
+.\" Copyright (c) 2013 Holger Weiss <holger@weiss.in-berlin.de>
+.\" All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions are met:
+.\"
+.\" 1. Redistributions of source code must retain the above copyright notice,
+.\"    this list of conditions and the following disclaimer.
+.\"
+.\" 2. Redistributions in binary form must reproduce the above copyright notice,
+.\"    this list of conditions and the following disclaimer in the documentation
+.\"    and/or other materials provided with the distribution.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+.\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+.\" CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+.\" SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+.\" INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+.\" CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+.\" ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+.\" POSSIBILITY OF SUCH DAMAGE.
+.
+.TH send_nsca 8 "@date@" "Version @version@" "The NSCA\-ng Manual"
+.
+.SH NAME
+.
+.B send_nsca
+\- send monitoring commands to NSCA\-ng server
+.
+.SH SYNOPSIS
+.
+.B send_nsca
+.RB [ \-CSstv ]
+.RB [ \-c
+.IR file ]
+.RB [ \-D
+.IR delay ]
+.RB [ \-d
+.IR delimiter ]
+.RB [ \-H
+.IR server ]
+.RB [ \-o
+.IR timeout ]
+.RB [ \-p
+.IR port ]
+.
+.PP
+.B send_nsca
+.BR \-h " | " \-V
+.
+.SH DESCRIPTION
+.
+The
+.B send_nsca
+utility transmits one or more check results or monitoring commands to an
+.BR nsca\-ng (8)
+server.
+The communication with the server is
+.SM TLS
+encrypted and authenticated using pre-shared keys (as per
+.SM RFC
+4279).
+By default,
+.B send_nsca
+reads host or service check results from the standard input.
+Multiple check results must be separated with an
+.SM ASCII ETB
+character (octal value: 27).
+Service check results are expected to be in the following format:
+.
+.PP
+.IR 	host [tab] service [tab] status [tab] message [newline]
+.
+.PP
+where
+.I host
+and
+.I service
+are the host name and service description as configured in Nagios,
+.I status
+is the numeric return code, and
+.I message
+is the output string.
+Host check results are expected to be in the same format, just without
+the
+.I service
+description:
+.
+.PP
+.IR 	host [tab] status [tab] message [newline]
+.
+.PP
+Note that multiline
+.IR message s
+are supported.
+.
+.SH OPTIONS
+.
+.TP
+.B \-C
+.
+Instead of accepting host or service check results in the format
+described above, read \(lqraw\(rq monitoring commands for submission to
+the Nagios command file from the standard input, one command per line.
+The commands are expected to be in the format described in the Nagios
+documentation; except that the leading bracketed timestamp may be
+omitted, in which case the current timestamp is prepended to the
+provided command by
+.BR send_nsca .
+.
+.TP
+.BI \-c\  file
+.
+Read the configuration from the specified
+.I file
+instead of using the default configuration file
+.IR @sysconfdir@/send_nsca.conf .
+.
+.TP
+.BI \-D\  delay
+.
+Wait for a random number of seconds between 0 and the specified
+.I delay
+before contacting the server.
+This might be useful to reduce the server load if many
+.B send_nsca
+clients are invoked simultaneously.
+The default setting is 0, which tells
+.B send_nsca
+to connect to the server immediately.
+If this option is specified, the
+.B delay
+setting in the
+.BR send_nsca.conf (5)
+file is ignored.
+.
+.TP
+.BI \-d\  delimiter
+.
+Use the specified
+.I delimiter
+(which must be a single
+.SM ASCII
+character) to separate the fields when parsing host or service check
+results.
+The
+.I delimiter
+must be a single character.
+Any
+.SM ASCII
+character other than a backslash, newline,
+.SM ETB,
+or
+.SM NUL
+is allowed.
+The default
+.I delimiter
+is a horizontal tab.
+This option is ignored if the
+.B \-C
+option is specified.
+.
+.TP
+.BI \-H\  server
+.
+Connect and talk to the specified
+.I server
+address or host name.
+By default,
+.B send_nsca
+attempts to communicate with \(lqlocalhost\(rq.
+This option takes precedence over the
+.B server
+setting in the
+.BR send_nsca.conf (5)
+file.
+.
+.TP
+.B \-h
+.
+Print usage information to the standard output and exit.
+.
+.TP
+.BI \-o\  timeout
+.
+Close the connection if the server didn't respond for the specified
+number of seconds.
+If the
+.I timeout
+is set to 0,
+.B send_nsca
+won't enforce connection timeouts.
+The default
+.I timeout
+is 15 seconds.
+This option is provided for compatibility with
+.SM NSCA
+2.x.
+If it's specified, the
+.B timeout
+setting in the
+.BR send_nsca.conf (5)
+file is ignored.
+.
+.TP
+.BI \-p\  port
+.
+Connect to the specified service name or
+.I port
+number instead of using the default
+.I port
+(5668).
+This option takes precedence over the
+.B port
+setting in the
+.BR send_nsca.conf (5)
+file.
+.
+.TP
+.B \-S
+.
+Write all messages to the standard error output.
+This is the default behaviour.
+.
+.TP
+.B \-s
+.
+Send all messages to the system logger.
+This option may be combined with the
+.B \-S
+option.
+.
+.TP
+.B \-t
+.
+This option is ignored.
+It is accepted for compatibility with
+.SM NSCA
+2.x.
+.
+.TP
+.B \-V
+.
+Print version information to the standard output and exit.
+.
+.TP
+.B \-v
+.
+Generate a message for each check result or monitoring command sent to
+the
+.BR nsca\-ng (8)
+server.
+This option can be specified up to three times in order to increase the
+verbosity.
+.
+.SH "EXIT STATUS"
+.
+The
+.B send_nsca
+utility exits 0 on success, and >0 if an error occurs.
+.
+.SH FILES
+.
+.TP
+.I @sysconfdir@/send_nsca.conf
+.
+The
+.BR send_nsca.conf (5)
+configuration file.
+.
+.SH "SEE ALSO"
+.
+.BR send_nsca.conf (5),
+.BR nsca\-ng (8),
+.BR nsca\-ng.conf (5)
+.
+.PP
+.I http://www.nagios.org/developerinfo/externalcommands/
+.
+.SH AUTHOR
+.
+Holger Weiss <holger@weiss.in-berlin.de>
+.
+.\" vim:set filetype=nroff textwidth=72:

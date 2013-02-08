@@ -1,0 +1,222 @@
+.\" Copyright (c) 2013 Holger Weiss <holger@weiss.in-berlin.de>
+.\" All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions are met:
+.\"
+.\" 1. Redistributions of source code must retain the above copyright notice,
+.\"    this list of conditions and the following disclaimer.
+.\"
+.\" 2. Redistributions in binary form must reproduce the above copyright notice,
+.\"    this list of conditions and the following disclaimer in the documentation
+.\"    and/or other materials provided with the distribution.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+.\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+.\" CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+.\" SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+.\" INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+.\" CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+.\" ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+.\" POSSIBILITY OF SUCH DAMAGE.
+.
+.TH nsca\-ng 8 "@date@" "Version @version@" "The NSCA\-ng Manual"
+.
+.SH NAME
+.
+.B nsca\-ng
+\- monitoring command acceptor
+.
+.SH SYNOPSIS
+.
+.B nsca\-ng
+.RB [ \-FSs ]
+.RB [ \-b
+.IR listen ]
+.RB [ \-C
+.IR file ]
+.RB [ \-c
+.IR file ]
+.RB [ \-l
+.IR level ]
+.RB [ \-P
+.IR file ]
+.
+.PP
+.B nsca\-ng
+.BR \-h " | " \-V
+.
+.SH DESCRIPTION
+.
+The
+.B nsca\-ng
+server makes the Nagios command file accessible from remote systems.
+This allows for submitting passive check results, downtimes, and many
+other commands to Nagios (or compatible monitoring solutions).
+The communication with clients is
+.SM TLS
+encrypted and authenticated using pre-shared keys (as per
+.SM RFC
+4279).
+The
+.B nsca\-ng
+server supports per-client passwords and fine-grained authorization
+control.
+.
+.PP
+The server process rereads its configuration file when it receives a
+hangup signal
+.SM (SIGHUP)
+by executing itself with the name and arguments it was started with.
+.
+.SH OPTIONS
+.
+.TP
+.BI \-b\  listen
+.
+Bind to the specified
+.I listen
+address or host name.
+The default setting is \(lq*\(rq, which tells
+.B nsca\-ng
+to listen on all available interfaces.
+A colon (\(lq:\(rq) followed by a service name or port number may be
+appended in order to override the default port (5668) used by
+.BR nsca\-ng .
+If this option is specified, the
+.B listen
+setting in the
+.BR nsca\-ng.conf (5)
+file is ignored.
+.
+.TP
+.BI \-C\  file
+.
+Submit monitoring commands into the specified
+.IR file .
+This should be the named pipe
+.SM (FIFO)
+that Nagios checks for external commands to process.
+By default,
+.B nsca\-ng
+submits commands into
+.IR @localstatedir@/nagios/rw/nagios.cmd .
+This option takes precedence over the
+.B command_file
+setting in the
+.BR nsca\-ng.conf (5)
+file.
+.
+.TP
+.BI \-c\  file
+.
+Read the configuration from the specified
+.I file
+instead of using the default configuration file
+.IR @sysconfdir@/nsca\-ng.conf .
+.
+.TP
+.B \-F
+.
+Don't detach from the controlling terminal, and write all messages to
+the standard error output (unless the
+.BR \-s
+option is specified).
+.
+.TP
+.B \-h
+.
+Print usage information to the standard output and exit.
+.
+.TP
+.BI \-l\  level
+.
+Use the specified log
+.IR level ,
+which must be an integer value between 0 and 5 inclusive.
+A value of 0 tells
+.B nsca\-ng
+to generate only fatal error messages, 1 adds non-fatal error messages,
+2 adds warnings (regarding issues such as connection timeouts), 3
+additionally spits out every submitted monitoring command (plus startup
+and shutdown notices), 4 also logs each message sent or received at the
+protocol level, and 5 generates additional debug output.
+The default log
+.I level
+is 3.
+If this option is specified, the
+.B log_level
+setting in the
+.BR nsca\-ng.conf (5)
+file is ignored.
+.
+.TP
+.BI \-P\  file
+.
+During startup, try to create and lock the specified
+.I file
+and write the process
+.SM ID
+of the
+.B nsca\-ng
+daemon into it.
+Bail out if another process holds a lock on the
+.IR file .
+By default, no such
+.SM PID
+.I file
+is written.
+This option takes precedence over the
+.B pid_file
+setting in the
+.BR nsca\-ng.conf (5)
+file.
+.
+.TP
+.B \-S
+.
+Write all messages to the standard error output and (with the exception
+of startup messages) to the system logger.
+This option may only be specified together with the
+.B \-F
+option.
+.
+.TP
+.B \-s
+.
+Send all messages to the system logger, except for startup messages.
+This is the default behaviour (unless the
+.B \-F
+option is specified).
+.
+.TP
+.B \-V
+.
+Print version information to the standard output and exit.
+.
+.SH FILES
+.
+.TP
+.I @sysconfdir@/nsca\-ng.conf
+.
+The
+.BR nsca\-ng.conf (5)
+configuration file.
+.
+.SH "SEE ALSO"
+.
+.BR nsca\-ng.conf (5),
+.BR send_nsca (8),
+.BR send_nsca.conf (5)
+.
+.PP
+.I http://www.nagios.org/developerinfo/externalcommands/
+.
+.SH AUTHOR
+.
+Holger Weiss <holger@weiss.in-berlin.de>
+.
+.\" vim:set filetype=nroff textwidth=72:

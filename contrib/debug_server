@@ -1,0 +1,77 @@
+#!/bin/sh
+#
+# Copyright (c) 2013 Holger Weiss <holger@weiss.in-berlin.de>
+#
+# This file is free software; Holger Weiss gives unlimited permission to copy
+# and/or distribute it, with or without modifications, as long as this notice is
+# preserved.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY, to the extent permitted by law; without even the implied
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+set -e
+set -u
+
+default_config_file='/etc/send_nsca.conf'
+default_port='5668'
+
+die()
+{
+	echo >&2 "$@"
+	exit 1
+}
+
+usage()
+{
+	die "Usage: $0 [-c <config-file>] [-H <server>] [-p <port>]"
+}
+
+xxd </dev/null >/dev/null 2>&1 || die "$0: xxd(1) is required"
+
+while getopts c:H:hp: option
+do
+	case $option in
+	c)
+		config_file=$OPTARG
+		;;
+	H)
+		opt_server=$OPTARG
+		;;
+	h|\?)
+		usage
+		;;
+	p)
+		opt_port=$OPTARG
+		;;
+	esac
+done
+
+shift `expr $OPTIND - 1`
+test $# -eq 0 || usage
+
+config_file=${config_file:-$default_config_file}
+
+if [ -r "$config_file" ]
+then
+	eval `sed 's/[[:space:]]*=[[:space:]]*/=/' "$config_file"`
+else
+	echo >&2 "Cannot read $config_file (continuing anyway)"
+fi
+
+server=${server:-'localhost'}
+server=${opt_server:-$server}
+port=${port:-$default_port}
+port=${opt_port:-$port}
+identity=${identity:-`hostname -s`}
+password=${password:-'change-me'}
+ciphers=${tls_ciphers:-'PSK-AES256-CBC-SHA:PSK-AES128-CBC-SHA:PSK-3DES-EDE-CBC-SHA:PSK-RC4-SHA'}
+
+exec openssl s_client                                           \
+    -crlf                                                       \
+    -cipher "$ciphers"                                          \
+    -psk_identity "$identity"                                   \
+    -psk `printf '%s' "$password" | xxd -p | tr -d '\n'`        \
+    -connect "$server:$port"
+
+# vim:set joinspaces noexpandtab textwidth=80

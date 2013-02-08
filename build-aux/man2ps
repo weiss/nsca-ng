@@ -1,0 +1,87 @@
+#!/bin/sh
+#
+# Create PDF versions of the manpages in the ./man directory.
+#
+set -e
+set -u
+
+heirloom_settings='.\\" Heirloom Settings\
+.\
+.do xflag 3\
+.\
+.lc_ctype en_US.UTF-8\
+.\
+.fp 1 R utrg____ pfb\
+.fp 2 I uti_____ pfb\
+.fp 3 B utb_____ pfb\
+.fp 4 BI utbi____ pfb\
+.\
+.fp 101 ER uerg____ pfb\
+.fp 102 EI uei_____ pfb\
+.fp 103 EB ueb_____ pfb\
+.fp 104 EBI uebi____ pfb\
+.\
+.fp 5 CW l047013t pfa\
+.fzoom CW .92\
+.\
+.fallback R ER\
+.hidechar R 0123456789\
+.flig R ff \\(ff ffi \\(Fi ffl \\(Fl\
+.\
+.fallback I EI\
+.hidechar I 0123456789\
+.flig I ff \\(ff ffi \\(Fi ffl \\(Fl\
+.\
+.fallback B EB\
+.hidechar B 0123456789\
+.flig B ff \\(ff ffi \\(Fi ffl \\(Fl\
+.\
+.fallback BI EBI\
+.hidechar BI 0123456789\
+.flig BI ff \\(ff ffi \\(Fi ffl \\(Fl\
+.\
+.padj\
+.minss 9\
+.letadj 95 98 18 105 102\
+.\
+'
+
+if [ $# -ne 2 ]
+then
+	echo >&2 "Usage: $0 <man_file> <ps_file>"
+	exit 2
+fi
+
+man_file=$1
+ps_file=$2
+tmp_file='man.tmp'
+
+if [ ! -r "$HOME/.fonts/type1/uerg____.pfb" ]
+then
+	groff -Tps -fN -man "$man_file" >"$ps_file"
+else	# We're probably on Holger's box.
+	PATH="$HOME/opt/heirloom/bin:$PATH"
+	TROFFONTS="$HOME/.fonts/type1"
+	export PATH TROFFONTS
+
+	#
+	# We could use Heirloom troff(1)'s "-mg" (which enables GNU groff(1) extensions)
+	# instead of replacing "\(lq" and "\(rq" with the corresponding UTF-8
+	# characters.  (We could then also remove the "lc_ctype" setting above.)
+	# However, we'd like to make sure our manpages work without GNU groff(1)
+	# extensions (other than "\(lq" and "\(rq").
+	#
+	left_quote=`perl -CO -e 'print chr 0x201c'`
+	right_quote=`perl -CO -e 'print chr 0x201d'`
+
+	sed                                     \
+	    -e "s,\\\(lq,$left_quote,g"         \
+	    -e "s,\\\(rq,$right_quote,g"        \
+	    -e "s,^\.TH.*,$heirloom_settings&," \
+	    "$man_file" >"$tmp_file"
+
+	troff -msafe -man "$tmp_file" | dpost >"$ps_file"
+	rm -f "$tmp_file"
+fi
+
+# vim:set joinspaces noexpandtab textwidth=80

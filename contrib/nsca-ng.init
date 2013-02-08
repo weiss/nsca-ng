@@ -1,0 +1,91 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:          nsca-ng
+# Required-Start:    $local_fs $network $remote_fs $syslog
+# Required-Stop:     $local_fs $network $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Receive monitoring commands
+# Description:       The NSCA-ng server makes the Nagios command file accessible
+#                    from remote systems.
+### END INIT INFO
+
+PATH='/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin'
+export PATH
+
+name='NSCA-ng'
+pid_file="$HOME/.nsca-ng.pid"
+
+get_pid()
+{
+	pid=`cat "$pid_file" 2>/dev/null`
+
+	if expr "X$pid" : 'X[0-9]\{1,\}$' >/dev/null && kill -0 $pid 2>/dev/null
+	then
+		echo "$pid"
+	else
+		rm -f "$pid_file" # In case it was left over.
+		echo 0
+	fi
+}
+
+pid=`get_pid`
+
+case $1 in
+start)
+	if [ $pid -eq 0 ]
+	then
+		printf 'Starting %s daemon ... ' "$name"
+		nsca-ng -P "$pid_file" && echo 'done.' || echo 'failed.'
+	else
+		echo "$name daemon is already running"
+	fi
+	;;
+stop)
+	if [ $pid -ne 0 ]
+	then
+		printf 'Stopping %s daemon ... ' "$name"
+		kill $pid 2>/dev/null && echo 'done.' || echo 'failed.'
+	else
+		echo "$name daemon is already stopped."
+	fi
+	;;
+restart)
+	"$0" stop && sleep 1 && "$0" start
+	;;
+try-restart)
+	if [ $pid -ne 0 ]
+	then
+		"$0" restart
+	else
+		echo "$name daemon doesn't appear to be running."
+	fi
+	;;
+reload|force-reload)
+	if [ $pid -ne 0 ]
+	then
+		printf 'Reloading %s daemon ... ' "$name"
+		kill -1 $pid 2>/dev/null && echo 'done.' || echo 'failed.'
+	else
+		echo "$name daemon is already stopped."
+	fi
+	;;
+status)
+	if [ $pid -ne 0 ]
+	then
+		echo "$name daemon appears to be running."
+	else
+		echo "$name daemon does NOT appear to be running."
+		exit 3
+	fi
+	;;
+*)
+	echo >&2 "Usage: $0 {start|stop|restart|try-restart|reload|status}"
+	exit 2
+	;;
+esac
+
+exit 0
+
+# vim:set joinspaces noexpandtab textwidth=80

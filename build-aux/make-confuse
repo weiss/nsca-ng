@@ -1,0 +1,65 @@
+#!/bin/sh
+
+set -e
+set -u
+
+myself=`echo "$0" | sed 's,.*/,,'`
+
+say()
+{
+	echo "$myself: $@."
+}
+
+die()
+{
+	echo >&2 "$myself: $@."
+	exit 1
+}
+
+if [ $# -eq 1 ]
+then
+	version=$1
+else
+	version=2.7
+fi
+
+if [ ! -f lib/system.h ]
+then
+	if [ -f ../lib/system.h ]
+	then
+		cd ..
+	else
+		die 'Please call me from the NSCA-ng source directory'
+	fi
+fi
+
+install_dir=`pwd`/lib/confuse
+tarball="confuse-$version.tar.gz"
+
+if [ ! -f "$tarball" ]
+then
+	if type curl >/dev/null 2>&1
+	then
+		get="curl -L -o $tarball"
+	elif type wget >/dev/null 2>&1
+	then
+		get=wget
+	else
+		say 'Cannot find an HTTP client'
+		die "Please download '$tarball' into `pwd`"
+	fi
+
+	$get "http://download.savannah.gnu.org/releases/confuse/$tarball"
+	test -f "$tarball" || die "Downloading '$tarball' failed"
+fi
+
+gzip -c -d "$tarball" | tar xf -
+cd `expr "$tarball" : '\(.*\)\.tar\.gz$'`
+
+./configure --prefix="$install_dir" --enable-static --disable-shared
+make
+make install
+
+say 'Success'
+
+# vim:set joinspaces noexpandtab textwidth=80

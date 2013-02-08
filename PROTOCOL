@@ -1,0 +1,223 @@
+The NSCA-ng Protocol, Version 1
+===============================
+
+	Holger Weiss <holger@weiss.in-berlin.de>
+	February 2013
+
+This is an informal description of the NSCA-ng Protocol, Version 1, used for
+transmitting `monitoring commands' from NSCA-ng clients to NSCA-ng servers.
+
+The keywords `MUST', `MUST NOT', `REQUIRED', `SHALL', `SHALL NOT', `SHOULD',
+`SHOULD NOT', `RECOMMENDED', `MAY', and `OPTIONAL' in this document are to be
+interpreted as described in RFC 2119.
+
+Connection Initiation
+---------------------
+
+The NSCA-ng server listens on TCP port 5668.  As soon as an NSCA-ng client
+connects, a TLS handshake is initiated in order to establish a secure
+connection.  NSCA-ng implementations MUST support version 1.0 of the TLS
+protocol as per RFC 2246.  Also, the TLS pre-shared key cipher suite
+TLS_PSK_WITH_AES_256_CBC_SHA as defined in RFC 4279 MUST be offered by
+clients and accepted by servers.  However, implementations MAY attempt to
+negotiate newer versions of the TLS protocol and/or other TLS cipher suites
+during the TLS handshake.  When the TLS connection is established
+successfully, the client can initiate the first NSCA-ng request.  All
+NSCA-ng data MUST be transmitted as TLS `application data'.
+
+NSCA-ng Session
+---------------
+
+Let's begin with an example where the client successfully transmits the
+ENABLE_NOTIFICATIONS command to the server (`C:' and `S:' indicate lines
+sent by the client and server, respectively):
+
+	C: MOIN 1 Zm9vYmFy
+	S: MOIN 1
+	C: PUSH 34
+	S: OKAY
+	C: [1358980254] ENABLE_NOTIFICATIONS
+	S: OKAY
+	C: QUIT
+	S: OKAY
+
+An NSCA-ng session is a sequence of one or more request-response pairs and
+zero or more `monitoring command' submissions.  Requests and responses are
+CRLF-terminated lines (though implementations SHOULD also accept
+LF-terminated lines).  The length of such a line MUST NOT exceed 1024
+octets, including the CRLF-termination.
+
+Requests can only be issued by clients.  A request consists of a
+case-insensitive four-character keyword followed by zero or more arguments.
+Keywords and arguments consist of printable US-ASCII characters, and are
+each separated by a single space character.
+
+Responses are emitted by servers and consist of a four-character keyword,
+which MUST be sent in all uppercase letters.
+
+The first request issued by the client (after establishing the TLS session)
+MUST be a MOIN, PING, or BAIL request.  If the first request is a MOIN
+request, the last request issued by the client MUST be a QUIT or BAIL
+request.
+
+The remaining part of this document describes the possible client requests
+and server responses.  `Monitoring command' submissions are described in the
+context of the PUSH request.
+
+MOIN Request
+------------
+
+    Synopsis:   MOIN <version> <session-id>
+    Example:    MOIN 1 Zm9vYmFy
+
+The client issues a MOIN request in order to negotiate the protocol
+<version> and to specify a <session-id>.
+
+The protocol <version> is a positive decimal number, currently always 1.
+
+The <session-id> is an arbitrary string consisting of 2--64 printable
+US-ASCII characters.  Clients SHOULD strive for uniqueness when generating
+the <session-id>, though it's currently not referenced anywhere else in the
+NSCA-ng protocol.  Implementations might mention the <session-id> when
+logging connection data.
+
+If a MOIN request is sent, it MUST be the first request of an NSCA-ng
+session; except that the MOIN request MAY be retried with different
+parameters after the server replied to a MOIN request with a FAIL response.
+
+On success, the server replies with a MOIN response.
+
+See also: <http://en.wikipedia.org/wiki/Moin>
+
+PING Request
+------------
+
+    Synopsis:   PING <version>
+    Example:    PING 1
+
+The protocol <version> is a positive decimal number, currently always 1.
+
+If a PING request is sent, it MUST be the first request of a NSCA-ng
+session; except that the PING request MAY be retried with different
+parameters after the server replied to a PING request with a FAIL response.
+
+On success, the server replies with a PONG response.  The TLS connection is
+then shut down (cleanly) by both sides.
+
+PUSH Request
+------------
+
+    Synopsis:   PUSH <size>
+    Example:    PUSH 42
+
+The client issues a PUSH request in order to initiate a `monitoring command'
+submission.  The `monitoring command' is expected to be in the format
+described in the Nagios documentation.  The trailing newline character MUST
+be included.
+
+The <size> parameter specifies the number of octets of the `monitoring
+command', including the trailing newline character.
+
+On success, the server replies with an OKAY response.  The client then
+transmits the `monitoring command'.  On success, the server replies with
+another OKAY response.
+
+The client MUST NOT submit multiple `monitoring commands' via a single PUSH
+request.  The client MAY issue multiple PUSH requests per NSCA-ng session,
+though.
+
+NOOP Request
+------------
+
+    Synopsis:   NOOP
+    Example:    NOOP
+
+A NOOP request has no effect, with the exception that any connection timeout
+timers on the server SHOULD be reset.
+
+On success, the server replies with an OKAY response.
+
+QUIT Request
+------------
+
+    Synopsis:   QUIT
+    Example:    QUIT
+
+The client issues a QUIT request in order to close the NSCA-ng session.
+
+On success, the server replies with an OKAY response.  The TLS connection is
+then shut down (cleanly) by both sides.
+
+BAIL Request
+------------
+
+    Synopsis:   BAIL <message> ...
+    Example:    BAIL I'm feeling bad
+
+The client may transmit a BAIL request for any reason at any time.  An
+arbitrary, human-readable <message> MUST be specified.
+
+The TLS connection is then shut down immediately and unconditionally (but
+cleanly) by both sides.
+
+MOIN Response
+-------------
+
+    Synopsis:   MOIN <version>
+    Example:    MOIN 1
+
+The server accepts a MOIN request by sending a MOIN response.  If the server
+doesn't support the protocol <version> suggested in the client's MOIN
+request, the server MUST either specify a supported protocol <version> in
+the MOIN response or generate a BAIL response.  In the former case, the
+client MUST either accept the protocol <version> suggested in the server's
+MOIN response or generate a BAIL request.
+
+The protocol <version> is a positive decimal number, currently always 1.
+
+PONG Response
+-------------
+
+    Synopsis:   PONG <version>
+    Example:    PONG 1
+
+The server replies to a PING request with a PONG response.
+
+The protocol <version> is a positive decimal number, currently always 1.
+
+The TLS connection is then shut down (cleanly) by both sides.
+
+OKAY Response
+-------------
+
+    Synopsis:   OKAY
+    Example:    OKAY
+
+The server acknowledges the current client request or `monitoring command'
+submission by sending an OKAY response.
+
+FAIL Response
+-------------
+
+    Synopsis:   FAIL <message> ...
+    Example:    FAIL You're not authorized to submit this command
+
+The server sends a FAIL response to reject the current client request or
+`monitoring command' submission.  An arbitrary, human-readable <message>
+MUST be specified.
+
+The client then sends a new request.
+
+BAIL Response
+-------------
+
+    Synopsis:   BAIL <message> ...
+    Example:    BAIL I'm feeling horrible
+
+The server may transmit a BAIL response for any reason at any time.  An
+arbitrary, human-readable <message> MUST be specified.
+
+The TLS connection is then shut down immediately and unconditionally (but
+cleanly) by both sides.
+
+# vim:set textwidth=76 joinspaces:

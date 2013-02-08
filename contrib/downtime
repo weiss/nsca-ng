@@ -1,0 +1,83 @@
+#!/bin/sh
+#
+# Copyright (c) 2013 Holger Weiss <holger@weiss.in-berlin.de>
+#
+# This file is free software; Holger Weiss gives unlimited permission to copy
+# and/or distribute it, with or without modifications, as long as this notice is
+# preserved.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY, to the extent permitted by law; without even the implied
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+# Note that this script uses non-standard date(1) extensions which aren't
+# available on all systems.  GNU date(1) provides them:
+#
+# 	http://www.gnu.org/software/coreutils/
+
+set -e
+set -u
+
+send_nsca_args=${SEND_NSCA_ARGS:+$SEND_NSCA_ARGS}
+
+die()
+{
+	echo >&2 "$@"
+	exit 1
+}
+
+usage()
+{
+	die "Usage: $0 [-C <comment>] [-c <config-file>] [-H <host>] [-S <service>]"
+}
+
+date -d 'now' '+%s' 2>&1 | grep '^[[:digit:]]*$' >/dev/null \
+    || die "$0: GNU date(1) or BSD date(1) is required"
+
+while getopts C:c:e:H:hS:s: option
+do
+	case $option in
+	C)
+		comment=$OPTARG
+		;;
+	c)
+		send_nsca_args="${send_nsca_args:+$send_nsca_args }-c $OPTARG"
+		;;
+	e)
+		end=$OPTARG
+		;;
+	H)
+		host=$OPTARG
+		;;
+	S)
+		service=$OPTARG
+		;;
+	s)
+		start=$OPTARG
+		;;
+	h|\?)
+		usage
+		;;
+	esac
+done
+
+shift `expr $OPTIND - 1`
+test $# -eq 0 || usage
+
+host=${host:-`hostname -s`}
+service=${service:+$service}
+start=`date -d ${start:-'now'}`
+end=`date -d ${end:-'+2 hours'}`
+author=`getent passwd "$USER" | cut -d: -f5`
+comment=${comment:-"Submitted by send_nsca@`hostname -s`"}
+
+if [ -z "$service" ]
+then	# Host check.
+	printf '%b' "SCHEDULE_HOST_DOWNTIME;$host;$start;$end;1;0;0;$author;$comment\n" \
+	    | send_nsca -C $send_nsca_args
+else	# Service check.
+	printf '%b' "SCHEDULE_SVC_DOWNTIME;$host;$service;$start;$end;1;0;0;$author;$comment\n" \
+	    | send_nsca -C $send_nsca_args
+fi
+
+# vim:set joinspaces noexpandtab textwidth=80

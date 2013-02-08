@@ -1,0 +1,46 @@
+#!/bin/sh
+#
+# Copyright (c) 2013 Holger Weiss <holger@weiss.in-berlin.de>
+#
+# This file is free software; Holger Weiss gives unlimited permission to copy
+# and/or distribute it, with or without modifications, as long as this notice is
+# preserved.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY, to the extent permitted by law; without even the implied
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+set -e
+set -u
+
+send_nsca_args=${SEND_NSCA_ARGS:+$SEND_NSCA_ARGS}
+
+die()
+{
+	echo >&2 "$@"
+	exit 1
+}
+
+usage()
+{
+	die "Usage: $0 [-c <config-file>]"
+}
+
+while getopts c:h option
+do
+	case $option in
+	c)
+		send_nsca_args="${send_nsca_args:+$send_nsca_args }-c $OPTARG"
+		;;
+	h|\?)
+		usage
+		;;
+	esac
+done
+
+shift `expr $OPTIND - 1`
+test $# -eq 0 || usage
+
+printf '%b' 'ENABLE_NOTIFICATIONS\n' | send_nsca -C $send_nsca_args
+
+# vim:set joinspaces noexpandtab textwidth=80

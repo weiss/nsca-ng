@@ -1,0 +1,211 @@
+.\" Copyright (c) 2013 Holger Weiss <holger@weiss.in-berlin.de>
+.\" All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions are met:
+.\"
+.\" 1. Redistributions of source code must retain the above copyright notice,
+.\"    this list of conditions and the following disclaimer.
+.\"
+.\" 2. Redistributions in binary form must reproduce the above copyright notice,
+.\"    this list of conditions and the following disclaimer in the documentation
+.\"    and/or other materials provided with the distribution.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+.\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+.\" CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+.\" SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+.\" INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+.\" CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+.\" ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+.\" POSSIBILITY OF SUCH DAMAGE.
+.
+.TH send_nsca.conf 5 "@date@" "Version @version@" "The NSCA\-ng Manual"
+.
+.SH NAME
+.
+.B send_nsca.conf
+\- NSCA\-ng client configuration file
+.
+.SH SYNOPSIS
+.
+.B @sysconfdir@/send_nsca.conf
+.
+.SH DESCRIPTION
+.
+The
+.BR send_nsca (8)
+process reads configuration data from the file specified with
+.B \-c
+on the command line or from
+.IR @sysconfdir@/send_nsca.conf .
+.
+.SS File Format
+.
+Configuration settings are defined by specifying a variable name
+followed by an equals sign (\(lq=\(rq) and a value, one setting per
+line.
+Values can be strings or integers.
+Strings have to be enclosed in single or double quotes if they contain
+whitespace characters, hash mark characters, or literal quotation marks.
+Otherwise, quoting is optional.
+To specify a literal single or double quote in a string, either escape
+it by preceding it with a backslash (\(lq\\\(rq) or quote the string
+using the other quote character.
+A literal backslash must be preceded with a second backslash.
+.
+.PP
+Any whitespace surrounding tokens is ignored.
+Empty lines and comments are also ignored.
+Comments are introduced with a hash mark character (\(lq#\(rq) and span
+to the end of the line.
+If the last character of a line is a backslash (\(lq\(rs\(rq), the
+subsequent line is treated as a continuation of the current line (and
+the backslash is otherwise ignored).
+.
+.SS Settings
+.
+The
+.BR send_nsca (8)
+client recognizes the following variables.
+They may appear in arbitrary order.
+The type of each value is denoted after an equals sign in angle
+brackets.
+.
+.TP
+\fBdelay\fP\ =\ <\fIinteger\fP>
+.
+Wait for a random number of seconds between 0 and the specified delay
+before contacting the server.
+This might be useful to reduce the server load if many
+.BR send_nsca (8)
+clients are invoked simultaneously.
+The default setting is 0, which tells
+.BR send_nsca (8)
+to connect to the server immediately.
+The specified value will be ignored if
+.BR send_nsca (8)
+is called with the
+.B \-D
+option.
+.
+.TP
+\fBencryption_method\fP\ =\ <\fIstring\fP>
+.
+This setting is ignored.
+It is accepted for compatibility with
+.SM NSCA
+2.x.
+.
+.TP
+\fBidentity\fP\ =\ <\fIstring\fP>
+.
+Send the specified client identity to the server.
+The client identity is used for authentication and authorization.
+The same identity may be provided by multiple clients.
+By default, the local host name will be used.
+.
+.TP
+\fBpassword\fP\ =\ <\fIstring\fP>
+.
+Use the specified passphrase for authentication and encryption.
+The default password is \(lqchange-me\(rq.
+Change it!
+.
+.TP
+\fBport\fP\ =\ <\fIstring\fP>
+.
+Connect to the specified service name or port number on the server
+instead of using the default port (5668).
+The specified value will be ignored if
+.BR send_nsca (8)
+is called with the
+.B \-p
+option.
+.
+.TP
+\fBserver\fP\ =\ <\fIstring\fP>
+.
+Connect and talk to the specified server address or host name.
+The default server is \(lqlocalhost\(rq.
+The specified value will be ignored if
+.BR send_nsca (8)
+is called with the
+.B \-H
+option.
+.
+.TP
+\fBtimeout\fP\ =\ <\fIinteger\fP>
+.
+Close the connection if the server didn't respond for the specified
+number of seconds.
+If the timeout is set to 0,
+.BR send_nsca (8)
+won't enforce connection timeouts.
+The default timeout is 15 seconds.
+The specified value will be ignored if
+.BR send_nsca (8)
+is called with the
+.B \-o
+option.
+.
+.TP
+\fBtls_ciphers\fP\ =\ <\fIstring\fP>
+.
+Limit the cipher suites offered during the
+.SM TLS
+negotiation to the specified list of ciphers.
+The format of the string is described in the
+.BR ciphers (1)
+manual.
+By default, the ciphers in the list
+.SM \f(CWPSK-RC4-SHA:PSK-AES256-CBC-SHA:PSK-AES128-CBC-SHA:PSK-3DES-EDE-CBC-SHA\fP
+will be offered.
+.
+.SH EXAMPLES
+.
+The
+.B @sysconfdir@/send_nsca.conf
+file might look similar to the following example.
+.
+.PP
+.RS
+.nf
+.ft CW
+.
+identity = "web-checker"
+password = "djMKCIcurJJLSQGT5qIhCfqCHQLTcvp9"
+server = "monitoring.example.com"
+tls_ciphers = "PSK-AES256-CBC-SHA"
+delay = 2
+port = 5668
+timeout = 10
+.
+.ft P
+.fi
+.RE
+.
+.SH CAVEATS
+.
+Please set the permissions appropriately to make sure that only
+authorized users can access the
+.B @sysconfdir@/send_nsca.conf
+file.
+.
+.SH "SEE ALSO"
+.
+.BR send_nsca (8),
+.BR nsca\-ng (8),
+.BR nsca\-ng.conf (5),
+.
+.PP
+.I http://www.nagios.org/developerinfo/externalcommands/
+.
+.SH AUTHOR
+.
+Holger Weiss <holger@weiss.in-berlin.de>
+.
+.\" vim:set filetype=nroff textwidth=72:

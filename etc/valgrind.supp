@@ -1,0 +1,53 @@
+# CRYPTO_malloc is a malloc(3)-like function.
+{
+   CRYPTO_malloc
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+}
+
+# Ignore an SSL_accept issue.
+{
+   SSL_accept
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   fun:sock_write
+   fun:BIO_write
+   fun:buffer_ctrl
+   fun:ssl3_accept
+   fun:ssl23_get_client_hello
+   fun:ssl23_accept
+   fun:accept_ssl_cb
+   fun:ev_invoke_pending
+   fun:ev_run
+   fun:main
+}
+
+# Ignore an SSL_write issue.
+{
+   SSL_write
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   fun:sock_write
+   fun:BIO_write
+   fun:ssl3_write_pending
+   fun:ssl3_write_bytes
+   fun:write_cb
+   fun:ev_invoke_pending
+   fun:ev_run
+   fun:main
+}
+
+# We base64-encode random data.  See:
+#
+# https://groups.google.com/group/comp.unix.programmer/msg/d62a0baba3c78b02
+{
+   RAND_pseudo_bytes
+   Memcheck:Value8
+   fun:EVP_EncodeBlock
+   fun:b64_write
+   fun:BIO_write
+   fun:main
+}

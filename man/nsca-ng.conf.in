@@ -1,0 +1,432 @@
+.\" Copyright (c) 2013 Holger Weiss <holger@weiss.in-berlin.de>
+.\" All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions are met:
+.\"
+.\" 1. Redistributions of source code must retain the above copyright notice,
+.\"    this list of conditions and the following disclaimer.
+.\"
+.\" 2. Redistributions in binary form must reproduce the above copyright notice,
+.\"    this list of conditions and the following disclaimer in the documentation
+.\"    and/or other materials provided with the distribution.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+.\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+.\" CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+.\" SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+.\" INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+.\" CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+.\" ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+.\" POSSIBILITY OF SUCH DAMAGE.
+.
+.TH nsca\-ng.conf 5 "@date@" "Version @version@" "The NSCA\-ng Manual"
+.
+.SH NAME
+.
+.B nsca\-ng.conf
+\- NSCA\-ng server configuration file
+.
+.SH SYNOPSIS
+.
+.B @sysconfdir@/nsca\-ng.conf
+.
+.SH DESCRIPTION
+.
+The
+.BR nsca\-ng (8)
+process reads configuration data from the file specified with
+.B \-c
+on the command line or from
+.IR @sysconfdir@/nsca\-ng.conf .
+.
+.SS File Format
+.
+Zero or more global settings and one or more authorizations must be
+defined in the configuration file (see the
+.B Global Settings
+subsection and the
+.B Authorizations
+subsection, respectively).
+They may appear in arbitrary order.
+Authorizations are specified using the
+.B authorize
+keyword followed by a (possibly quoted) client
+.SM ID
+and a brace-enclosed block of authorization settings.
+.
+.PP
+Global settings and authorization settings are defined by specifying a
+variable name followed by an equals sign (\(lq=\(rq) and a value (or
+possibly a list of values).
+Values can be strings, integers, or floating-point numbers.
+Strings have to be enclosed in single or double quotes if they contain
+whitespace characters, hash mark characters, or literal quotation marks.
+Otherwise, quoting is optional.
+To specify a literal single or double quote in a string, either escape
+it by preceding it with a backslash (\(lq\\\(rq) or quote the string
+using the other quote character.
+A literal backslash must be preceded with a second backslash if the
+string is enclosed in double quotes.
+.
+.PP
+A variable can be set to the value of an environment variable by
+specifying
+.BI ${ FOO },
+where
+.I FOO
+is the name of the environment variable.
+The same can be done by specifying
+.BI ${ FOO :\- bar },
+except that in this case, the value
+.I bar
+will be assigned when the environment variable
+.I FOO
+is not set.
+.
+.PP
+Any whitespace surrounding tokens is ignored.
+Empty lines and comments are also ignored.
+Comments are introduced with a hash mark character (\(lq#\(rq) and span
+to the end of the line.
+If the last character of a line is a backslash (\(lq\(rs\(rq), the
+subsequent line is treated as a continuation of the current line (and
+the backslash is otherwise ignored).
+.
+.PP
+The special directive
+.BI include(\(dq file \(dq)
+tells
+.BR nsca\-ng (8)
+to treat the contents of the specified
+.I file
+as if those contents had appeared at the point where this directive
+appears.
+.
+.PP
+In the following subsections, the type of each value is denoted after an
+equals sign in angle brackets.
+.
+.SS Global Settings
+.
+The
+.BR nsca\-ng (8)
+server recognizes the following global variables.
+.
+.TP
+\fBcommand_file\fP\ =\ <\fIstring\fP>
+.
+Submit monitoring commands to the specified path name.
+This should be the named pipe
+.SM (FIFO)
+that Nagios (or a compatible monitoring solution) checks for external
+commands to process.
+The default is
+.IR @localstatedir@/nagios/rw/nagios.cmd .
+The specified value will be overridden if
+.BR nsca\-ng (8)
+is called with the
+.B \-C
+option.
+.
+.TP
+\fBlisten\fP\ =\ <\fIstring\fP>
+.
+Bind to the specified
+.SM IP
+address or host name.
+The default setting is \(lq*\(rq, which tells
+.BR nsca\-ng (8)
+to listen on all available interfaces.
+A colon (\(lq:\(rq) followed by a service name or port number may be
+appended to override the default port (5668) used by the
+.BR nsca\-ng (8)
+server.
+The specified value will be ignored if
+.BR nsca\-ng (8)
+is called with the
+.B \-b
+option.
+.
+.TP
+\fBlog_level\fP\ =\ <\fIinteger\fP>
+.
+Use the specified log level, which must be an integer value between 0
+and 5 inclusive.
+A value of 0 tells
+.BR nsca\-ng (8)
+to generate only fatal error messages, 1 adds non-fatal error messages,
+2 adds warnings (regarding issues such as connection timeouts), 3
+additionally spits out every submitted command (plus startup and
+shutdown notices), 4 also logs each message sent or received at the
+protocol level, and 5 generates additional debug output.
+The default log level is 3.
+The specified value will be overridden if
+.BR nsca\-ng (8)
+is called with the
+.B \-l
+option.
+.
+.TP
+\fBmax_command_size\fP\ =\ <\fIinteger\fP>
+.
+Refuse monitoring commands (including check result submissions) which
+are longer than the specified number of bytes.
+Setting this variable to 0 tells
+.BR nsca\-ng (8)
+to accept commands of arbitrary length.
+The default value is 16384.
+.
+.TP
+\fBmax_queue_size\fP\ =\ <\fIinteger\fP>
+.
+Don't queue more than the specified number of megabytes worth of
+monitoring commands while Nagios isn't running (or not reading the
+command file).
+When the amount of available data exceeds this threshold, the queued
+data is thrown away.
+If this variable is set to 0,
+.BR nsca\-ng (8)
+queues an unlimited amount of data (until it exits due to running out of
+memory).
+The default value is 1024 (i.e., 1 gigabyte).
+.
+.TP
+\fBpid_file\fP\ =\ <\fIstring\fP>
+.
+During startup, try to create and lock the specified file and write the
+process
+.SM ID
+of the
+.BR nsca\-ng (8)
+daemon into it.
+Bail out if another process holds a lock on that file.
+By default, no such
+.SM PID
+file is written.
+The specified value will be overridden if
+.BR nsca\-ng (8)
+is called with the
+.B \-p
+option.
+.
+.TP
+\fBtemp_directory\fP\ =\ <\fIstring\fP>
+.
+Write temporary files to the specified directory.
+Temporary files are only written if clients submit very large commands
+(which cannot be written to the named pipe atomically).
+It is recommended to specify a directory which resides on a memory file
+system.
+By default,
+.I /tmp
+is used.
+.
+.TP
+\fBtimeout\fP\ =\ <\fIfloating\-point\fP>
+.
+Close the connection if a client didn't show any activity for the
+specified number of seconds.
+If this value is set to 0.0,
+.BR nsca\-ng (8)
+won't enforce connection timeouts.
+The default setting is 60.0 seconds.
+.
+.TP
+\fBtls_ciphers\fP\ =\ <\fIstring\fP>
+.
+Limit the acceptable
+.SM TLS-PSK
+cipher suites to the specified list of ciphers.
+The format of the string is described in the
+.BR ciphers (1)
+manual.
+By default, the ciphers in the list
+.SM \f(CWPSK-RC4-SHA:PSK-AES256-CBC-SHA:PSK-AES128-CBC-SHA:PSK-3DES-EDE-CBC-SHA\fP
+will be accepted.
+.
+.TP
+\fBuser\fP\ =\ <\fIstring\fP>
+.
+Switch to the specified user, and to the groups the user belongs to.
+This is done early on startup\^\(em\^after the configuration file has
+been read, but before the listening socket and (possibly) the
+.SM PID
+file are created.
+By default,
+.BR nsca\-ng (8)
+runs with the privileges of the invoking user.
+.
+.SS Authorizations
+.
+As mentioned above, an authorization section is introduced with the
+.B authorize
+keyword and a client
+.SM ID
+field followed by a brace-delimited block of one or more authorization
+settings.
+A client provides its
+.SM ID
+during the connection handshake.
+The server uses the provided
+.SM ID
+for looking up the
+.B authorize
+section applicable to the client.
+The corresponding section, if any, defines the authentication and
+authorization settings for the client in question.
+If no section explicitly defined for this client
+.SM ID
+is found, but a section for the special client
+.SM ID
+\(dq*\(dq (including the quotes) is defined, this section is used as a
+fallback.
+Note that no other wildcard characters are available, and that the
+\(lq*\(rq character has no special meaning in the client
+.SM ID
+field except when specified exactly as described.
+.
+.PP
+Within the brace-delimited block of an authorization section, values may
+be assigned to the variables listed below.
+The pattern strings assigned to the
+.B commands
+and
+.B services
+variables are
+.SM POSIX
+\(lqextended\(rq regular expressions, but with an implicit \(lq^\(rq at
+the beginning and \(lq$\(rq at the end of the patterns.
+Multiple patterns can be specified as a brace-enclosed, comma-separated
+list; check results and commands will then be accepted if they match any
+of the specified patterns.
+Commands and check results will be rejected unless these settings
+authorize the client to submit them.
+.
+.TP
+\fBcommands\fP\ =\ <\fI(list of) string(s)\fP>
+.
+Match the specified regular expression(s) against submitted monitoring
+commands and accept commands that match any of these expressions.
+The patterns are matched against the full command string supplied by the
+client,
+.I except
+for the leading bracketed timestamp and any whitespace following that
+timestamp.
+.
+.TP
+\fBpassword\fP\ =\ <\fIstring\fP>
+.
+Reject connections from clients that don't use the specified password.
+.
+.TP
+\fBservices\fP\ =\ <\fI(list of) string(s)\fP>
+.
+Match the specified regular expression(s) against the \(lqservice
+description\(rq field of client-supplied
+.SM PROCESS_SERVICE_CHECK_RESULT
+commands and accept such commands if they match any of these
+expressions.
+If a specified string includes one or more at signs (\(lq@\(rq),
+only the part preceding the last of these at signs is matched against
+the \(lqservice description\(rq field.
+The part following this at sign is used as a separate pattern which is
+matched against the \(lqhost name\(rq field of the same command.
+A service check result is then accepted only if both matches succeed for
+a given command.
+.
+.SH EXAMPLES
+.
+The
+.B @sysconfdir@/nsca\-ng.conf
+file might look similar to the following example.
+.
+.PP
+.RS
+.nf
+.ft CW
+.
+command_file = "/usr/local/nagios/var/rw/nagios.cmd"
+listen = "monitoring.example.com:5668"
+pid_file = "/usr/local/nagios/var/run/nsca-ng.pid"
+temp_directory = "/dev/shm"
+tls_ciphers = "PSK-AES256-CBC-SHA"
+user = "nagios"
+log_level = 3
+max_command_size = 65536
+max_queue_size = 128
+timeout = 15.0
+
+#
+# Authenticated "root" clients may submit arbitrary
+# check results and any other monitoring commands (see
+# <http://nagios.org/developerinfo/externalcommands/>).
+#
+authorize "root" {
+    password = "g3m25sMCUAO4NecZGld1H4xcJ9uDWvhH"
+    commands = ".*"
+}
+
+#
+# Authenticated "checker" clients may submit check
+# results for arbitrary services on arbitrary hosts, but
+# no other commands.
+#
+authorize "checker" {
+    password = "ilzNanlE9XjMLdjrMkXnk09XBCTFQrj5"
+    services = ".*"
+}
+
+#
+# Authenticated "web-checker" clients may submit check
+# results for arbitrary services on hosts whose names
+# begin with "www".
+#
+authorize "web-checker" {
+    password = "m2uaIWwiq3AIqN55m3QdjwptkU1Q4Oov"
+    services = ".+@www.*"
+}
+
+#
+# Other authenticated clients may submit check results
+# for the "disk", "swap", and "load" services on
+# arbitrary hosts.
+#
+authorize "*" {
+    password = "awHW5vxr3DcA9EvcUC9T3a90QfEexsWd"
+    services = {
+        "disk",
+        "swap",
+        "load"
+    }
+}
+.
+.ft P
+.fi
+.RE
+.
+.SH CAVEATS
+.
+Please set the permissions appropriately to make sure that only
+authorized users can access the
+.B @sysconfdir@/nsca\-ng.conf
+file.
+.
+.SH "SEE ALSO"
+.
+.BR nsca\-ng (8),
+.BR send_nsca (8),
+.BR send_nsca.conf (5),
+.BR regex (7)
+.
+.PP
+.I http://www.nagios.org/developerinfo/externalcommands/
+.
+.SH AUTHOR
+.
+Holger Weiss <holger@weiss.in-berlin.de>
+.
+.\" vim:set filetype=nroff textwidth=72:

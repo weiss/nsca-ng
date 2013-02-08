@@ -1,0 +1,74 @@
+#!/bin/sh
+
+set -e
+set -u
+
+myself=`echo "$0" | sed 's,.*/,,'`
+
+say()
+{
+	echo "$myself: $@."
+}
+
+die()
+{
+	echo >&2 "$myself: $@."
+	exit 1
+}
+
+found_browser=no
+
+if [ ! -f lib/system.h ]
+then
+	if [ -f ../lib/system.h ]
+	then
+		cd ..
+	else
+		die 'Please call me from the NSCA-ng source directory'
+	fi
+fi
+
+for browser in 'lynx -width=1024' 'elinks' 'links'
+do
+	if type `expr "$browser" : '\([^ ]*\)'` >/dev/null 2>&1 &&
+	    $browser -dump 'http://nagios-plugins.org/' >/dev/null 2>&1
+	then
+		found_browser=yes
+		break
+	fi
+done
+
+test "$found_browser" = yes ||
+    die 'Cannot find a usable text web browser, please install lynx(1)'
+
+install_dir=`pwd`/lib/ssl
+tarball=`$browser -dump 'http://www.openssl.org/source/' |
+    awk '$NF == "[LATEST]" {sub("\\\[.*\\\]", "", $6); print $6}'`
+
+if [ ! -f "$tarball" ]
+then
+	if type curl >/dev/null 2>&1
+	then
+		get="curl -L -o $tarball"
+	elif type wget >/dev/null 2>&1
+	then
+		get=wget
+	else
+		say 'Cannot find an HTTP client'
+		die "Please download '$tarball' into `pwd`"
+	fi
+
+	$get "http://www.openssl.org/source/$tarball"
+	test -f "$tarball" || die "Downloading '$tarball' failed"
+fi
+
+gzip -c -d "$tarball" | tar xf -
+cd `expr "$tarball" : '\(.*\)\.tar\.gz$'`
+
+./config --prefix="$install_dir" no-shared no-threads
+make
+make install
+
+say 'Success'
+
+# vim:set joinspaces noexpandtab textwidth=80

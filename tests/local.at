@@ -1,0 +1,75 @@
+# Copyright (c) 2013 Holger Weiss <holger@weiss.in-berlin.de>
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# 1. Redistributions of source code must retain the above copyright notice, this
+#    list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+# Initialize Autotest.
+AT_INIT
+
+# Enable colored test output.
+AT_COLOR_TESTS
+
+# Log the `--version' of our programs.
+AT_TESTED([test_nsca])
+
+# NSCA_CHECK([INPUT], [STDOUT], [STDERR], [CLIENT-FLAGS], [SERVER-FLAGS],
+#            [CLIENT-CONF], [SERVER-CONF], [STATUS = 0], [COMMANDS = 1])
+# -----------------------------------------------------------------------
+# Transmit the given INPUT to the nsca-ng(8) server using send_nsca(8).  If the
+# INPUT consists of multiple monitoring commands, the number of COMMANDS must be
+# specified.  The data written to the FIFO by the server is then checked against
+# STDOUT, send_nsca(8)'s standard error output is checked against STDERR, and
+# the exit status is checked against STATUS.  Non-default CLIENT-CONF and/or
+# SERVER-CONF contents may be specified.  See also the AT_CHECK documentation.
+m4_define([NSCA_CHECK],
+[
+  dnl Put together the command line.
+  m4_define([nsca_cmd_line], [<input])
+  m4_ifval([$4], [m4_append([nsca_cmd_line], [NSCA_CLIENT_FLAGS="$4"], [ ])])
+  m4_ifval([$5], [m4_append([nsca_cmd_line], [NSCA_SERVER_FLAGS="$5"], [ ])])
+  m4_append([nsca_cmd_line], [test_nsca], [ ])
+  m4_ifval([$9], [m4_append([nsca_cmd_line], [-l $9], [ ])])
+
+  dnl Optionally prepare the input file.
+  m4_ifval([$1],
+    [AT_CAPTURE_FILE([input])
+     AT_DATA([input], [m4_n([$1])])])
+
+  dnl Optionally create configuration files.
+  m4_ifval([$6],
+    [AT_CAPTURE_FILE([client.conf])
+     AT_DATA([client.conf], [m4_n([$6])])])
+  m4_ifval([$7],
+    [AT_CAPTURE_FILE([server.conf])
+     AT_DATA([server.conf], [m4_n([$7])])])
+
+  dnl We append a newline to STDOUT/STDERR, unless a literal was specified.
+  m4_set_add_all([nsca_at_literals], [ignore], [ignore-nolog], [stdout],
+    [stderr], [stdout-nolog], [stderr-nolog], [expout], [experr])
+
+  dnl Run the check.
+  AT_CHECK([nsca_cmd_line], [$8],
+    [m4_set_contains([nsca_at_literals], [$2], [$2], [m4_n([$2])])],
+    [m4_set_contains([nsca_at_literals], [$3], [$3], [m4_n([$3])])])
+])
+
+dnl vim:set joinspaces textwidth=80 filetype=m4:
