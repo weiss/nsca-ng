@@ -163,7 +163,7 @@ service_to_command(const char *service_pattern)
 	service_part = pattern;
 
 	xasprintf(&command_pattern,
-	    "PROCESS_SERVICE_CHECK_RESULT;%s;%s;[0-3];.+",
+	    "PROCESS_SERVICE_CHECK_RESULT;%s;%s;.+;.+",
 	    host_part, service_part);
 
 	free(pattern);
