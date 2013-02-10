@@ -118,7 +118,7 @@ nsca_version(void)
 	(void)snprintf(version_string, sizeof(version_string),
 	    "%s %s (%s, libev %d.%d with %s)",
 	    getprogname(),
-	    PACKAGE_VERSION,
+	    NSCA_VERSION,
 	    get_openssl_version(),
 	    ev_version_major(),
 	    ev_version_minor(),
