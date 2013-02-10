@@ -62,7 +62,7 @@ concat(const char *str1, const char *str2)
 	catenated = xmalloc(size);
 	(void)memcpy(catenated, str1, len1);
 	(void)memcpy(catenated + len1, str2, len2);
-	catenated[len1 + len2] = 0;
+	catenated[len1 + len2] = '\0';
 
 	return catenated;
 }
