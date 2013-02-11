@@ -228,7 +228,7 @@ This is the default behaviour.
 .TP
 .B \-s
 .
-Send all messages to the system logger.
+Send all messages (except for usage errors) to the system logger.
 This option may be combined with the
 .B \-S
 option.
