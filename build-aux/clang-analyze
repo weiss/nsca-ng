@@ -17,7 +17,14 @@ die()
 }
 
 general_args='--analyze'
-include_args='-I. -Ilib -Ilib/ev -Isrc/common'
+include_args='
+    -I.
+    -Ilib
+    -Ilib/ev
+    -Ilib/pidfile
+    -Isrc/common
+    -I/usr/local/include
+    -I/usr/pkg/include'
 definition_args='
     -DHAVE_CONFIG_H
     -DNSCA_VERSION=PACKAGE_VERSION
