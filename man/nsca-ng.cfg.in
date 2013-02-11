@@ -54,9 +54,8 @@ subsection, respectively).
 They may appear in arbitrary order.
 Authorizations are specified using the
 .B authorize
-keyword followed by a (possibly quoted) client
-.SM ID
-and a brace-enclosed block of authorization settings.
+keyword followed by a (possibly quoted) client identity string and a
+brace-enclosed block of corresponding authorization settings.
 .
 .PP
 Global settings and authorization settings are defined by specifying a
@@ -264,30 +263,20 @@ runs with the privileges of the invoking user.
 .
 As mentioned above, an authorization section is introduced with the
 .B authorize
-keyword and a client
-.SM ID
-field followed by a brace-delimited block of one or more authorization
-settings.
-A client provides its
-.SM ID
-during the connection handshake.
-The server uses the provided
-.SM ID
-for looking up the
+keyword and a client identity field followed by a brace-delimited block
+of one or more authorization settings.
+A client provides its identity during the connection handshake.
+The server uses the provided identity string for looking up the
 .B authorize
 section applicable to the client.
 The corresponding section, if any, defines the authentication and
 authorization settings for the client in question.
-If no section explicitly defined for this client
-.SM ID
-is found, but a section for the special client
-.SM ID
-\(dq*\(dq (including the quotes) is defined, this section is used as a
-fallback.
+If no section explicitly defined for this client identity is found, but
+a section for the special client identity \(dq*\(dq (including the
+quotes) is defined, this section is used as a fallback.
 Note that no other wildcard characters are available, and that the
-\(lq*\(rq character has no special meaning in the client
-.SM ID
-field except when specified exactly as described.
+\(lq*\(rq character has no special meaning in the client identity field
+except when specified exactly as described.
 .
 .PP
 Within the brace-delimited block of an authorization section, values may
