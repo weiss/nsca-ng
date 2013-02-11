@@ -18,7 +18,11 @@ die()
 
 general_args='--analyze'
 include_args='-I. -Ilib -Ilib/ev -Isrc/common'
-definition_args='-DHAVE_CONFIG_H -DSYSCONFDIR="/foo" -DLOCALSTATEDIR="/bar"'
+definition_args='
+    -DHAVE_CONFIG_H
+    -DNSCA_VERSION=PACKAGE_VERSION
+    -DSYSCONFDIR="/foo"
+    -DLOCALSTATEDIR="/bar"'
 
 test -f 'lib/system.h' \
     || die 'Please call me from the NSCA-ng source directory'
