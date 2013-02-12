@@ -251,8 +251,8 @@ will be accepted.
 \fBuser\fP\ =\ <\fIstring\fP>
 .
 Switch to the specified user, and to the groups the user belongs to.
-This is done early on startup\^\(em\^after the configuration file has
-been read, but before the listening socket and (possibly) the
+This is done early on startup: after the configuration file has been
+read, but before the listening socket and (possibly) the
 .SM PID
 file are created.
 By default,
