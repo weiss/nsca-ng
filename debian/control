@@ -1,0 +1,29 @@
+Source: nsca-ng
+Section: net
+Priority: extra
+Maintainer: Holger Weiss <holger@weiss.in-berlin.de>
+Build-Depends: debhelper (>= 8), autoconf, automake, git, curl, lynx-cur
+Standards-Version: 3.9.4
+
+Package: nsca-ng-client
+Architecture: any
+Section: net
+Depends: ${shlibs:Depends}
+Conflicts: nsca (<< 2.9.1-1), nsca-client
+Description: Send monitoring commands to NSCA-ng server
+ The send_nsca utility transmits one or more check results or monitoring
+ commands to an NSCA-ng server.  The communication with the server is TLS
+ encrypted and authenticated using pre-shared keys.
+
+Package: nsca-ng-server
+Architecture: any
+Section: net
+Depends: ${shlibs:Depends}
+Recommends: nagios3 | icinga
+Description: Monitoring command acceptor
+ The NSCA-ng server makes the Nagios command file accessible from remote
+ systems.  This allows for submitting passive check results, downtimes, and many
+ other commands to Nagios or Icinga.  The communication with clients is TLS
+ encrypted and authenticated using pre-shared keys (as per RFC 4279).  The
+ NSCA-ng server supports per-client passwords and fine-grained authorization
+ control.

@@ -1,0 +1,18 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+	./build-aux/make-confuse
+	./build-aux/make-openssl
+	./autogen.sh
+	./configure \
+	  --enable-server \
+	  --prefix=/usr \
+	  --sysconfdir=/etc \
+	  --localstatedir=/var
+
+override_dh_fixperms:
+	dh_fixperms
+	chmod 0600 debian/nsca-ng-server/etc/nsca-ng.cfg

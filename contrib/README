@@ -1,11 +1,11 @@
-NSCA-ng's `contrib' Directory
-=============================
+NSCA-ng Examples
+================
 
 This directory contains a collection of scripts that may be useful.  All
-scripts except for `nsca-ng.init' allow for specifying the path to the
-send_nsca.cfg(5) file via `-c <path>'.  Other send_nsca(8) options can be
-specified by setting the environment variable SEND_NSCA_ARGS.  All scripts
-print usage information when called with the `-h' option.
+scripts allow for specifying the path to the send_nsca.cfg(5) file via `-c
+<path>'.  Other send_nsca(8) options can be specified by setting the
+environment variable SEND_NSCA_ARGS.  All scripts print usage information
+when called with the `-h' option.
 
 * acknowledge
 
@@ -56,12 +56,5 @@ print usage information when called with the `-h' option.
 	send_nsca(8).  Example invocation:
 
 	$ invoke_check check_disk -w 20% -c 10%
-
-* nsca-ng.init
-
-	Starts, stops, restarts, or reloads the nsca-ng(8) server running on
-	the local system.  Example invocation:
-
-	$ nsca-ng.init start
 
 # vim:set textwidth=76 joinspaces:

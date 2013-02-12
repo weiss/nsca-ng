@@ -1,0 +1,89 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:          nsca-ng
+# Required-Start:    $remote_fs $network $syslog
+# Required-Stop:     $remote_fs $network $syslog
+# Should-Start:      $named nagios3 icinga
+# Should-Stop:       $named nagios3 icinga
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Accept monitoring commands
+# Description:       The NSCA-ng server makes the Nagios command file accessible
+#                    from remote systems.  This allows for submitting passive
+#                    check results, downtimes, and many other commands to Nagios
+#                    or Icinga.
+### END INIT INFO
+
+PATH='/sbin:/usr/sbin:/bin:/usr/bin'
+NAME='nsca-ng'
+DESC='monitoring command acceptor'
+DAEMON="/usr/sbin/$NAME"
+PIDDIR="/var/run/$NAME"
+PIDFILE="$PIDDIR/$NAME.pid"
+
+# Exit if the package is not installed.
+[ -x "$DAEMON" ] || exit 0
+
+# Read configuration variable file if it is present.
+[ -r "/etc/default/$NAME" ] && . "/etc/default/$NAME"
+
+# Define LSB log_* functions.
+. '/lib/lsb/init-functions'
+
+# Look up the name of the user running the NSCA-ng server.
+: ${CFGFILE:='/etc/nsca-ng.cfg'}
+if [ -r "$CFGFILE" ]
+then
+	: ${DAEMONUSER:="$(sed -r -n "s/^[[:blank:]]*user[[:blank:]]*=[[:blank:]]*[\"']?([^\"'#[:blank:]]+).*/\1/p" "$CFGFILE")"}
+fi
+: ${DAEMONUSER:='root'}
+
+# Check whether that user actually exists.
+if ! getent passwd "$DAEMONUSER" >'/dev/null'
+then
+	echo >&2 "$0: Configured user \"$DAEMONUSER\" doesn't exist, aborting."
+	exit 1
+fi
+
+# Create PID directory and hand it over to the $DAEMONUSER.
+if [ ! -d "$PIDDIR" ]
+then
+	mkdir -p "$PIDDIR"
+	chown "$DAEMONUSER:$DAEMONUSER" "$PIDDIR"
+fi
+
+# Set the default command line arguments.
+: ${DAEMONARGS:="-P $PIDFILE"}
+
+DAEMONCTL="start-stop-daemon --quiet --pidfile $PIDFILE --exec $DAEMON"
+
+case $1 in
+start)
+	log_daemon_msg "Starting $DESC" "$NAME"
+	$DAEMONCTL --start -- $DAEMONARGS
+	log_end_msg $?
+	;;
+stop)
+	log_daemon_msg "Stopping $DESC" "$NAME"
+	$DAEMONCTL --stop --retry 'TERM/30/KILL/5'
+	log_end_msg $?
+	;;
+restart)
+	"$0" 'stop' && sleep 1 && "$0" 'start'
+	;;
+reload|force-reload)
+	log_daemon_msg "Reloading $DESC" "$NAME"
+	$DAEMONCTL --stop --signal 1
+	log_end_msg $?
+	;;
+status)
+	status_of_proc "$DAEMON" "$DESC" && exit 0 || exit $?
+	;;
+*)
+	echo >&2 "Usage: $0 {start|stop|status|restart|reload|force-reload}"
+	exit 3
+	;;
+esac
+
+:

@@ -31,17 +31,9 @@
 # replacement functions.
 AC_DEFUN([NSCA_LIB_PIDFILE],
 [
-  AC_CHECK_HEADERS([sys/param.h])
-  AC_CHECK_HEADERS([bsd/libutil.h libutil.h],
-    [AC_SEARCH_LIBS([pidfile_open], [bsd util],
-      [nsca_lib_pidfile_embedded=no],
-      [nsca_lib_pidfile_embedded=yes])],
-    [nsca_lib_pidfile_embedded=yes],
-    [[#if HAVE_SYS_PARAM_H
-      #include <sys/param.h>
-      #endif]])
-  AS_IF([test "x$nsca_lib_pidfile_embedded" = xyes],
-    [_NSCA_LIB_PIDFILE_EMBEDDED])
+  # Minimize the number of dependencies of our Debian package.
+  nsca_lib_pidfile_embedded=yes
+  _NSCA_LIB_PIDFILE_EMBEDDED
 ])# NSCA_LIB_PIDFILE
 
 # _NSCA_LIB_PIDFILE_EMBEDDED

@@ -20,6 +20,12 @@
 /config.status
 /configure
 /confuse-*
+/debian/files
+/debian/nsca-ng-*.debhelper*
+/debian/nsca-ng-*.substvars
+/debian/nsca-ng-client/
+/debian/nsca-ng-server/
+/debian/tmp/
 /lib/confuse/
 /lib/ssl/
 /man/*.man
