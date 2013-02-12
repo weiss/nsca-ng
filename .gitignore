@@ -24,6 +24,7 @@
 /lib/ssl/
 /man/*.man
 /man/*.pdf
+/man/*.ps
 /nsca-ng-*.tar.gz
 /openssl-*
 /src/client/send_nsca
