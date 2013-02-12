@@ -39,7 +39,7 @@ AC_DEFUN([NSCA_LIB_NETWORKING],
     [AC_CHECK_LIB([nsl], [getpeername],
       [LIBS="-lsocket -lnsl $LIBS"],
       [AC_MSG_FAILURE([cannot find the `getpeername' function])],
-      [-lsocket])])
+      [-lsocket -lnsl])])
 ])# NSCA_LIB_NETWORKING
 
 dnl vim:set joinspaces textwidth=80:
