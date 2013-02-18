@@ -477,8 +477,8 @@ dispatch_data(fifo_state *fifo)
 			ev_io_start(EV_DEFAULT_UC_ &fifo->write_watcher);
 
 			/*
-			 * Invoke write_cb() to minimize the risk
-			 * of exceeding the PIPE_BUF threshold.
+			 * Invoke write_cb() immediately to minimize the risk of
+			 * exceeding the PIPE_BUF threshold.
 			 */
 			ev_invoke(EV_DEFAULT_UC_ &fifo->write_watcher,
 			    EV_CUSTOM);
