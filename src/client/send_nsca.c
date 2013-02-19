@@ -194,10 +194,14 @@ get_options(int argc, char **argv)
 			opt->port = xstrdup(optarg);
 			break;
 		case 'S':
-			opt->log_target |= LOG_TARGET_STDERR;
+			opt->log_target = opt->log_target != -1
+			    ? LOG_TARGET_STDERR | opt->log_target
+			    : LOG_TARGET_STDERR;
 			break;
 		case 's':
-			opt->log_target |= LOG_TARGET_SYSLOG;
+			opt->log_target = opt->log_target != -1
+			    ? LOG_TARGET_SYSLOG | opt->log_target
+			    : LOG_TARGET_SYSLOG;
 			break;
 		case 't':
 			notice("Ignoring -t option for backward compatibility");
