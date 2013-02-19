@@ -1,3 +1,14 @@
+Changes in release 0.2 (2013-02-19, unpublished):
+
+  - Accept non-numeric service check result status when matching against
+    service patterns.
+  - Don't accept spurious service check results.  This could have happened
+    when service patterns without host name part were specified.
+  - Mention the session ID when refusing data.
+  - Fix the client's `-s' option.  It was effectively ignored.
+  - Don't link the client against the libraries used only by the server.
+  - Various minor cleanups.
+
 Changes in release 0.1 (2013-02-08, unpublished):
 
   - Initial release.
