@@ -350,8 +350,8 @@ max_queue_size = 128
 timeout = 15.0
 
 #
-# Authenticated "root" clients may submit arbitrary
-# check results and any other monitoring commands (see
+# Authenticated "root" clients may submit arbitrary check
+# results and any other monitoring commands (see:
 # <http://nagios.org/developerinfo/externalcommands/>).
 #
 authorize "root" {
@@ -360,9 +360,8 @@ authorize "root" {
 }
 
 #
-# Authenticated "checker" clients may submit check
-# results for arbitrary services on arbitrary hosts, but
-# no other commands.
+# Authenticated "checker" clients may submit check results for
+# arbitrary services on arbitrary hosts, but no other commands.
 #
 authorize "checker" {
     password = "ilzNanlE9XjMLdjrMkXnk09XBCTFQrj5"
@@ -370,9 +369,8 @@ authorize "checker" {
 }
 
 #
-# Authenticated "web-checker" clients may submit check
-# results for arbitrary services on hosts whose names
-# begin with "www".
+# Authenticated "web-checker" clients may submit check results
+# for arbitrary services on hosts whose names begin with "www".
 #
 authorize "web-checker" {
     password = "m2uaIWwiq3AIqN55m3QdjwptkU1Q4Oov"
@@ -380,9 +378,8 @@ authorize "web-checker" {
 }
 
 #
-# Other authenticated clients may submit check results
-# for the "disk", "swap", and "load" services on
-# arbitrary hosts.
+# Other authenticated clients may submit check results for the
+# "disk", "swap", and "load" services on arbitrary hosts.
 #
 authorize "*" {
     password = "awHW5vxr3DcA9EvcUC9T3a90QfEexsWd"
