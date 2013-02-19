@@ -162,10 +162,11 @@ main(int argc, char **argv)
 	    (size_t)cfg_getint(cfg, "max_queue_size"),
 	    cfg_getfloat(cfg, "timeout"));
 
-	if (!opt->foreground && daemon(0, 0) == -1)
-		die("Cannot daemonize: %m");
-
-	ev_loop_fork(EV_DEFAULT_UC);
+	if (!opt->foreground) {
+		if (daemon(0, 0) == -1)
+			die("Cannot daemonize: %m");
+		ev_loop_fork(EV_DEFAULT_UC);
+	}
 
 	log_set((int)cfg_getint(cfg, "log_level"), opt->log_target);
 
