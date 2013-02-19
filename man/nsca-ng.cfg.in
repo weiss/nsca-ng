@@ -158,10 +158,9 @@ and 5 inclusive.
 A value of 0 tells
 .BR nsca\-ng (8)
 to generate only fatal error messages, 1 adds non-fatal error messages,
-2 adds warnings (regarding issues such as connection timeouts), 3
-additionally spits out every submitted command (plus startup and
-shutdown notices), 4 also logs each message sent or received at the
-protocol level, and 5 generates additional debug output.
+2 adds warnings, 3 additionally spits out every submitted command (plus
+startup and shutdown notices), 4 also logs each message sent or received
+at the protocol level, and 5 generates additional debug output.
 The default log level is 3.
 The specified value will be overridden if
 .BR nsca\-ng (8)
