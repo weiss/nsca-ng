@@ -309,6 +309,7 @@ timestamp.
 \fBpassword\fP\ =\ <\fIstring\fP>
 .
 Reject connections from clients that don't use the specified password.
+This setting is mandatory.
 .
 .TP
 \fBservices\fP\ =\ <\fI(list of) string(s)\fP>
