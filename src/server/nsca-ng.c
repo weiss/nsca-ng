@@ -254,11 +254,12 @@ get_options(int argc, char **argv)
 			opt->pid_file = xstrdup(optarg);
 			break;
 		case 'S':
-			opt->log_target |= LOG_TARGET_SYSLOG
-			    | LOG_TARGET_STDERR;
+			opt->log_target = LOG_TARGET_SYSLOG | LOG_TARGET_STDERR;
 			break;
 		case 's':
-			opt->log_target |= LOG_TARGET_SYSLOG;
+			opt->log_target = opt->log_target != -1
+			    ? LOG_TARGET_SYSLOG | opt->log_target
+			    : LOG_TARGET_SYSLOG;
 			break;
 		case 'V':
 			(void)puts(nsca_version());
