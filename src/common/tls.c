@@ -339,6 +339,16 @@ tls_server_stop(tls_server_state *ctx)
 }
 
 void
+tls_set_connection_id(tls_state *tls, const char *id)
+{
+	char *peer;
+
+	xasprintf(&peer, "%s (ID: %s)", tls->peer, id);
+	free(tls->peer);
+	tls->peer = peer;
+}
+
+void
 tls_on_drain(tls_state *tls, void handle_drain(tls_state *))
 {
 	tls->drain_handler = handle_drain;

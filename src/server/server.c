@@ -59,7 +59,6 @@ struct server_state_s { /* This is typedef'd to `server_state' in server.h. */
 typedef struct {
 	server_state *ctx;
 	size_t input_length;
-	char *session_id;
 } connection_state;
 
 static void handle_connect(tls_state *);
@@ -143,7 +142,6 @@ handle_connect(tls_state *tls)
 	connection_state *connection = xmalloc(sizeof(connection_state));
 
 	connection->ctx = tls->data;
-	connection->session_id = NULL;
 	tls->data = connection;
 
 	tls_on_timeout(tls, handle_timeout);
@@ -159,7 +157,7 @@ handle_handshake(tls_state * restrict tls, char * restrict line)
 	connection_state *connection = tls->data;
 	char *args[3];
 
-	info("<%s> C: %s", tls->peer, line);
+	info("%s C: %s", tls->peer, line);
 
 	if (strncasecmp("MOIN", line, 4) == 0) {
 		if (!parse_line(line, args, 3)) {
@@ -172,7 +170,7 @@ handle_handshake(tls_state * restrict tls, char * restrict line)
 			tls_read_line(tls, handle_handshake);
 		} else {
 			debug("MOIN handshake successful");
-			connection->session_id = xstrdup(args[2]);
+			tls_set_connection_id(tls, args[2]);
 			send_response(tls, "MOIN 1");
 			tls_read_line(tls, handle_connection);
 		}
@@ -195,7 +193,7 @@ handle_connection(tls_state * restrict tls, char * restrict line)
 	char *args[2];
 	int data_size;
 
-	info("<%s> C: %s", tls->peer, line);
+	info("%s C: %s", tls->peer, line);
 
 	if (strncasecmp("NOOP", line, 4) == 0)
 		send_response(tls, "OKAY");
@@ -234,17 +232,15 @@ handle_push(tls_state * restrict tls, char * restrict data)
 	    && data[connection->input_length - 1] == '\n'
 	    ? (int)connection->input_length - 1 : (int)connection->input_length;
 
-	info("<%s> C: %.*s", tls->peer, width, data);
+	info("%s C: %.*s", tls->peer, width, data);
 
 	if (is_authorized(tls->id, data)) {
-		notice("Queuing data from %s (ID: %s): %.*s", tls->peer,
-		    connection->session_id, width, data);
+		notice("Queuing data from %s: %.*s", tls->peer, width, data);
 		fifo_write(connection->ctx->fifo, data,
 		    connection->input_length, free);
 		send_response(tls, "OKAY");
 	} else {
-		warning("Refusing data from %s (ID: %s): %.*s", tls->peer,
-		    connection->session_id, width, data);
+		warning("Refusing data from %s: %.*s", tls->peer, width, data);
 		free(data);
 		send_response(tls, "FAIL You're not authorized");
 	}
@@ -273,7 +269,7 @@ handle_line_too_long(tls_state *tls)
 static void
 send_response(tls_state * restrict tls, const char * restrict response)
 {
-	info("<%s> S: %s", tls->peer, response);
+	info("%s S: %s", tls->peer, response);
 	tls_write_line(tls, response);
 }
 
@@ -287,7 +283,7 @@ bail(tls_state * restrict tls, const char * restrict fmt, ...)
 	xvasprintf(&message, fmt, ap);
 	va_end(ap);
 
-	info("<%s> S: %s %s", tls->peer, "BAIL", message);
+	info("%s S: %s %s", tls->peer, "BAIL", message);
 
 	tls_write(tls, "BAIL ", sizeof("BAIL ") - 1, NULL);
 	tls_write_line(tls, message);
@@ -319,8 +315,6 @@ connection_stop(tls_state *tls)
 {
 	connection_state *connection = tls->data;
 
-	if (connection->session_id != NULL)
-		free(connection->session_id);
 	free(connection);
 }
 
