@@ -67,4 +67,4 @@ else	# We're probably on Holger's box.
 	rm -f "$tmp_file"
 fi
 
-# vim:set joinspaces noexpandtab textwidth=80
+# vim:set joinspaces noexpandtab textwidth=80:

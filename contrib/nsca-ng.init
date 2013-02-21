@@ -88,4 +88,4 @@ esac
 
 exit 0
 
-# vim:set joinspaces noexpandtab textwidth=80
+# vim:set joinspaces noexpandtab textwidth=80:

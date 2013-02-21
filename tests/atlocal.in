@@ -26,4 +26,4 @@
 
 nsca_pipe_buf='@nsca_pipe_buf@'
 
-# vim:set joinspaces noexpandtab textwidth=80
+# vim:set joinspaces noexpandtab textwidth=80:
