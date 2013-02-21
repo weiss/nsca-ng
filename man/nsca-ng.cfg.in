@@ -91,7 +91,7 @@ Any whitespace surrounding tokens is ignored.
 Empty lines and comments are also ignored.
 Comments are introduced with a hash mark character (\(lq#\(rq) and span
 to the end of the line.
-If the last character of a line is a backslash (\(lq\(rs\(rq), the
+If the last character of a line is a backslash (\(lq\\\(rq), the
 subsequent line is treated as a continuation of the current line (and
 the backslash is otherwise ignored).
 .
