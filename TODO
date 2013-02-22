@@ -8,24 +8,19 @@ The wish list items are listed in no particular order.
   commands, as oppposed to simply matching them against the user-supplied
   regular expressions.
 
-- Let the server support proxying of (selected or all) data (with `forward'
+- Let the server support proxying of (selected or all) data (with `forward`
   blocks in the configuration, for example).
 
 - Support requests for status and configuration data in order to provide a
   full-blown remote API.
 
 - Let the client execute standard Nagios plugins directly (as an alternative
-  to using a script such as `contrib/invoke_check'), and maybe provide a
-  daemon mode with poor man's check scheduling (i.e., add `check_interval'
-  and `retry_interval' directives to the client configuration).
+  to using a script such as `contrib/invoke_check`), and maybe provide a
+  daemon mode with poor man's check scheduling (i.e., add `check_interval`
+  and `retry_interval` directives to the client configuration).
 
 - Port the client to Microsoft Windows.
 
 - Create a client library with Perl (and maybe Python) bindings.
 
-Please drop me an email if you are interested in any of these or other
-features:
-
-	Holger Weiss <holger@weiss.in-berlin.de>
-
-# vim:set textwidth=76 joinspaces:
+<!-- vim:set textwidth=76 joinspaces: -->

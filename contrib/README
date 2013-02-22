@@ -1,67 +1,67 @@
-NSCA-ng's `contrib' Directory
+NSCA-ng's "contrib" Directory
 =============================
 
 This directory contains a collection of scripts that may be useful.  All
-scripts except for `nsca-ng.init' allow for specifying the path to the
-send_nsca.cfg(5) file via `-c <path>'.  Other send_nsca(8) options can be
-specified by setting the environment variable SEND_NSCA_ARGS.  All scripts
-print usage information when called with the `-h' option.
+scripts except for `nsca-ng.init` allow for specifying the path to the
+`send_nsca.cfg(5)` file via `-c <path>`.  Other `send_nsca(8)` options can
+be specified by setting the environment variable `SEND_NSCA_ARGS`.  All
+scripts print usage information when called with the `-h` option.
 
-* acknowledge
+* `acknowledge`
 
-	Acknowledges a problem using send_nsca(8).  If the `-S' option is
-	specified, a service problem is acknowledged; otherwise, a host
-	problem is acknowledged.  Example invocation:
+    Acknowledges a problem using `send_nsca(8)`.  If the `-S` option is
+    specified, a service problem is acknowledged; otherwise, a host problem
+    is acknowledged.  Example invocation:
 
-	$ acknowledge -H www -S HTTP
+        $ acknowledge -H www -S HTTP
 
-* debug_server
+* `debug_server`
 
-	Opens a raw TLS connection to the nsca-ng(8) server, sends any lines
-	read from the standard input, and prints any server responses to the
-	standard output.  Requires s_client(1) from OpenSSL 1.0.0 or newer,
-	and xxd(1).  Example invocation:
+    Opens a raw TLS connection to the `nsca-ng(8)` server, sends any lines
+    read from the standard input, and prints any server responses to the
+    standard output.  Requires `s_client(1)` from OpenSSL 1.0.0 or newer,
+    and `xxd(1)`.  Example invocation:
 
-	$ debug_server -c /etc/send_nsca.cfg
+        $ debug_server -c /etc/send_nsca.cfg
 
-* disable_notifications
+* `disable_notifications`
 
-	Globally disables host and service notifications using send_nsca(8).
-	Example invocation:
+    Globally disables host and service notifications using `send_nsca(8)`.
+    Example invocation:
 
-	$ disable_notifications
+        $ disable_notifications
 
-* downtime
+* `downtime`
 
-	Schedules a host or service downtime using send_nsca(8).  If the
-	`-S' option is used, a service downtime is scheduled; otherwise, a
-	host downtime is scheduled.  The start and end times are specified
-	with the `-s' and `-e' options, respectively.  They accept the same
-	date string format as GNU date(1)'s `-d' option.  Requires GNU
-	date(1) or BSD date(1).  Example invocation (the `-s' and `-e'
-	options could be omitted here, as these are their default values):
+    Schedules a host or service downtime using `send_nsca(8)`.  If the `-S`
+    option is used, a service downtime is scheduled; otherwise, a host
+    downtime is scheduled.  The start and end times are specified with the
+    `-s` and `-e` options, respectively.  They accept the same date string
+    format as GNU `date(1)'s` `-d` option.  Requires GNU `date(1)` or BSD
+    `date(1)`.  Example invocation (the `-s` and `-e` options could be
+    omitted here, as these are their default values):
 
-	$ downtime -H mail -S IMAP -s now -e +2hours
+        $ downtime -H mail -S IMAP -s now -e +2hours
 
-* enable_notifications
+* `enable_notifications`
 
-	Globally enables host and service notifications using send_nsca(8).
-	Example invocation:
+    Globally enables host and service notifications using `send_nsca(8)`.
+    Example invocation:
 
-	$ enable_notifications
+        $ enable_notifications
 
-* invoke_check
+* `invoke_check`
 
-	Executes standard plugins and transmits their results using
-	send_nsca(8).  Example invocation:
+    Executes standard plugins and transmits their results using
+    `send_nsca(8)`.  Example invocation:
 
-	$ invoke_check check_disk -w 20% -c 10%
+        $ invoke_check check_disk -w 20% -c 10%
 
-* nsca-ng.init
+* `nsca-ng.init`
 
-	Starts, stops, restarts, or reloads the nsca-ng(8) server running on
-	the local system.  Example invocation:
+    Starts, stops, restarts, or reloads the `nsca-ng(8)` server running on
+    the local system.  Example invocation:
 
-	$ nsca-ng.init start
+        $ nsca-ng.init start
 
-# vim:set textwidth=76 joinspaces:
+<!-- vim:set textwidth=76 joinspaces: -->
