@@ -142,16 +142,18 @@ file.
 
 For copyright and license information, see the file `COPYING`.
 
-Feedback
---------
+Support
+-------
 
-Please send any feedback to
-[Holger Weiss](mailto:holger@weiss.in-berlin.de).
+Bug reports and patches can be sent to the <developers@nsca-ng.org> list (no
+subscription required).  For usage support, please subscribe to the
+<users@nsca-ng.org> list.  See the [NSCA-ng][6] website for details.
 
 [1]: http://www.nagios.org/developerinfo/externalcommands/
 [2]: http://tools.ietf.org/html/rfc4279
 [3]: http://www.openssl.org/
 [4]: http://www.nongnu.org/confuse/
 [5]: http://libev.schmorp.de/
+[6]: http://www.nsca-ng.org/
 
 <!-- vim:set textwidth=76 joinspaces: -->

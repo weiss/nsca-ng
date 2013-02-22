@@ -28,7 +28,7 @@
 AC_PREREQ([2.60]) dnl But Autoconf 2.63 is required for AC_INIT's URL parameter.
 AC_INIT([NSCA-ng],
   [0.2],
-  [holger@weiss.in-berlin.de],
+  [developers@nsca-ng.org],
   [nsca-ng],
   [http://www.nsca-ng.org/])
 AC_CONFIG_SRCDIR([src/server/nsca-ng.c])
