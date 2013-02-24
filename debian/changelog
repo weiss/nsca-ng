@@ -1,3 +1,9 @@
+nsca-ng (0.2~upstream1) unstable; urgency=low
+
+  * New release.
+
+ -- Holger Weiss <holger@weiss.in-berlin.de>  Sun, 24 Feb 2013 23:06:50 +0100
+
 nsca-ng (0.1~upstream1) unstable; urgency=low
 
   * Inital version.
