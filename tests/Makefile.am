@@ -26,6 +26,7 @@
 ## POSSIBILITY OF SUCH DAMAGE.
 
 EXTRA_DIST = $(TESTSUITE) $(TESTSUITE_AT) package.m4 atlocal.in
+DISTCLEANFILES = atconfig
 
 #
 # Build test_nsca.

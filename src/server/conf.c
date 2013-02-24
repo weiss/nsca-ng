@@ -155,7 +155,7 @@ service_to_command(const char *service_pattern)
 	char *at, *command_pattern, *pattern = xstrdup(service_pattern);
 
 	if ((at = strrchr(pattern, '@')) == NULL)
-		host_part = ".+";
+		host_part = "[^;]+";
 	else {
 		host_part = at + 1;
 		*at = '\0';
@@ -163,7 +163,7 @@ service_to_command(const char *service_pattern)
 	service_part = pattern;
 
 	xasprintf(&command_pattern,
-	    "PROCESS_SERVICE_CHECK_RESULT;%s;%s;[0-3];.+",
+	    "PROCESS_SERVICE_CHECK_RESULT;%s;%s;.+;.+",
 	    host_part, service_part);
 
 	free(pattern);

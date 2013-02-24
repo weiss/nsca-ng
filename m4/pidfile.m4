@@ -46,11 +46,15 @@ AC_DEFUN([_NSCA_LIB_PIDFILE_EMBEDDED],
   AC_CHECK_HEADERS([sys/file.h])
   AC_TYPE_MODE_T
   # At least on AIX 5.3, flock(2) is hidden in libbsd.
-  AC_SEARCH_LIBS([flock], [bsd],
-    [nsca_func_flock=yes
-     AC_DEFINE([HAVE_FLOCK], [1],
-       [Define to 1 if you have the `flock' function.])],
-    [nsca_func_flock=no])
+  AC_CHECK_FUNC([flock],
+    [nsca_func_flock=yes],
+    [AC_CHECK_LIB([bsd], [flock],
+      [PIDFILELIBS='-lbsd'
+       nsca_func_flock=yes],
+      [nsca_func_flock=no])])
+  AS_IF([test "x$nsca_func_flock" = xyes],
+    [AC_DEFINE([HAVE_FLOCK], [1],
+      [Define to 1 if you have the `flock' function.])])
 ])# _NSCA_LIB_PIDFILE_EMBEDDED
 
 dnl vim:set joinspaces textwidth=80:

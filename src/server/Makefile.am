@@ -44,7 +44,9 @@ LDADD =                                 \
   ../../lib/libcompat.a                 \
   $(CONFUSELIBS)                        \
   $(EVLIBS)                             \
-  $(SSLLIBS)
+  $(SSLLIBS)                            \
+  $(AIOLIBS)                            \
+  $(PIDFILELIBS)
 
 if USE_EMBEDDED_EV
 AM_CPPFLAGS += -I$(top_srcdir)/lib/ev

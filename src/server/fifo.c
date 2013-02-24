@@ -95,13 +95,13 @@ struct fifo_state_s { /* This is typedef'd to `fifo_state' in fifo.h. */
 static void open_cb(EV_P_ ev_timer *, int);
 static void write_cb(EV_P_ ev_io *, int);
 #if HAVE_POSIX_AIO
-static void dump_data_async(fifo_state *);
+static void async_dump_data(fifo_state *);
 static void async_signal_handler(int, siginfo_t *, void *);
 static void async_cb(EV_P_ ev_async *, int);
 #else
 static void idle_cb(EV_P_ ev_idle *, int);
 static void timeout_cb(EV_P_ ev_timer *, int);
-static void dump_data_sync(fifo_state *);
+static void sync_dump_data(fifo_state *);
 #endif
 static void dispatch_data(fifo_state *);
 static char *make_process_file_command(fifo_state *);
@@ -323,7 +323,7 @@ write_cb(EV_P_ ev_io *w, int revents __attribute__((__unused__)))
  */
 
 static void
-dump_data_async(fifo_state *fifo)
+async_dump_data(fifo_state *fifo)
 {
 	join_buffers(fifo);
 
@@ -416,7 +416,7 @@ idle_cb(EV_P_ ev_idle *w, int revents __attribute__((__unused__)))
 	if (ev_is_active(&fifo->timeout_watcher))
 		ev_timer_stop(EV_A_ &fifo->timeout_watcher);
 
-	dump_data_sync(fifo);
+	sync_dump_data(fifo);
 }
 
 static void
@@ -429,7 +429,7 @@ timeout_cb(EV_P_ ev_timer *w, int revents)
 }
 
 static void
-dump_data_sync(fifo_state *fifo)
+sync_dump_data(fifo_state *fifo)
 {
 	char *command;
 	size_t offset;
@@ -477,8 +477,8 @@ dispatch_data(fifo_state *fifo)
 			ev_io_start(EV_DEFAULT_UC_ &fifo->write_watcher);
 
 			/*
-			 * Invoke write_cb() to minimize the risk
-			 * of exceeding the PIPE_BUF threshold.
+			 * Invoke write_cb() immediately to minimize the risk of
+			 * exceeding the PIPE_BUF threshold.
 			 */
 			ev_invoke(EV_DEFAULT_UC_ &fifo->write_watcher,
 			    EV_CUSTOM);
@@ -492,7 +492,7 @@ dispatch_data(fifo_state *fifo)
 #if HAVE_POSIX_AIO
 		if (!ev_is_active(&fifo->async_watcher)) {
 			debug("Initiating asynchronous output request");
-			dump_data_async(fifo);
+			async_dump_data(fifo);
 		} else
 			debug("Asynchronous output watcher is active");
 #else

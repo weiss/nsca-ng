@@ -9,8 +9,6 @@ heirloom_settings='.\\" Heirloom Settings\
 .\
 .do xflag 3\
 .\
-.lc_ctype en_US.UTF-8\
-.\
 .fp 1 R utrg____ pfb\
 .fp 2 I uti_____ pfb\
 .fp 3 B utb_____ pfb\
@@ -64,22 +62,7 @@ else	# We're probably on Holger's box.
 	TROFFONTS="$HOME/.fonts/type1"
 	export PATH TROFFONTS
 
-	#
-	# We could use Heirloom troff(1)'s "-mg" (which enables GNU groff(1) extensions)
-	# instead of replacing "\(lq" and "\(rq" with the corresponding UTF-8
-	# characters.  (We could then also remove the "lc_ctype" setting above.)
-	# However, we'd like to make sure our manpages work without GNU groff(1)
-	# extensions (other than "\(lq" and "\(rq").
-	#
-	left_quote=`perl -CO -e 'print chr 0x201c'`
-	right_quote=`perl -CO -e 'print chr 0x201d'`
-
-	sed                                     \
-	    -e "s,\\\(lq,$left_quote,g"         \
-	    -e "s,\\\(rq,$right_quote,g"        \
-	    -e "s,^\.TH.*,$heirloom_settings&," \
-	    "$man_file" >"$tmp_file"
-
+	sed "s,^\.TH.*,$heirloom_settings&," "$man_file" >"$tmp_file"
 	troff -msafe -man "$tmp_file" | dpost >"$ps_file"
 	rm -f "$tmp_file"
 fi

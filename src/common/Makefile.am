@@ -25,18 +25,22 @@
 ## ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 ## POSSIBILITY OF SUCH DAMAGE.
 
-AM_CPPFLAGS =           \
-  -I$(top_srcdir)/lib   \
-  $(EVCPPFLAGS)         \
+GIT_DESCRIBE = git describe --tags --match 'v[0-9]*' --dirty 2>/dev/null
+NSCA_VERSION = `($(GIT_DESCRIBE) || echo $(PACKAGE_VERSION)) | sed 's/^v//'`
+
+AM_CPPFLAGS =                           \
+  -DNSCA_VERSION=\"$(NSCA_VERSION)\"    \
+  -I$(top_srcdir)/lib                   \
+  $(EVCPPFLAGS)                         \
   $(SSLCPPFLAGS)
 
-AM_LDFLAGS =            \
-  $(EVLDFLAGS)          \
+AM_LDFLAGS =                            \
+  $(EVLDFLAGS)                          \
   $(SSLLDFLAGS)
 
-LDADD =                 \
-  ../../lib/libcompat.a \
-  $(EVLIBS)             \
+LDADD =                                 \
+  ../../lib/libcompat.a                 \
+  $(EVLIBS)                             \
   $(SSLLIBS)
 
 if USE_EMBEDDED_EV

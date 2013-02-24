@@ -142,10 +142,8 @@ file is ignored.
 .
 Use the specified
 .I delimiter
-(which must be a single
-.SM ASCII
-character) to separate the fields when parsing host or service check
-results.
+instead of a horizontal tab to separate the fields when parsing host or
+service check results.
 The
 .I delimiter
 must be a single character.
@@ -156,9 +154,6 @@ character other than a backslash, newline,
 or
 .SM NUL
 is allowed.
-The default
-.I delimiter
-is a horizontal tab.
 This option is ignored if the
 .B \-C
 option is specified.
@@ -228,7 +223,7 @@ This is the default behaviour.
 .TP
 .B \-s
 .
-Send all messages to the system logger.
+Send all messages (except for usage errors) to the system logger.
 This option may be combined with the
 .B \-S
 option.

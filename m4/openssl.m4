@@ -70,7 +70,7 @@ AC_DEFUN([NSCA_LIB_OPENSSL],
     [AC_CHECK_LIB([dl], [DSO_load],
       [SSLLIBS='-lcrypto -ldl'],
       [SSLLIBS='-lcrypto'],
-      [-lcrypto])],
+      [-lcrypto -ldl])],
     [AC_MSG_FAILURE([cannot link with OpenSSL])])
   AC_CHECK_LIB([ssl], [SSL_library_init],
     [SSLLIBS="-lssl $SSLLIBS"],

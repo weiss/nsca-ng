@@ -30,8 +30,9 @@
 # http://www.gnu.org/software/libc/manual/html_node/Configuration-of-AIO.html
 #
 # If the POSIX AIO API is available, we set $nsca_lib_posix_aio to "yes" and
-# define HAVE_POSIX_AIO to 1.  We also define symbols which describe the
-# aio_init(3) extension, if available.
+# define HAVE_POSIX_AIO to 1.  We also set the output variable AIOLIBS.  Apart
+# from that, we define symbols which describe the aio_init(3) extension, if
+# available.
 #
 # We check whether POSIX AIO programs can actually be executed because at least
 # on AIX 5.3, POSIX AIO is not enabled by default even though the header
@@ -40,13 +41,16 @@
 # allows the user to override this assumption.
 AC_DEFUN([NSCA_LIB_AIO],
 [
-  AC_SEARCH_LIBS([aio_return], [rt],
+  AC_CHECK_FUNC([aio_return],
     [nsca_lib_posix_aio=yes],
     [AC_CHECK_LIB([rt], [aio_return],
-      [LIBS="-lrt -lpthread $LIBS"
+      [AIOLIBS='-lrt'
        nsca_lib_posix_aio=yes],
-      [nsca_lib_posix_aio=no],
-      [-lpthread])])
+      [AC_CHECK_LIB([pthread], [aio_return],
+        [AIOLIBS='-lrt -lpthread'
+         nsca_lib_posix_aio=yes],
+        [nsca_lib_posix_aio=no],
+        [-lrt -lpthread])])])
   AS_IF([test "x$nsca_lib_posix_aio" = xyes],
     [AC_CACHE_CHECK([whether POSIX AIO works],
       [nsca_cv_lib_aio_enabled],
@@ -90,6 +94,7 @@ AC_DEFUN([NSCA_LIB_AIO],
          struct aioinit.aio_idle_time],
          [], [], [[#include <aio.h>]])])],
     [nsca_lib_posix_aio=no])
+  AC_SUBST([AIOLIBS])
 ])# NSCA_LIB_AIO
 
 dnl vim:set joinspaces textwidth=80:

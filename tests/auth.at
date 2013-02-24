@@ -37,4 +37,10 @@ NSCA_CHECK([jupiter	0	jupiter is alive], [],
   [], [], [], [authorize "*" { password = "forty-two" commands = "none" }], [1])
 AT_CLEANUP
 
+AT_SETUP([Malicious service check result])
+NSCA_CHECK([jupiter	http	0	disk;0;tricked you!], [],
+  [[send_nsca: [FATAL] Server said: FAIL You're not authorized]],
+  [], [], [], [authorize "*" { password = "forty-two" services = "disk" }], [1])
+AT_CLEANUP
+
 dnl vim:set joinspaces textwidth=80 filetype=m4:

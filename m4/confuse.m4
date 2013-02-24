@@ -73,8 +73,8 @@ AC_DEFUN([NSCA_LIB_CONFUSE],
       [AC_CHECK_LIB([iconv], [cfg_init],
         [CONFUSELIBS='-lconfuse -lintl -liconv'],
         [AC_MSG_FAILURE([cannot link with libConfuse])],
-        [-lconfuse -lintl])],
-      [-lconfuse])])
+        [-lconfuse -lintl -liconv])],
+      [-lconfuse -lintl])])
   AC_CHECK_DECL([CFGF_NO_TITLE_DUPES], [],
     [AC_MSG_ERROR([libConfuse too old, version 2.6 or newer is required])],
     [[#include <confuse.h>]])

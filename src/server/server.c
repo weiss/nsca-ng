@@ -243,7 +243,8 @@ handle_push(tls_state * restrict tls, char * restrict data)
 		    connection->input_length, free);
 		send_response(tls, "OKAY");
 	} else {
-		warning("Refusing data from %s: %.*s", tls->peer, width, data);
+		warning("Refusing data from %s (ID: %s): %.*s", tls->peer,
+		    connection->session_id, width, data);
 		free(data);
 		send_response(tls, "FAIL You're not authorized");
 	}

@@ -123,6 +123,16 @@ Usage
 Please see the scripts in the `contrib' directory for various usage
 examples.
 
+NSCA Compatibility
+------------------
+
+The NSCA-ng client (`send_nsca') is a drop-in replacement for the
+`send_nsca' binary provided with the original NSCA 2.x package in the sense
+that NSCA-ng's `send_nsca' accepts all input, command line arguments, and
+configuration files accepted by the original `send_nsca'.  NSCA-ng clients
+cannot talk to NSCA servers (nor vice versa), but NSCA and NSCA-ng servers
+can happily run side by side, and they use different ports by default.
+
 Documentation
 -------------
 
