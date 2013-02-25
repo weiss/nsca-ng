@@ -1,11 +1,11 @@
 NSCA-ng Examples
 ================
 
-This directory contains a collection of scripts that may be useful.  All
-scripts allow for specifying the path to the `send_nsca.cfg(5)` file via `-c
-<path>`.  Other `send_nsca(8)` options can be specified by setting the
-environment variable `SEND_NSCA_ARGS`.  All scripts print usage information
-when called with the `-h` option.
+This directory contains a collection of example scripts.  All scripts allow for
+specifying the path to the `send_nsca.cfg(5)` file via `-c <path>`.  Other
+`send_nsca(8)` options can be specified by setting the environment variable
+`SEND_NSCA_ARGS`.  All scripts print usage information when called with the
+`-h` option.
 
 * `acknowledge`
 
