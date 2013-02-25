@@ -1,6 +1,15 @@
 NSCA-ng Release History
 =======================
 
+Changes in Release 0.3 (2013-02-25)
+-----------------------------------
+
+  - First public release.
+  - Fix the server's `-s` and `-S` options.  They were effectively ignored.
+  - Mention the session ID in all log messages related to the TLS
+    communication in order to ease debugging.
+  - A few minor cleanups.
+
 Changes in Release 0.2 (2013-02-19, Unpublished)
 ------------------------------------------------
 
