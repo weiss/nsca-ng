@@ -43,4 +43,4 @@ test $# -eq 0 || usage
 
 printf '%b' 'DISABLE_NOTIFICATIONS\n' | send_nsca -C $send_nsca_args
 
-# vim:set joinspaces noexpandtab textwidth=80
+# vim:set joinspaces noexpandtab textwidth=80:

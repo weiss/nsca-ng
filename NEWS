@@ -1,16 +1,30 @@
-Changes in release 0.2 (2013-02-19, unpublished):
+NSCA-ng Release History
+=======================
+
+Changes in Release 0.3 (2013-02-25)
+-----------------------------------
+
+  - First public release.
+  - Fix the server's `-s` and `-S` options.  They were effectively ignored.
+  - Mention the session ID in all log messages related to the TLS
+    communication in order to ease debugging.
+  - A few minor cleanups.
+
+Changes in Release 0.2 (2013-02-19, Unpublished)
+------------------------------------------------
 
   - Accept non-numeric service check result status when matching against
     service patterns.
   - Don't accept spurious service check results.  This could have happened
     when service patterns without host name part were specified.
   - Mention the session ID when refusing data.
-  - Fix the client's `-s' option.  It was effectively ignored.
+  - Fix the client's `-s` option.  It was effectively ignored.
   - Don't link the client against the libraries used only by the server.
   - Various minor cleanups.
 
-Changes in release 0.1 (2013-02-08, unpublished):
+Changes in Release 0.1 (2013-02-08, Unpublished)
+------------------------------------------------
 
   - Initial release.
 
-# vim:set textwidth=76 joinspaces:
+<!-- vim:set textwidth=76 joinspaces: -->

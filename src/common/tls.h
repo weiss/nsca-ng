@@ -145,6 +145,7 @@ void tls_write_line(tls_state * restrict, const char * restrict);
 void tls_shutdown(tls_state *);
 void tls_client_stop(tls_client_state *);
 void tls_server_stop(tls_server_state *);
+void tls_set_connection_id(tls_state *, const char *);
 void tls_on_drain(tls_state *, void (*)(tls_state *));
 void tls_on_timeout(tls_state *, void (*)(tls_state *));
 void tls_on_error(tls_state *, void (*)(tls_state *));

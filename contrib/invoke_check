@@ -56,8 +56,8 @@ service=${service:-`echo "$1" | sed 's+.*[_/]++' | tr '[:lower:]' '[:upper:]'`}
 output=`"$@"`
 state=$?
 
-test $state -le 3 || die "$0: '$@' yields invalid plugin return code $state."
+test $state -le 3 || die "$0: '$@' yields invalid plugin return code $state"
 
 printf '%b' "$host\t$service\t$state\t$output\n" | send_nsca -C $send_nsca_args
 
-# vim:set joinspaces noexpandtab textwidth=80
+# vim:set joinspaces noexpandtab textwidth=80:

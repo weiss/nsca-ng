@@ -64,4 +64,4 @@ else	# Service acknowledgement.
 	    | send_nsca -C $send_nsca_args
 fi
 
-# vim:set joinspaces noexpandtab textwidth=80
+# vim:set joinspaces noexpandtab textwidth=80:

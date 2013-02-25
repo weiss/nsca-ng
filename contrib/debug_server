@@ -74,4 +74,4 @@ exec openssl s_client                                           \
     -psk `printf '%s' "$password" | xxd -p | tr -d '\n'`        \
     -connect "$server:$port"
 
-# vim:set joinspaces noexpandtab textwidth=80
+# vim:set joinspaces noexpandtab textwidth=80:

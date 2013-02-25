@@ -91,7 +91,7 @@ Any whitespace surrounding tokens is ignored.
 Empty lines and comments are also ignored.
 Comments are introduced with a hash mark character (\(lq#\(rq) and span
 to the end of the line.
-If the last character of a line is a backslash (\(lq\(rs\(rq), the
+If the last character of a line is a backslash (\(lq\\\(rq), the
 subsequent line is treated as a continuation of the current line (and
 the backslash is otherwise ignored).
 .
@@ -158,10 +158,9 @@ and 5 inclusive.
 A value of 0 tells
 .BR nsca\-ng (8)
 to generate only fatal error messages, 1 adds non-fatal error messages,
-2 adds warnings (regarding issues such as connection timeouts), 3
-additionally spits out every submitted command (plus startup and
-shutdown notices), 4 also logs each message sent or received at the
-protocol level, and 5 generates additional debug output.
+2 adds warnings, 3 additionally spits out every submitted command (plus
+startup and shutdown notices), 4 also logs each message sent or received
+at the protocol level, and 5 generates additional debug output.
 The default log level is 3.
 The specified value will be overridden if
 .BR nsca\-ng (8)
@@ -310,6 +309,7 @@ timestamp.
 \fBpassword\fP\ =\ <\fIstring\fP>
 .
 Reject connections from clients that don't use the specified password.
+This setting is mandatory.
 .
 .TP
 \fBservices\fP\ =\ <\fI(list of) string(s)\fP>
@@ -350,8 +350,8 @@ max_queue_size = 128
 timeout = 15.0
 
 #
-# Authenticated "root" clients may submit arbitrary
-# check results and any other monitoring commands (see
+# Authenticated "root" clients may submit arbitrary check
+# results and any other monitoring commands (see:
 # <http://nagios.org/developerinfo/externalcommands/>).
 #
 authorize "root" {
@@ -360,9 +360,8 @@ authorize "root" {
 }
 
 #
-# Authenticated "checker" clients may submit check
-# results for arbitrary services on arbitrary hosts, but
-# no other commands.
+# Authenticated "checker" clients may submit check results for
+# arbitrary services on arbitrary hosts, but no other commands.
 #
 authorize "checker" {
     password = "ilzNanlE9XjMLdjrMkXnk09XBCTFQrj5"
@@ -370,9 +369,8 @@ authorize "checker" {
 }
 
 #
-# Authenticated "web-checker" clients may submit check
-# results for arbitrary services on hosts whose names
-# begin with "www".
+# Authenticated "web-checker" clients may submit check results
+# for arbitrary services on hosts whose names begin with "www".
 #
 authorize "web-checker" {
     password = "m2uaIWwiq3AIqN55m3QdjwptkU1Q4Oov"
@@ -380,9 +378,8 @@ authorize "web-checker" {
 }
 
 #
-# Other authenticated clients may submit check results
-# for the "disk", "swap", and "load" services on
-# arbitrary hosts.
+# Other authenticated clients may submit check results for the
+# "disk", "swap", and "load" services on arbitrary hosts.
 #
 authorize "*" {
     password = "awHW5vxr3DcA9EvcUC9T3a90QfEexsWd"

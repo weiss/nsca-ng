@@ -63,8 +63,8 @@ else	# We're probably on Holger's box.
 	export PATH TROFFONTS
 
 	sed "s,^\.TH.*,$heirloom_settings&," "$man_file" >"$tmp_file"
-	troff -msafe -man "$tmp_file" | dpost >"$ps_file"
+	troff -mg -msafe -man "$tmp_file" | dpost >"$ps_file"
 	rm -f "$tmp_file"
 fi
 
-# vim:set joinspaces noexpandtab textwidth=80
+# vim:set joinspaces noexpandtab textwidth=80:

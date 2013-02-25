@@ -1,49 +1,37 @@
 Welcome to NSCA-ng!
 ===================
 
-The NSCA-ng package provides a client-server pair which makes the `Nagios
-command file' accessible from remote systems.  This allows for submitting
-passive check results, downtimes, and many other commands to Nagios (or
-compatible monitoring solutions).  See
-
-	<http://www.nagios.org/developerinfo/externalcommands/>
-
-for the full list of available commands.
+The NSCA-ng package provides a client-server pair which makes the "Nagios
+command file" accessible from remote systems.  This allows for submitting
+passive check results, downtimes, and many other [commands][1] to Nagios (or
+compatible monitoring solutions).
 
 NSCA-ng supports TLS encryption and shared-secret authentication with
-client-specific passwords (based on RFC 4279), as well as fine-grained
+client-specific passwords (based on [RFC 4279][2]), as well as fine-grained
 authorization control.
 
 Prerequisites
 -------------
 
-OpenSSL 1.0.0 or newer is required for building NSCA-ng (as older releases
-don't support pre-shared key authentication).  OpenSSL can be obtained from:
+1.  [OpenSSL][3] 1.0.0 or newer is required for building NSCA-ng (as older
+    releases don't support pre-shared key authentication).  This is the only
+    hard dependency of the NSCA-ng client.  If the OpenSSL version provided
+    by your operating system vendor is too old, you might want to build a
+    private copy of OpenSSL and embed it into NSCA-ng.  This could be done
+    by running the `./build-aux/make-openssl` script, which downloads the
+    most recent OpenSSL version and installs it into the NSCA-ng source
+    tree.  The `./configure` script (see below) will then pick that up
+    automatically.
 
-	<http://www.openssl.org/>
+2.  The NSCA-ng *server* also requires [libConfuse][4] 2.6 or newer.  In
+    order to embed a private copy of libConfuse into NSCA-ng, the
+    `./build-aux/make-confuse` script could be run before calling
+    `./configure`.
 
-This is the only hard dependency of the NSCA-ng client.  If the OpenSSL
-version provided by your operating system vendor is too old, you might want
-to build a private copy of OpenSSL and embed it into NSCA-ng.  This can
-easily be done by running the `./build-aux/make-openssl' script, which
-downloads the most recent OpenSSL version and installs it into the NSCA-ng
-source tree.  The `./configure' script (see below) will then pick that up
-automatically.
-
-In addition to OpenSSL, the NSCA-ng server requires libConfuse 2.6 or newer,
-as available from:
-
-	<http://www.nongnu.org/confuse/>
-
-In order to embed a private copy of libConfuse into NSCA-ng, you could run
-the `./build-aux/make-confuse' script before calling `./configure'.
-
-Also, if libev 4.00 or newer is pre-installed and found by the `./configure'
-script, NSCA-ng will use it (by default).  Otherwise, a bundled copy of
-libev is embedded into NSCA-ng (by default), so this dependency is optional.
-The libev library can be downloaded from:
-
-	<http://libev.schmorp.de/>
+3.  If [libev][5] 4.00 or newer is pre-installed and found by the
+    `./configure` script, NSCA-ng will (by default) use it.  Otherwise, a
+    bundled copy of libev is (by default) embedded into NSCA-ng, so this
+    dependency is optional.
 
 Installation
 ------------
@@ -51,85 +39,89 @@ Installation
 If only the client should be built, issuing the following three commands in
 NSCA-ng's source directory should do the trick:
 
-	./configure
-	make
-	su root -c 'make install'
+    $ ./configure
+    $ make
+    $ su root -c 'make install'
 
 This installs the NSCA-ng client into appropriate subdirectories of
-`/usr/local'.
+`/usr/local`.
 
 The installation process can be customized by setting environment variables
-and/or passing options to the `./configure' script.  Some of the more
-frequently used `./configure' options include:
+and/or passing options to the `./configure` script.  Some of the more
+frequently used `./configure` options include:
 
-  --enable-server
-  	Build and install the NSCA-ng server (in addition to the client,
-  	unless `--disable-client' is specified).
+* `--enable-server`
 
-  --disable-client
-  	Don't build and install the NSCA-ng client.
+    Build and install the NSCA-ng server (in addition to the client, unless
+    `--disable-client` is specified).
 
-  --disable-posix-aio
-  	Don't use the POSIX AIO API.  By default, the NSCA-ng server will
-  	use the POSIX AIO API if available.
+* `--disable-client`
 
-  --prefix=PATH
-  	Install NSCA-ng into subdirectories of `PATH' instead of
-  	`/usr/local'.
+    Don't build and install the NSCA-ng client.
 
-  --with-confuse=PATH
-  	Search for the libConfuse header files in `PATH'/include, and search
-  	for the libConfuse library files in `PATH'/lib.  If this option
-  	isn't specified, `./configure' will look for libConfuse in a few
-  	typical locations.
+* `--disable-posix-aio`
 
-  --with-ev=PATH
-  	Search for the libev header files in `PATH'/include, and search for
-  	the libev library files in `PATH'/lib.  If this option isn't
-  	specified, `./configure' will look for libev in a few typical
-  	locations; and if no usable version is found, a bundled copy of
-  	libev will be embedded into NSCA-ng.  In order to force usage of the
-  	included copy, `--with-ev=embedded' can be specified; while
-  	`--with-ev=external' would disallow falling back to the bundled
-  	libev code.
+    Don't use the POSIX AIO API.  By default, the NSCA-ng server will use
+    the POSIX AIO API if available.
 
-  --with-openssl=PATH
-  	Search for the OpenSSL header files in `PATH'/include, and search
-  	for the OpenSSL library files in `PATH'/lib.  If this option isn't
-  	specified, `./configure' will look for OpenSSL in a few typical
-  	locations.
+* `--prefix=PATH`
+
+    Install NSCA-ng into subdirectories of `PATH` instead of `/usr/local`.
+
+* `--with-confuse=PATH`
+
+    Search for the libConfuse header files in `PATH/include`, and search for
+    the libConfuse library files in ``PATH/lib`.  If this option isn't
+    specified, `./configure` will look for libConfuse in a few typical
+    locations.
+
+* `--with-ev=PATH`
+
+    Search for the libev header files in `PATH/include`, and search for the
+    libev library files in `PATH/lib`.  If this option isn't specified,
+    `./configure` will look for libev in a few typical locations; and if no
+    usable version is found, a bundled copy of libev will be embedded into
+    NSCA-ng.  In order to force usage of the included copy,
+    `--with-ev=embedded` can be specified; while `--with-ev=external` would
+    disallow falling back to the bundled libev code.
+
+* `--with-openssl=PATH`
+
+    Search for the OpenSSL header files in `PATH/include`, and search for
+    the OpenSSL library files in `PATH/lib`.  If this option isn't
+    specified, `./configure` will look for OpenSSL in a few typical
+    locations.
 
 For a full list of available options and environment variables, run
-`./configure --help'.  See the file `INSTALL' for detailed installation
+`./configure --help`.  See the file `INSTALL` for detailed installation
 instructions.
 
 Configuration
 -------------
 
-The NSCA-ng client is configured using the send_nsca.cfg(5) file, the
-NSCA-ng server uses the nsca-ng.cfg(5) file.  Examples of these files are
+The NSCA-ng client is configured using the `send_nsca.cfg(5)` file, the
+NSCA-ng server uses the `nsca-ng.cfg(5)` file.  Examples of these files are
 installed if they don't already exist.
 
-	IMPORTANT:  Please set the permissions of the configuration
-	files appropriately to make sure that only authorized users
-	can access them.
+> **Important:**  Please set the permissions of the configuration files
+> appropriately to make sure that only authorized users can access them.
 
-A script such as `nsca-ng.init' (as provided in the `contrib' directory of
+A script such as `nsca-ng.init` (as provided in the `contrib` directory of
 this package) could be used to start and stop the NSCA-ng server.
 
 Usage
 -----
 
-Please see the scripts in the `contrib' directory for various usage
+Please see the scripts in the `contrib` directory for various usage
 examples.
 
 NSCA Compatibility
 ------------------
 
-The NSCA-ng client (`send_nsca') is a drop-in replacement for the
-`send_nsca' binary provided with the original NSCA 2.x package in the sense
-that NSCA-ng's `send_nsca' accepts all input, command line arguments, and
-configuration files accepted by the original `send_nsca'.  NSCA-ng clients
+The NSCA-ng client (`send_nsca`) is a drop-in replacement for the
+`send_nsca` binary provided with the original NSCA 2.x package in the sense
+that NSCA-ng's `send_nsca` accepts all input, command line arguments, and
+configuration files accepted by the original `send_nsca`.  NSCA-ng clients
 cannot talk to NSCA servers (nor vice versa), but NSCA and NSCA-ng servers
 can happily run side by side, and they use different ports by default.
 
@@ -137,22 +129,31 @@ Documentation
 -------------
 
 Detailed information regarding the build and installation process can be
-found in the file `INSTALL'.
+found in the file `INSTALL`.
 
-The NSCA-ng usage and configuration is documented in the nsca-ng(8),
-send_nsca(8), nsca-ng.cfg(5), and send_nsca.cfg(5) manual pages.  The
-commands `nsca-ng -h' and `send_nsca -h' spit out short summaries of the
+The NSCA-ng usage and configuration is documented in the `nsca-ng(8)`,
+`send_nsca(8)`, `nsca-ng.cfg(5)`, and `send_nsca.cfg(5)` manual pages.  The
+commands `send_nsca -h` and `nsca-ng -h` spit out short summaries of the
 available command line options.
 
-For each release, noteworthy changes are listed in the file `NEWS'.  Feature
-additions which are planned for future releases are added to the `TODO'
+For each release, noteworthy changes are listed in the file `NEWS`.  Feature
+additions which are planned for future releases are added to the `TODO`
 file.
 
-For copyright and license information, see the file `COPYING'.
+For copyright and license information, see the file `COPYING`.
 
-Feedback
---------
+Support
+-------
 
-Please send any feedback to Holger Weiss <holger@weiss.in-berlin.de>.
+Bug reports and patches can be sent to the <developers@nsca-ng.org> list (no
+subscription required).  For usage support, please subscribe to the
+<users@nsca-ng.org> list.  See the [NSCA-ng][6] website for details.
 
-# vim:set textwidth=76 joinspaces:
+[1]: http://www.nagios.org/developerinfo/externalcommands/
+[2]: http://tools.ietf.org/html/rfc4279
+[3]: http://www.openssl.org/
+[4]: http://www.nongnu.org/confuse/
+[5]: http://libev.schmorp.de/
+[6]: http://www.nsca-ng.org/
+
+<!-- vim:set textwidth=76 joinspaces: -->

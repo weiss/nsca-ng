@@ -57,7 +57,6 @@ struct client_state_s { /* This is typedef'd to `client_state' in client.h. */
 	tls_client_state *tls_client;
 	tls_state *tls;
 	input_state *input;
-	char *session_id;
 	char *command;
 	size_t command_length;
 	int mode;
@@ -92,7 +91,6 @@ client_start(const char *server, const char *ciphers, ev_tstamp timeout,
 	client->tls_client->data = client;
 	client->tls = NULL;
 	client->input = NULL;
-	client->session_id = generate_session_id();
 	client->mode = mode;
 	client->delimiter = delimiter;
 
@@ -112,7 +110,6 @@ client_stop(client_state *client)
 	if (client->tls_client != NULL)
 		tls_client_stop(client->tls_client);
 
-	free(client->session_id);
 	free(client);
 }
 
@@ -138,7 +135,7 @@ handle_input_chunk(input_state * restrict input, char * restrict chunk)
 	client->command[client->command_length++] = '\n';
 
 	xasprintf(&request, "PUSH %u", client->command_length);
-	info("<%s> C: %s", client->tls->peer, request);
+	info("%s C: %s", client->tls->peer, request);
 	tls_write_line(client->tls, request);
 	free(request);
 
@@ -159,9 +156,12 @@ static void
 handle_tls_connect(tls_state *tls)
 {
 	client_state *client = tls->data;
-	char *request = concat("MOIN 1 ", client->session_id);
+	char *session_id = generate_session_id();
+	char *request = concat("MOIN 1 ", session_id);
 
 	client->tls = tls;
+	tls_set_connection_id(tls, session_id);
+	free(session_id);
 	send_request(tls, request);
 	free(request);
 	tls_read_line(tls, handle_tls_moin_response);
@@ -174,7 +174,7 @@ handle_tls_moin_response(tls_state * restrict tls, char * restrict line)
 	int protocol_version;
 	char *args[2];
 
-	info("<%s> S: %s", tls->peer, line);
+	info("%s S: %s", tls->peer, line);
 
 	if (strncasecmp("MOIN", line, 4) == 0) {
 		if (!parse_line(line, args, 2))
@@ -210,10 +210,10 @@ handle_tls_push_response(tls_state * restrict tls, char * restrict line)
 {
 	client_state *client = tls->data;
 
-	info("<%s> S: %s", tls->peer, line);
+	info("%s S: %s", tls->peer, line);
 
 	if (strcasecmp("OKAY", line) == 0) {
-		notice("Sending data (ID: %s): %.*s", client->session_id,
+		notice("Transmitting to %s: %.*s", tls->peer,
 		    (int)client->command_length - 1, client->command);
 		tls_write(tls, client->command, client->command_length, free);
 		tls_read_line(tls, handle_tls_command_response);
@@ -230,7 +230,7 @@ handle_tls_command_response(tls_state * restrict tls, char * restrict line)
 {
 	client_state *client = tls->data;
 
-	info("<%s> S: %s", tls->peer, line);
+	info("%s S: %s", tls->peer, line);
 
 	if (strcasecmp("OKAY", line) == 0)
 		input_read_chunk(client->input, handle_input_chunk);
@@ -245,7 +245,7 @@ handle_tls_quit_response(tls_state * restrict tls, char * restrict line)
 {
 	client_state *client = tls->data;
 
-	info("<%s> S: %s", tls->peer, line);
+	info("%s S: %s", tls->peer, line);
 
 	if (strcasecmp("OKAY", line) == 0)
 		client_stop(client);
@@ -258,7 +258,7 @@ handle_tls_quit_response(tls_state * restrict tls, char * restrict line)
 static void
 send_request(tls_state * restrict tls, const char * restrict request)
 {
-	info("<%s> C: %s", tls->peer, request);
+	info("%s C: %s", tls->peer, request);
 	tls_write_line(tls, request);
 }
 
@@ -273,7 +273,7 @@ bail(tls_state * restrict tls, const char * restrict fmt, ...)
 	xvasprintf(&message, fmt, ap);
 	va_end(ap);
 
-	info("<%s> C: %s %s", tls->peer, "BAIL", message);
+	info("%s C: %s %s", tls->peer, "BAIL", message);
 
 	tls_write(tls, "BAIL ", sizeof("BAIL ") - 1, NULL);
 	tls_write_line(tls, message);
