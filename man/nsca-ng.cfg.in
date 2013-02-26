@@ -378,6 +378,14 @@ authorize "web-checker" {
 }
 
 #
+# Authenticated "nsca-checker" clients may talk to the NSCA-ng
+# server, but may not submit anything to Nagios.
+#
+authorize "nsca-checker" {
+    password = "ceOKwxpz14lKXroC4yUjJZbov6VAyKuT"
+}
+
+#
 # Other authenticated clients may submit check results for the
 # "disk", "swap", and "load" services on arbitrary hosts.
 #
