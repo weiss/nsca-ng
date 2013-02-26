@@ -45,14 +45,7 @@
 #define DEFAULT_SERVER "localhost"
 #define DEFAULT_TIMEOUT 15
 #define DEFAULT_TLS_CIPHERS \
-    "PSK-RC4-SHA:PSK-AES256-CBC-SHA:PSK-AES128-CBC-SHA:PSK-3DES-EDE-CBC-SHA"
-
-/*
- * The PSK-*-CBC-SHA cipher suites are broken in OpenSSL 1.0.1d.  Otherwise we'd
- * use the following list of DEFAULT_TLS_CIPHERS:
- *
- * PSK-AES256-CBC-SHA:PSK-AES128-CBC-SHA:PSK-3DES-EDE-CBC-SHA:PSK-RC4-SHA
- */
+    "PSK-AES256-CBC-SHA:PSK-AES128-CBC-SHA:PSK-3DES-EDE-CBC-SHA:PSK-RC4-SHA"
 
 struct conf_s { /* This is typedef'd to `conf' in conf.h. */
 	const char *key;

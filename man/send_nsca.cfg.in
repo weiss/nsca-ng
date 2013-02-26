@@ -162,7 +162,7 @@ The format of the string is described in the
 .BR ciphers (1)
 manual.
 By default, the ciphers in the list
-.SM \f(CWPSK-RC4-SHA:PSK-AES256-CBC-SHA:PSK-AES128-CBC-SHA:PSK-3DES-EDE-CBC-SHA\fP
+.SM \f(CWPSK-AES256-CBC-SHA:PSK-AES128-CBC-SHA:PSK-3DES-EDE-CBC-SHA:PSK-RC4-SHA\fP
 will be offered.
 .
 .SH EXAMPLES
