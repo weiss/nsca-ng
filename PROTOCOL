@@ -115,7 +115,10 @@ PUSH Request
 The client issues a `PUSH` request in order to initiate a "monitoring
 command" submission.  The "monitoring command" is expected to be in the
 format described in the Nagios documentation.  The trailing newline
-character MUST be included.
+character MUST be included, and the submitted "monitoring command" MUST NOT
+be CRLF-terminated.  Newline characters within the "monitoring command"
+(except for the trailing newline) must be replaced with the literal string
+`\n`, and backslash characters must be escaped with another backslash.
 
 The `<size>` parameter specifies the number of octets of the "monitoring
 command", including the trailing newline character.
