@@ -32,6 +32,7 @@ AC_INIT([NSCA-ng],
   [nsca-ng],
   [http://www.nsca-ng.org/])
 AC_CONFIG_SRCDIR([src/server/nsca-ng.c])
+AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_LIBOBJ_DIR([lib])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_TESTDIR([tests], [tests:src/client:src/server])
