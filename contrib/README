@@ -64,4 +64,4 @@ scripts print usage information when called with the `-h` option.
 
         $ nsca-ng.init start
 
-<!-- vim:set textwidth=76 joinspaces: -->
+<!-- vim:set filetype=markdown textwidth=76 joinspaces: -->
