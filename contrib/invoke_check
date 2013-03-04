@@ -58,6 +58,6 @@ state=$?
 
 test $state -le 3 || die "$0: '$@' yields invalid plugin return code $state"
 
-printf '%b' "$host\t$service\t$state\t$output\n" | send_nsca -C $send_nsca_args
+printf '%b' "$host\t$service\t$state\t$output\n" | send_nsca $send_nsca_args
 
 # vim:set joinspaces noexpandtab textwidth=80:
