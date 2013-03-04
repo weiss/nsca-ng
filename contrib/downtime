@@ -66,8 +66,8 @@ test $# -eq 0 || usage
 
 host=${host:-`hostname -s`}
 service=${service:+$service}
-start=`date -d ${start:-'now'}`
-end=`date -d ${end:-'+2 hours'}`
+start=`date -d ${start:-'now'} '+%s'`
+end=`date -d ${end:-'+2 hours'} '+%s'`
 author=`getent passwd "$USER" | cut -d: -f5`
 comment=${comment:-"Submitted by send_nsca@`hostname -s`"}
 
