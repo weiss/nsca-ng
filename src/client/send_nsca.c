@@ -114,7 +114,7 @@ main(int argc, char **argv)
 
 	(void)client_start(host_port,
 	    conf_getstr(cfg, "tls_ciphers"),
-	    (ev_tstamp)conf_getint(cfg, "timeout"),
+	    conf_getint(cfg, "timeout"),
 	    opt->raw_commands ? CLIENT_MODE_COMMAND : CLIENT_MODE_CHECK_RESULT,
 	    opt->delimiter);
 

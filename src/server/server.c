@@ -154,7 +154,6 @@ handle_connect(tls_state *tls)
 static void
 handle_handshake(tls_state * restrict tls, char * restrict line)
 {
-	connection_state *connection = tls->data;
 	char *args[3];
 
 	info("%s C: %s", tls->peer, line);
