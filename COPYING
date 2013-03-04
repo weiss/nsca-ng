@@ -36,13 +36,13 @@ be required to reproduce the following copyright notices, depending on which
 source files are compiled.  The above license statement applies to all of
 them.
 
-If files in the `lib/ev' directory are used during compilation:
+If any files in the `lib/ev' directory are used during compilation:
 
 | Copyright (c) 2007, 2008, 2009, 2010, 2011, 2012
 | 	Marc Alexander Lehmann <libev@schmorp.de>
 | Copyright (c) 2011 Emanuele Giaquinta
 
-If files in the `lib/pidfile' directory are used during compilation:
+If any files in the `lib/pidfile' directory are used during compilation:
 
 | Copyright (c) 2005 Pawel Jakub Dawidek <pjd@FreeBSD.org>
 | Copyright (c) 2007 Dag-Erling Coidan Smoergrav
