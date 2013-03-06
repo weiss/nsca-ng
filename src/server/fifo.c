@@ -163,7 +163,7 @@ fifo_start(const char * restrict path, const char * restrict dump_dir,
 	ev_init(&fifo->open_watcher, open_cb);
 	ev_init(&fifo->write_watcher, write_cb);
 
-	ev_invoke(EV_DEFAULT_UC_ &fifo->open_watcher, 0);
+	ev_invoke(EV_DEFAULT_UC_ &fifo->open_watcher, EV_CUSTOM);
 
 	return fifo;
 }
@@ -229,9 +229,11 @@ fifo_stop(fifo_state *fifo)
  */
 
 static void
-open_cb(EV_P_ ev_timer *w, int revents __attribute__((__unused__)))
+open_cb(EV_P_ ev_timer *w, int revents)
 {
 	fifo_state *fifo = w->data;
+	struct stat sb;
+	int result;
 
 	do
 		fifo->fd = open(fifo->path, O_WRONLY | O_NONBLOCK);
@@ -242,14 +244,28 @@ open_cb(EV_P_ ev_timer *w, int revents __attribute__((__unused__)))
 			warning("No process is reading the command file");
 		else
 			warning("Cannot open %s: %m", fifo->path);
+	} else if ((result = stat(fifo->path, &sb) == -1)
+	    || !S_ISFIFO(sb.st_mode)) {
+		if (result == -1)
+			warning("Cannot get status of %s: %m", fifo->path);
+		else
+			warning("%s is not a named pipe", fifo->path);
 
-		ev_timer_set(&fifo->open_watcher, TIMEOUT, 0.0);
-		ev_timer_start(EV_A_ w);
+		(void)close(fifo->fd);
+		fifo->fd = -1;
 	} else {
-		debug("Opened command file for writing");
+		if (revents == EV_CUSTOM) /* We were invoked by fifo_start(). */
+			debug("Opened command file for writing");
+		else
+			notice("Opened the command file successfully");
 		ev_io_set(&fifo->write_watcher, fifo->fd, EV_WRITE);
 		if (!buffers_are_empty(fifo))
 			dispatch_data(fifo);
+	}
+
+	if (fifo->fd == -1) {
+		ev_timer_set(&fifo->open_watcher, TIMEOUT, 0.0);
+		ev_timer_start(EV_A_ w);
 	}
 }
 

@@ -49,14 +49,7 @@
 #define DEFAULT_TEMP_DIRECTORY "/tmp"
 #define DEFAULT_TIMEOUT 60.0 /* For considerations, see RFC 5482, section 6. */
 #define DEFAULT_TLS_CIPHERS \
-    "PSK-RC4-SHA:PSK-AES256-CBC-SHA:PSK-AES128-CBC-SHA:PSK-3DES-EDE-CBC-SHA"
-
-/*
- * The PSK-*-CBC-SHA cipher suites are broken in OpenSSL 1.0.1d.  Otherwise we'd
- * use the following list of DEFAULT_TLS_CIPHERS:
- *
- * PSK-AES256-CBC-SHA:PSK-AES128-CBC-SHA:PSK-3DES-EDE-CBC-SHA:PSK-RC4-SHA
- */
+    "PSK-AES256-CBC-SHA:PSK-AES128-CBC-SHA:PSK-3DES-EDE-CBC-SHA:PSK-RC4-SHA"
 
 static void hash_auth_blocks(cfg_t *);
 static char *service_to_command(const char *);

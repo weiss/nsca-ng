@@ -19,8 +19,10 @@ The wish list items are listed in no particular order.
   daemon mode with poor man's check scheduling (i.e., add `check_interval`
   and `retry_interval` directives to the client configuration).
 
+- Let the client talk to multiple servers.
+
 - Port the client to Microsoft Windows.
 
 - Create a client library with Perl (and maybe Python) bindings.
 
-<!-- vim:set textwidth=76 joinspaces: -->
+<!-- vim:set filetype=markdown textwidth=76 joinspaces: -->

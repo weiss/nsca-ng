@@ -243,7 +243,7 @@ The format of the string is described in the
 .BR ciphers (1)
 manual.
 By default, the ciphers in the list
-.SM \f(CWPSK-RC4-SHA:PSK-AES256-CBC-SHA:PSK-AES128-CBC-SHA:PSK-3DES-EDE-CBC-SHA\fP
+.SM \f(CWPSK-AES256-CBC-SHA:PSK-AES128-CBC-SHA:PSK-3DES-EDE-CBC-SHA:PSK-RC4-SHA\fP
 will be accepted.
 .
 .TP
@@ -375,6 +375,14 @@ authorize "checker" {
 authorize "web-checker" {
     password = "m2uaIWwiq3AIqN55m3QdjwptkU1Q4Oov"
     services = ".+@www.*"
+}
+
+#
+# Authenticated "nsca-checker" clients may talk to the NSCA-ng
+# server, but may not submit anything to Nagios.
+#
+authorize "nsca-checker" {
+    password = "ceOKwxpz14lKXroC4yUjJZbov6VAyKuT"
 }
 
 #

@@ -57,15 +57,4 @@ specifying the path to the `send_nsca.cfg(5)` file via `-c <path>`.  Other
 
         $ invoke_check check_disk -w 20% -c 10%
 
-<<<<<<< HEAD
-# vim:set textwidth=76 joinspaces:
-=======
-* `nsca-ng.init`
-
-    Starts, stops, restarts, or reloads the `nsca-ng(8)` server running on
-    the local system.  Example invocation:
-
-        $ nsca-ng.init start
-
-<!-- vim:set textwidth=76 joinspaces: -->
->>>>>>> v0.3
+<!-- vim:set filetype=markdown textwidth=76 joinspaces: -->

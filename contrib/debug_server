@@ -54,7 +54,7 @@ config_file=${config_file:-$default_config_file}
 
 if [ -r "$config_file" ]
 then
-	eval `sed 's/[[:space:]]*=[[:space:]]*/=/' "$config_file"`
+	eval "`sed 's/[[:space:]]*=[[:space:]]*/=/' "$config_file"`"
 else
 	echo >&2 "Cannot read $config_file (continuing anyway)"
 fi

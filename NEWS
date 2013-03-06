@@ -1,6 +1,17 @@
 NSCA-ng Release History
 =======================
 
+Changes in Release 1.0 (2013-03-06)
+-----------------------------------
+
+  - Actually use the POSIX AIO API if it's provided by the target system.
+    The corresponding Autoconf test was broken since version 0.2.
+  - When opening the command file, check whether it's a named pipe.  If it's
+    not, log a warning message and retry opening it later on.
+  - Use the PSK-AES256-CBC-SHA cipher suite (instead of PSK-RC4-SHA) by
+    default.
+  - Various minor fixes and improvements.
+
 Changes in Release 0.3 (2013-02-25)
 -----------------------------------
 
@@ -27,4 +38,4 @@ Changes in Release 0.1 (2013-02-08, Unpublished)
 
   - Initial release.
 
-<!-- vim:set textwidth=76 joinspaces: -->
+<!-- vim:set filetype=markdown textwidth=76 joinspaces: -->

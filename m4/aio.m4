@@ -54,33 +54,36 @@ AC_DEFUN([NSCA_LIB_AIO],
   AS_IF([test "x$nsca_lib_posix_aio" = xyes],
     [AC_CACHE_CHECK([whether POSIX AIO works],
       [nsca_cv_lib_aio_enabled],
-      [AC_RUN_IFELSE(
-        [AC_LANG_PROGRAM(
-          [[#include <sys/types.h>
-            #include <sys/stat.h>
-            #include <fcntl.h>
-            #include <aio.h>
-            #include <string.h>
-            #include <unistd.h>]],
-          [[struct aiocb cb;
-            const struct aiocb *cb_list[1];
-            char msg[] = "Hello, world!\n";
-            int fd;
-            if ((fd = open("/dev/null", O_WRONLY)) == -1)
-              return 1;
-            (void)memset(&cb, 0, sizeof(cb));
-            cb.aio_buf = msg;
-            cb.aio_nbytes = sizeof(msg);
-            cb.aio_fildes = fd;
-            cb.aio_offset = 0;
-            cb.aio_sigevent.sigev_notify = SIGEV_NONE;
-            cb_list[0] = &cb;
-            if (aio_write(&cb) == -1 || aio_suspend(cb_list, 1, NULL) == -1)
-              return 1;
-            (void)close(fd);]])],
-        [nsca_cv_lib_aio_enabled=yes],
-        [nsca_cv_lib_aio_enabled=no],
-        [nsca_cv_lib_aio_enabled=no])])])
+      [save_LIBS=$LIBS
+       LIBS=$AIOLIBS
+       AC_RUN_IFELSE(
+         [AC_LANG_PROGRAM(
+           [[#include <sys/types.h>
+             #include <sys/stat.h>
+             #include <fcntl.h>
+             #include <aio.h>
+             #include <string.h>
+             #include <unistd.h>]],
+           [[struct aiocb cb;
+             const struct aiocb *cb_list[1];
+             char msg[] = "Hello, world!\n";
+             int fd;
+             if ((fd = open("/dev/null", O_WRONLY)) == -1)
+               return 1;
+             (void)memset(&cb, 0, sizeof(cb));
+             cb.aio_buf = msg;
+             cb.aio_nbytes = sizeof(msg);
+             cb.aio_fildes = fd;
+             cb.aio_offset = 0;
+             cb.aio_sigevent.sigev_notify = SIGEV_NONE;
+             cb_list[0] = &cb;
+             if (aio_write(&cb) == -1 || aio_suspend(cb_list, 1, NULL) == -1)
+               return 1;
+             (void)close(fd);]])],
+         [nsca_cv_lib_aio_enabled=yes],
+         [nsca_cv_lib_aio_enabled=no],
+         [nsca_cv_lib_aio_enabled=no])
+       LIBS=$save_LIBS])])
   AS_IF([test "x$nsca_cv_lib_aio_enabled" = xyes],
     [AC_DEFINE([HAVE_POSIX_AIO], [1],
       [Define to 1 if you have the POSIX AIO API.])

@@ -898,6 +898,7 @@ check_tls_error(EV_P_ ev_io *w, int code)
 				 * http://marc.info/?m=127100694709805
 				 */
 				warning_f("%s aborted the TLS shutdown", peer);
+				break;
 			default:
 				warning_f("Socket error (%s): %m", peer);
 			}
