@@ -1,7 +1,5 @@
 #!/bin/sh
-#
-# Create PDF versions of the manpages in the ./man directory.
-#
+
 set -e
 set -u
 
