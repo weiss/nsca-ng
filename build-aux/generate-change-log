@@ -1,53 +1,53 @@
-#!/usr/bin/env python
-#
-# This is a modified version of the file tools/generate-change-log taken from
-# Gaupol 0.20 (http://home.gna.org/gaupol/).  The author and copyright holder of
-# the original version is Osmo Salomaa <otsaloma@iki.fi>.  He gave permission to
-# use, modify, and redistribute this file under the terms of the BSD 2-Clause
-# License in a private email sent to Holger Weiss <holger@weiss.in-berlin.de> on
-# October 31, 2012.  The file has been modified by Holger Weiss in 2012.
-#
-# Print a GNU-style ChangeLog to standard output based on the Git history. Git
-# commit messages are left untouched to avoid ruining formatting, so they are
-# expected to have been wrapped at 72 characters.
-#
-import os
-import re
-import sys
-import textwrap
+#!/usr/bin/env perl
 
-re_commit = re.compile((r"^commit \w+?\n"
-                        r"^Author: (?P<name>.*?) <(?P<email>.*?)>\n"
-                        r"^Date:   (?P<date>.*?)\n"
-                        r"^$\n"
-                        r"(?P<message>(^    .*?$\n)+)"
-                        r"^$\n"
-                        r"(?P<files>(^.+?$\n)+?)"
-                        r"^$\n"), re.MULTILINE)
+use warnings;
+use strict;
+use Text::Wrap;
 
-wrapper = textwrap.TextWrapper(initial_indent="\t", subsequent_indent="\t")
+# The lines will have a length of no more than $columns - 1.
+$Text::Wrap::columns = 81;
 
-def write_commit(match):
-    message = textwrap.dedent(match.group("message"))
-    write_message(match.group("date"),
-                  match.group("name"),
-                  match.group("email"),
-                  match.group("files").splitlines(),
-                  message)
-    print("")
+if (system('git rev-parse --git-dir >/dev/null 2>&1') != 0) {
+	print "Not a Git repository, so I won't update the ChangeLog.\n";
+	exit 0;
+}
 
-def write_message(date, name, email, files, message):
-    print("%s  %s  <%s>" % (date, name, email))
-    message_lines = message.splitlines()
-    text = "* %s: %s" % (', '.join(files), message_lines.pop(0))
-    print("\n%s" % wrapper.fill(text))
-    for line in message_lines:
-        print(("\t%s" % line).rstrip())
+my $regex =
+    '^commit [0-9a-f]+\n' .
+    '^Author: (?<name>.+) <(?<email>.*)>\n' .
+    '^Date:   (?<date>\d{4}-\d{2}-\d{2})\n' .
+    '^\n' .
+    '(?<message>(^    .*\n)+)' .
+    '^\n' .
+    '(?<files>(^.+\n)+)';
 
-if os.system("git rev-parse --git-dir >/dev/null 2>&1"):
-    sys.stderr.write("Not a Git repository, so I won't update the ChangeLog.\n")
-    sys.exit(0)
+my $git_log = qx'git log -M -C --stat --name-only --date=short';
+die "Cannot get `git log' output\n" if $? != 0;
 
-text = os.popen("git log --stat -M -C --name-only --date=short", "r").read()
-for match in re_commit.finditer(text):
-    write_commit(match)
+my ($prev_date, $prev_name, $prev_email);
+
+while ($git_log =~ /$regex/gm) {
+	my %commit = %+;
+
+	if (not defined $prev_date
+	    or $commit{date} ne $prev_date
+	    or $commit{name} ne $prev_name
+	    or $commit{email} ne $prev_email) {
+		print "$commit{date}  $commit{name}  <$commit{email}>\n\n";
+	}
+	$prev_date = $commit{date};
+	$prev_name = $commit{name};
+	$prev_email = $commit{email};
+
+	my @files = split(/\n/, $commit{files});
+	my @message = map { s/^ {4}//r } split(/\n/, $commit{message});
+	my $first_line = shift(@message) =~ s/^$files[-1]: //r;
+	my $intro = sprintf('* %s: %s', join(', ', @files), $first_line);
+
+	print fill("\t", "\t", $intro), "\n";
+	foreach my $line (@message) {
+		print "\t$line" if length($line) > 0;
+		print "\n";
+	}
+	print "\n";
+}
