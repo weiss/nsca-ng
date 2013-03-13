@@ -116,6 +116,23 @@ The
 server recognizes the following global variables.
 .
 .TP
+\fBchroot\fP\ =\ <\fIstring\fP>
+.
+On startup, perform a
+.BR chroot (2)
+operation to the specified directory.
+By default,
+.BR nsca\-ng (8)
+does not call
+.BR chroot (2).
+If this directive is used, the
+.BR command_file ,
+.BR pid_file ,
+and
+.B temp_directory
+must be specified relative to this directory.
+.
+.TP
 \fBcommand_file\fP\ =\ <\fIstring\fP>
 .
 Submit monitoring commands to the specified path name.

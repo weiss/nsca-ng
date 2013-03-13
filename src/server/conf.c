@@ -78,6 +78,7 @@ conf_parse(const char *path)
 	};
 	cfg_opt_t opts[] = {
 		CFG_FUNC("include", cfg_include),
+		CFG_STR("chroot", NULL, CFGF_NODEFAULT),
 		CFG_STR("command_file", DEFAULT_COMMAND_FILE, CFGF_NONE),
 		CFG_STR("listen", DEFAULT_LISTEN, CFGF_NONE),
 		CFG_INT("log_level", DEFAULT_LOG_LEVEL, CFGF_NONE),
