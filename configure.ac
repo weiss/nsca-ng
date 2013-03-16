@@ -37,6 +37,7 @@ AC_CONFIG_LIBOBJ_DIR([lib])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_TESTDIR([tests], [tests:src/client:src/server])
 AM_INIT_AUTOMAKE([1.10 -Wall -Werror check-news])
+AM_MAINTAINER_MODE([enable])
 
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES]) dnl Automake 1.11 added this.
 
