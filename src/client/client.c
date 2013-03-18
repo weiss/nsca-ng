@@ -122,12 +122,19 @@ handle_input_chunk(input_state * restrict input, char * restrict chunk)
 {
 	client_state *client = input->data;
 	char *request;
+	char *data = skip_newlines(chunk);
+
+	if (*data == '\0') { /* Ignore empty input lines. */
+		free(chunk);
+		input_read_chunk(input, handle_input_chunk);
+		return;
+	}
 
 	if (client->mode == CLIENT_MODE_CHECK_RESULT) {
-		chomp(chunk);
-		client->command = parse_check_result(chunk, client->delimiter);
+		chomp(data);
+		client->command = parse_check_result(data, client->delimiter);
 	} else
-		client->command = parse_command(chunk);
+		client->command = parse_command(data);
 
 	free(chunk);
 

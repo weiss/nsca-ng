@@ -91,6 +91,17 @@ parse_line(char * restrict line, char ** restrict args, int n_args)
 }
 
 char *
+skip_newlines(const char *string)
+{
+	const char *p = string;
+
+	while (*p == '\r' || *p == '\n')
+		p++;
+
+	return (char *)p;
+}
+
+char *
 skip_whitespace(const char *string)
 {
 	const char *p = string;

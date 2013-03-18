@@ -53,6 +53,13 @@ ln input expout
 NSCA_CHECK([], [expout], [], [-C], [], [], [], [0], [3])
 AT_CLEANUP
 
+AT_SETUP([Result with trailing ETB and newline])
+AT_CAPTURE_FILE([input])
+printf 'jupiter\t0\tjupiter is alive\n' >input
+printf '\27\n' >>input
+NSCA_CHECK([], [PROCESS_HOST_CHECK_RESULT;jupiter;0;jupiter is alive])
+AT_CLEANUP
+
 AT_SETUP([Incorrect input format])
 NSCA_CHECK([garbage], [],
   [[send_nsca: [FATAL] Input format incorrect, see the send_nsca(8) man page]],
