@@ -70,7 +70,7 @@ frequently used `./configure` options include:
 * `--with-confuse=PATH`
 
     Search for the libConfuse header files in `PATH/include`, and search for
-    the libConfuse library files in ``PATH/lib`.  If this option isn't
+    the libConfuse library files in `PATH/lib`.  If this option isn't
     specified, `./configure` will look for libConfuse in a few typical
     locations.
 
