@@ -7,7 +7,7 @@ override_dh_auto_configure:
 	./build-aux/make-confuse
 	./build-aux/make-openssl
 	./autogen.sh
-	dh_auto_configure -- --enable-server
+	dh_auto_configure -- --enable-server --with-ev=embedded
 
 override_dh_fixperms:
 	dh_fixperms
