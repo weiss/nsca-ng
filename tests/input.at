@@ -68,8 +68,7 @@ AT_CLEANUP
 
 AT_SETUP([Data size exceeds max_command_size])
 NSCA_CHECK([jupiter	0	jupiter is alive], [],
-  [[send_nsca: [FATAL] Server said: FAIL PUSH data size too large]],
-  [], [], [],
+  [[send_nsca: [FATAL] Server said: FAIL PUSH data size too large]], [], [], [],
   [max_command_size = 10
    authorize "*" {
      password = "forty-two"
