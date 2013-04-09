@@ -40,6 +40,8 @@
 .IR delay ]
 .RB [ \-d
 .IR delimiter ]
+.RB [ \-e
+.IR separator ]
 .RB [ \-H
 .IR server ]
 .RB [ \-o
@@ -154,6 +156,25 @@ character other than a backslash, newline,
 or
 .SM NUL
 is allowed.
+This option is ignored if the
+.B \-C
+option is specified.
+.
+.TP
+.BI \-e\  separator
+.
+Use the specified
+.I separator
+instead of an
+.SM ASCII ETB
+character to separate multiple host or service check results.
+The
+.I separator
+must be a single character.
+Any
+.SM ASCII
+character is allowed, but note that multiline check result messages
+cannot be submitted if a newline character is used.
 This option is ignored if the
 .B \-C
 option is specified.

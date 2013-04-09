@@ -43,7 +43,8 @@ enum {
 
 typedef struct client_state_s client_state;
 
-client_state *client_start(const char *, const char *, ev_tstamp, int, char);
+client_state *client_start(const char *, const char *, ev_tstamp, int, char,
+                           char);
 void client_stop(client_state *);
 
 #endif
