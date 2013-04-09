@@ -298,7 +298,8 @@ except when specified exactly as described.
 Within the brace-delimited block of an authorization section, values may
 be assigned to the variables listed below.
 The pattern strings assigned to the
-.B commands
+.BR commands ,
+.BR hosts ,
 and
 .B services
 variables are
@@ -321,6 +322,15 @@ client,
 .I except
 for the leading bracketed timestamp and any whitespace following that
 timestamp.
+.
+.TP
+\fBhosts\fP\ =\ <\fI(list of) string(s)\fP>
+.
+Match the specified regular expression(s) against the \(lqhost name\(rq
+field of client-supplied
+.SM PROCESS_HOST_CHECK_RESULT
+commands and accept such commands if they match any of these
+expressions.
 .
 .TP
 \fBpassword\fP\ =\ <\fIstring\fP>
@@ -377,11 +387,12 @@ authorize "root" {
 }
 
 #
-# Authenticated "checker" clients may submit check results for
-# arbitrary services on arbitrary hosts, but no other commands.
+# Authenticated "checker" clients may submit arbitrary check
+# results, but no other commands.
 #
 authorize "checker" {
     password = "ilzNanlE9XjMLdjrMkXnk09XBCTFQrj5"
+    hosts = ".*"
     services = ".*"
 }
 
