@@ -100,6 +100,12 @@ is_authorized(const char * restrict identity, const char * restrict command)
 	}
 	command = skip_whitespace(command + 1);
 
+	for (i = 0; i < cfg_size(auth, "hosts"); i++) {
+		regex_t *pattern = cfg_getnptr(auth, "hosts", i);
+
+		if (match(pattern, command))
+			return true;
+	}
 	for (i = 0; i < cfg_size(auth, "services"); i++) {
 		regex_t *pattern = cfg_getnptr(auth, "services", i);
 

@@ -61,6 +61,7 @@ struct client_state_s { /* This is typedef'd to `client_state' in client.h. */
 	size_t command_length;
 	int mode;
 	char delimiter;
+	char separator;
 };
 
 static void handle_input_chunk(input_state * restrict, char * restrict);
@@ -83,7 +84,7 @@ static char *base64(const unsigned char *, size_t);
 
 client_state *
 client_start(const char *server, const char *ciphers, ev_tstamp timeout,
-             int mode, char delimiter)
+             int mode, char delimiter, char separator)
 {
 	client_state *client = xmalloc(sizeof(client_state));
 
@@ -93,6 +94,7 @@ client_start(const char *server, const char *ciphers, ev_tstamp timeout,
 	client->input = NULL;
 	client->mode = mode;
 	client->delimiter = delimiter;
+	client->separator = mode == CLIENT_MODE_COMMAND ? '\n' : separator;
 
 	tls_connect(client->tls_client, server, timeout, TLS_AUTO_DIE,
 	    handle_tls_connect, NULL, set_psk);
@@ -122,12 +124,19 @@ handle_input_chunk(input_state * restrict input, char * restrict chunk)
 {
 	client_state *client = input->data;
 	char *request;
+	char *data = skip_newlines(chunk);
+
+	if (*data == '\0') { /* Ignore empty input lines. */
+		free(chunk);
+		input_read_chunk(input, handle_input_chunk);
+		return;
+	}
 
 	if (client->mode == CLIENT_MODE_CHECK_RESULT) {
-		chomp(chunk);
-		client->command = parse_check_result(chunk, client->delimiter);
+		chomp(data);
+		client->command = parse_check_result(data, client->delimiter);
 	} else
-		client->command = parse_command(chunk);
+		client->command = parse_command(data);
 
 	free(chunk);
 
@@ -185,15 +194,8 @@ handle_tls_moin_response(tls_state * restrict tls, char * restrict line)
 			bail(tls, "Protocol version %d not supported",
 			    protocol_version);
 		else { /* The handshake succeeded. */
-			char separator;
-
-			if (client->mode == CLIENT_MODE_CHECK_RESULT)
-				separator = '\27';
-			else
-				separator = '\n';
-
 			debug("Protocol handshake successful");
-			client->input = input_start(separator);
+			client->input = input_start(client->separator);
 			client->input->data = client;
 
 			input_on_eof(client->input, handle_input_eof);

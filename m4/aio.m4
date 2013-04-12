@@ -94,8 +94,8 @@ AC_DEFUN([NSCA_LIB_AIO],
          struct aioinit.aio_usedba,
          struct aioinit.aio_debug,
          struct aioinit.aio_numusers,
-         struct aioinit.aio_idle_time],
-         [], [], [[#include <aio.h>]])])],
+         struct aioinit.aio_idle_time], [], [],
+         [[#include <aio.h>]])])],
     [nsca_lib_posix_aio=no])
   AC_SUBST([AIOLIBS])
 ])# NSCA_LIB_AIO

@@ -27,7 +27,7 @@
 # Autotools initialization.
 AC_PREREQ([2.60]) dnl But Autoconf 2.63 is required for AC_INIT's URL parameter.
 AC_INIT([NSCA-ng],
-  [1.0],
+  [1.1],
   [developers@nsca-ng.org],
   [nsca-ng],
   [http://www.nsca-ng.org/])
@@ -37,11 +37,12 @@ AC_CONFIG_LIBOBJ_DIR([lib])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_TESTDIR([tests], [tests:src/client:src/server])
 AM_INIT_AUTOMAKE([1.10 -Wall -Werror check-news])
+AM_MAINTAINER_MODE([enable])
 
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES]) dnl Automake 1.11 added this.
 
 # Set the release date.
-RELEASE_DATE='March 06, 2013'
+RELEASE_DATE='March 12, 2013'
 
 AC_SUBST([RELEASE_DATE])
 

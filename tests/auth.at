@@ -33,14 +33,32 @@ AT_CLEANUP
 
 AT_SETUP([Unauthorized submission])
 NSCA_CHECK([jupiter	0	jupiter is alive], [],
-  [[send_nsca: [FATAL] Server said: FAIL You're not authorized]],
-  [], [], [], [authorize "*" { password = "forty-two" commands = "none" }], [1])
+  [[send_nsca: [FATAL] Server said: FAIL You're not authorized]], [], [], [],
+  [authorize "*" { password = "forty-two" commands = "none" }], [1])
+AT_CLEANUP
+
+AT_SETUP([Legitimate host check result])
+NSCA_CHECK([jupiter	0	jupiter is alive],
+  [PROCESS_HOST_CHECK_RESULT;jupiter;0;jupiter is alive], [], [], [], [],
+  [authorize "*" { password = "forty-two" hosts = "jupiter" }])
+AT_CLEANUP
+
+AT_SETUP([Legitimate service check result])
+NSCA_CHECK([jupiter	disk	0	disk is fine],
+  [PROCESS_SERVICE_CHECK_RESULT;jupiter;disk;0;disk is fine], [], [], [], [],
+  [authorize "*" { password = "forty-two" services = "disk" }])
+AT_CLEANUP
+
+AT_SETUP([Malicious host check result])
+NSCA_CHECK([saturn	0	jupiter;0;tricked you!], [],
+  [[send_nsca: [FATAL] Server said: FAIL You're not authorized]], [], [], [],
+  [authorize "*" { password = "forty-two" hosts = "jupiter" }], [1])
 AT_CLEANUP
 
 AT_SETUP([Malicious service check result])
 NSCA_CHECK([jupiter	http	0	disk;0;tricked you!], [],
-  [[send_nsca: [FATAL] Server said: FAIL You're not authorized]],
-  [], [], [], [authorize "*" { password = "forty-two" services = "disk" }], [1])
+  [[send_nsca: [FATAL] Server said: FAIL You're not authorized]], [], [], [],
+  [authorize "*" { password = "forty-two" services = "disk" }], [1])
 AT_CLEANUP
 
 dnl vim:set joinspaces textwidth=80 filetype=m4:

@@ -10,7 +10,6 @@
 # ANY WARRANTY, to the extent permitted by law; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-set -e
 set -u
 
 send_nsca_args=${SEND_NSCA_ARGS:+$SEND_NSCA_ARGS}

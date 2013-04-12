@@ -116,6 +116,23 @@ The
 server recognizes the following global variables.
 .
 .TP
+\fBchroot\fP\ =\ <\fIstring\fP>
+.
+On startup, perform a
+.BR chroot (2)
+operation to the specified directory.
+By default,
+.BR nsca\-ng (8)
+does not call
+.BR chroot (2).
+If this directive is used, the
+.BR command_file ,
+.BR pid_file ,
+and
+.B temp_directory
+must be specified relative to this directory.
+.
+.TP
 \fBcommand_file\fP\ =\ <\fIstring\fP>
 .
 Submit monitoring commands to the specified path name.
@@ -281,7 +298,8 @@ except when specified exactly as described.
 Within the brace-delimited block of an authorization section, values may
 be assigned to the variables listed below.
 The pattern strings assigned to the
-.B commands
+.BR commands ,
+.BR hosts ,
 and
 .B services
 variables are
@@ -304,6 +322,15 @@ client,
 .I except
 for the leading bracketed timestamp and any whitespace following that
 timestamp.
+.
+.TP
+\fBhosts\fP\ =\ <\fI(list of) string(s)\fP>
+.
+Match the specified regular expression(s) against the \(lqhost name\(rq
+field of client-supplied
+.SM PROCESS_HOST_CHECK_RESULT
+commands and accept such commands if they match any of these
+expressions.
 .
 .TP
 \fBpassword\fP\ =\ <\fIstring\fP>
@@ -338,12 +365,13 @@ file might look similar to the following example.
 .nf
 .ft CW
 .
-command_file = "/usr/local/nagios/var/rw/nagios.cmd"
-listen = "monitoring.example.com:5668"
-pid_file = "/usr/local/nagios/var/run/nsca-ng.pid"
-temp_directory = "/dev/shm"
-tls_ciphers = "PSK-AES256-CBC-SHA"
 user = "nagios"
+chroot = "/var/nagios" # Other paths are relative to this one!
+command_file = "/rw/nagios.cmd"
+pid_file = "/run/nsca-ng.pid"
+temp_directory = "/dev/shm"
+listen = "monitoring.example.com:5668"
+tls_ciphers = "PSK-AES256-CBC-SHA"
 log_level = 3
 max_command_size = 65536
 max_queue_size = 128
@@ -360,11 +388,12 @@ authorize "root" {
 }
 
 #
-# Authenticated "checker" clients may submit check results for
-# arbitrary services on arbitrary hosts, but no other commands.
+# Authenticated "checker" clients may submit arbitrary check
+# results, but no other commands.
 #
 authorize "checker" {
     password = "ilzNanlE9XjMLdjrMkXnk09XBCTFQrj5"
+    hosts = ".*"
     services = ".*"
 }
 

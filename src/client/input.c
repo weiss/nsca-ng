@@ -85,7 +85,7 @@ input_read_chunk(input_state *input, void handle_read(input_state *, char *))
 		ev_invoke(EV_DEFAULT_UC_ &input->watcher, EV_CUSTOM);
 	} else {
 		debug("There's no (more) data available");
-		if (input->eof_handler != 0)
+		if (input->eof_handler != NULL)
 			input->eof_handler(input);
 		input_stop(input);
 	}
@@ -152,7 +152,7 @@ read_cb(EV_P_ ev_io *w, int revents __attribute__((__unused__)))
 				input->read_handler(input, chunk);
 			} else {
 				debug("No (more) data available");
-				if (input->eof_handler != 0)
+				if (input->eof_handler != NULL)
 					input->eof_handler(input);
 				input_stop(input);
 			}

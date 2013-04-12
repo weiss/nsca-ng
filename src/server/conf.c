@@ -53,6 +53,8 @@
 
 static void hash_auth_blocks(cfg_t *);
 static char *service_to_command(const char *);
+static int parse_host_pattern_cb(cfg_t * restrict, cfg_opt_t * restrict,
+                                 const char * restrict, void * restrict);
 static int parse_service_pattern_cb(cfg_t * restrict, cfg_opt_t * restrict,
                                     const char * restrict, void * restrict);
 static int parse_command_pattern_cb(cfg_t * restrict, cfg_opt_t * restrict,
@@ -72,12 +74,15 @@ conf_parse(const char *path)
 		CFG_STR("password", NULL, CFGF_NODEFAULT),
 		CFG_PTR_LIST_CB("commands", NULL, CFGF_NODEFAULT,
 		    parse_command_pattern_cb, free_auth_pattern_cb),
+		CFG_PTR_LIST_CB("hosts", NULL, CFGF_NODEFAULT,
+		    parse_host_pattern_cb, free_auth_pattern_cb),
 		CFG_PTR_LIST_CB("services", NULL, CFGF_NODEFAULT,
 		    parse_service_pattern_cb, free_auth_pattern_cb),
 		CFG_END()
 	};
 	cfg_opt_t opts[] = {
 		CFG_FUNC("include", cfg_include),
+		CFG_STR("chroot", NULL, CFGF_NODEFAULT),
 		CFG_STR("command_file", DEFAULT_COMMAND_FILE, CFGF_NONE),
 		CFG_STR("listen", DEFAULT_LISTEN, CFGF_NONE),
 		CFG_INT("log_level", DEFAULT_LOG_LEVEL, CFGF_NONE),
@@ -142,6 +147,17 @@ hash_auth_blocks(cfg_t *cfg)
 }
 
 static char *
+host_to_command(const char *host_pattern)
+{
+	char *command_pattern;
+
+	xasprintf(&command_pattern, "PROCESS_HOST_CHECK_RESULT;%s;.+",
+	    host_pattern);
+
+	return command_pattern;
+}
+
+static char *
 service_to_command(const char *service_pattern)
 {
 	const char *host_part, *service_part;
@@ -161,6 +177,18 @@ service_to_command(const char *service_pattern)
 
 	free(pattern);
 	return command_pattern;
+}
+
+static int
+parse_host_pattern_cb(cfg_t * restrict cfg, cfg_opt_t * restrict opt,
+                      const char * restrict value, void * restrict result)
+{
+	char *command_pattern = host_to_command(value);
+	int success = parse_command_pattern_cb(cfg, opt, command_pattern,
+	    result);
+
+	free(command_pattern);
+	return success;
 }
 
 static int

@@ -43,6 +43,20 @@ printf 'PROCESS_HOST_CHECK_RESULT;jupiter;0;result 3\n' >>expout
 NSCA_CHECK([], [expout], [], [], [], [], [], [0], [3])
 AT_CLEANUP
 
+AT_SETUP([Multiple results, colon-separated])
+AT_CAPTURE_FILE([input])
+printf 'jupiter\t0\tresult 1\n' >input
+printf ':' >>input
+printf 'jupiter\t0\tresult 2\n' >>input
+printf ':' >>input
+printf 'jupiter\t0\tresult 3\n' >>input
+AT_CAPTURE_FILE([expout])
+printf 'PROCESS_HOST_CHECK_RESULT;jupiter;0;result 1\n' >expout
+printf 'PROCESS_HOST_CHECK_RESULT;jupiter;0;result 2\n' >>expout
+printf 'PROCESS_HOST_CHECK_RESULT;jupiter;0;result 3\n' >>expout
+NSCA_CHECK([], [expout], [], [-e :], [], [], [], [0], [3])
+AT_CLEANUP
+
 AT_SETUP([Multiple monitoring commands])
 AT_CAPTURE_FILE([input])
 printf 'PROCESS_HOST_CHECK_RESULT;saturn;0;result 1\n' >input
@@ -53,6 +67,13 @@ ln input expout
 NSCA_CHECK([], [expout], [], [-C], [], [], [], [0], [3])
 AT_CLEANUP
 
+AT_SETUP([Result with trailing ETB and newline])
+AT_CAPTURE_FILE([input])
+printf 'jupiter\t0\tjupiter is alive\n' >input
+printf '\27\n' >>input
+NSCA_CHECK([], [PROCESS_HOST_CHECK_RESULT;jupiter;0;jupiter is alive])
+AT_CLEANUP
+
 AT_SETUP([Incorrect input format])
 NSCA_CHECK([garbage], [],
   [[send_nsca: [FATAL] Input format incorrect, see the send_nsca(8) man page]],
@@ -61,8 +82,7 @@ AT_CLEANUP
 
 AT_SETUP([Data size exceeds max_command_size])
 NSCA_CHECK([jupiter	0	jupiter is alive], [],
-  [[send_nsca: [FATAL] Server said: FAIL PUSH data size too large]],
-  [], [], [],
+  [[send_nsca: [FATAL] Server said: FAIL PUSH data size too large]], [], [], [],
   [max_command_size = 10
    authorize "*" {
      password = "forty-two"

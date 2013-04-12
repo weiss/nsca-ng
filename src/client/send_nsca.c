@@ -60,6 +60,7 @@ typedef struct {
 	int log_target;
 	int timeout;
 	char delimiter;
+	char separator;
 	bool raw_commands;
 } options;
 
@@ -116,7 +117,8 @@ main(int argc, char **argv)
 	    conf_getstr(cfg, "tls_ciphers"),
 	    conf_getint(cfg, "timeout"),
 	    opt->raw_commands ? CLIENT_MODE_COMMAND : CLIENT_MODE_CHECK_RESULT,
-	    opt->delimiter);
+	    opt->delimiter,
+	    opt->separator);
 
 	ev_run(EV_DEFAULT_UC_ 0);
 
@@ -141,6 +143,7 @@ get_options(int argc, char **argv)
 	opt->log_target = -1;
 	opt->timeout = -1;
 	opt->delimiter = '\t';
+	opt->separator = '\27';
 	opt->raw_commands = false;
 
 	if (argc == 2) {
@@ -152,7 +155,7 @@ get_options(int argc, char **argv)
 		}
 	}
 
-	while ((option = getopt(argc, argv, "Cc:D:d:H:ho:p:SstVv")) != -1)
+	while ((option = getopt(argc, argv, "Cc:D:d:e:H:ho:p:SstVv")) != -1)
 		switch (option) {
 		case 'C':
 			opt->raw_commands = true;
@@ -175,6 +178,11 @@ get_options(int argc, char **argv)
 			    || *optarg == '\\')
 				die("Illegal delimiter specified with -d");
 			opt->delimiter = *optarg;
+			break;
+		case 'e':
+			if (strlen(optarg) != 1)
+				die("-e argument must be a single character");
+			opt->separator = *optarg;
 			break;
 		case 'H':
 			if (opt->server != NULL)
@@ -219,6 +227,8 @@ get_options(int argc, char **argv)
 			usage(EXIT_FAILURE);
 		}
 
+	if (opt->delimiter == opt->separator)
+		die("Field delimiter must be different from record separator");
 	if (argc - optind > 0)
 		die("Unexpected non-option argument: %s", argv[optind]);
 
@@ -291,6 +301,7 @@ usage(int status)
 	    " -c <file>        Use the specified configuration <file>.\n"
 	    " -D <delay>       Sleep up to <delay> seconds on startup.\n"
 	    " -d <delimiter>   Expect <delimiter> to separate input fields.\n"
+	    " -e <separator>   Expect <separator> to separate check results.\n"
 	    " -H <server>      Connect and talk to the specified <server>.\n"
 	    " -h               Print this usage information and exit.\n"
 	    " -o <timeout>     Use the specified connection <timeout>.\n"

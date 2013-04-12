@@ -2,7 +2,7 @@ Welcome to NSCA-ng!
 ===================
 
 The NSCA-ng package provides a client-server pair which makes the "Nagios
-command file" accessible from remote systems.  This allows for submitting
+command file" accessible to remote systems.  This allows for submitting
 passive check results, downtimes, and many other [commands][1] to Nagios (or
 compatible monitoring solutions).
 
@@ -28,10 +28,9 @@ Prerequisites
     `./build-aux/make-confuse` script could be run before calling
     `./configure`.
 
-3.  If [libev][5] 4.00 or newer is pre-installed and found by the
-    `./configure` script, NSCA-ng will (by default) use it.  Otherwise, a
-    bundled copy of libev is (by default) embedded into NSCA-ng, so this
-    dependency is optional.
+3.  If [libev][5] 4.00 or newer is available and found by the `./configure`
+    script, NSCA-ng will (by default) use it.  Otherwise, a bundled copy of
+    libev is embedded into NSCA-ng, so this dependency is optional.
 
 Installation
 ------------
@@ -71,7 +70,7 @@ frequently used `./configure` options include:
 * `--with-confuse=PATH`
 
     Search for the libConfuse header files in `PATH/include`, and search for
-    the libConfuse library files in ``PATH/lib`.  If this option isn't
+    the libConfuse library files in `PATH/lib`.  If this option isn't
     specified, `./configure` will look for libConfuse in a few typical
     locations.
 

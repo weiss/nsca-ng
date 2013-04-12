@@ -1,6 +1,23 @@
 NSCA-ng Release History
 =======================
 
+Changes in Release 1.1 (2013-04-12)
+-----------------------------------
+
+  - Add chroot(2) support to the server.
+  - Let the server accept `hosts` patterns in `authorize` sections.  They're
+    syntactic sugar for allowing host checks to be submitted (analogous to
+    the `services` patterns for service check submissions).
+  - Let the client ignore empty input lines.  This fixes some corner cases
+    where NSCA-ng's client didn't accept the same input as the client
+    provided with the original NSCA package.
+  - Add the `-e` client option, which allows for specifying a delimiter to
+    use instead of the ASCII ETB character for separating check results.
+  - Let the `invoke_check` script (provided in the `contrib` directory of
+    the source tarball) survive plugin return codes other than zero.  This
+    should make the script slightly more useful :-)
+  - Apply a few minor improvements.
+
 Changes in Release 1.0 (2013-03-06)
 -----------------------------------
 
@@ -10,7 +27,7 @@ Changes in Release 1.0 (2013-03-06)
     not, log a warning message and retry opening it later on.
   - Use the PSK-AES256-CBC-SHA cipher suite (instead of PSK-RC4-SHA) by
     default.
-  - Various minor fixes and improvements.
+  - Apply various minor fixes and improvements.
 
 Changes in Release 0.3 (2013-02-25)
 -----------------------------------
@@ -19,7 +36,7 @@ Changes in Release 0.3 (2013-02-25)
   - Fix the server's `-s` and `-S` options.  They were effectively ignored.
   - Mention the session ID in all log messages related to the TLS
     communication in order to ease debugging.
-  - A few minor cleanups.
+  - Apply a few minor cleanups.
 
 Changes in Release 0.2 (2013-02-19, Unpublished)
 ------------------------------------------------
@@ -31,7 +48,7 @@ Changes in Release 0.2 (2013-02-19, Unpublished)
   - Mention the session ID when refusing data.
   - Fix the client's `-s` option.  It was effectively ignored.
   - Don't link the client against the libraries used only by the server.
-  - Various minor cleanups.
+  - Apply various minor cleanups.
 
 Changes in Release 0.1 (2013-02-08, Unpublished)
 ------------------------------------------------

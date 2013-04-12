@@ -36,6 +36,7 @@
 
 char *concat(const char *, const char *);
 bool parse_line(char * restrict , char ** restrict, int);
+char *skip_newlines(const char *);
 char *skip_whitespace(const char *);
 void chomp(char *);
 const char *nsca_version(void);
