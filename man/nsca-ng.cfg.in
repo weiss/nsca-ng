@@ -365,12 +365,13 @@ file might look similar to the following example.
 .nf
 .ft CW
 .
-command_file = "/usr/local/nagios/var/rw/nagios.cmd"
-listen = "monitoring.example.com:5668"
-pid_file = "/usr/local/nagios/var/run/nsca-ng.pid"
-temp_directory = "/dev/shm"
-tls_ciphers = "PSK-AES256-CBC-SHA"
 user = "nagios"
+chroot = "/var/nagios" # Other paths are relative to this one!
+command_file = "/rw/nagios.cmd"
+pid_file = "/run/nsca-ng.pid"
+temp_directory = "/dev/shm"
+listen = "monitoring.example.com:5668"
+tls_ciphers = "PSK-AES256-CBC-SHA"
 log_level = 3
 max_command_size = 65536
 max_queue_size = 128
