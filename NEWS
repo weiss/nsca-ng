@@ -1,6 +1,23 @@
 NSCA-ng Release History
 =======================
 
+Changes in Release 1.1 (2013-04-12)
+-----------------------------------
+
+  - Add chroot(2) support to the server.
+  - Let the server accept `hosts` patterns in `authorize` sections.  They're
+    syntactic sugar for allowing host checks to be submitted (analogous to
+    the `services` patterns for service check submissions).
+  - Let the client ignore empty input lines.  This fixes some corner cases
+    where NSCA-ng's client didn't accept the same input as the client
+    provided with the original NSCA package.
+  - Add the `-e` client option, which allows for specifying a delimiter to
+    use instead of the ASCII ETB character for separating check results.
+  - Let the `invoke_check` script (provided in the `contrib` directory of
+    the source tarball) survive plugin return codes other than zero.  This
+    should make the script slightly more useful :-)
+  - Apply a few minor improvements.
+
 Changes in Release 1.0 (2013-03-06)
 -----------------------------------
 
