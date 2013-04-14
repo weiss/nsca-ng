@@ -99,7 +99,9 @@ int
 main(int argc, char **argv)
 {
 	struct sigaction sa;
+#ifndef __gnu_hurd__
 	int fd;
+#endif
 
 	get_options(argc, argv);
 
@@ -119,11 +121,20 @@ main(int argc, char **argv)
 	create_fifo();
 	xatexit(remove_fifo);
 
-	/* Make sure there's a FIFO reader when the server starts up. */
+	/*
+	 * Make sure there's a FIFO reader when the server starts up, in order
+	 * to avoid having to wait ten seconds until the server notices that we
+	 * opened the FIFO for reading (in the cat_fifo() function).  GNU Hurd
+	 * doesn't like this trick, though.
+	 */
+#ifndef __gnu_hurd__
 	fd = open(COMMAND_FILE, O_RDONLY | O_NONBLOCK);
+#endif
 	run_command(join(SERVER_COMMAND_LINE, getenv("NSCA_SERVER_FLAGS")));
 	xatexit(kill_server);
+#ifndef __gnu_hurd__
 	(void)close(fd);
+#endif
 
 	run_command(join(CLIENT_COMMAND_LINE, getenv("NSCA_CLIENT_FLAGS")));
 	cat_fifo(expected_num_lines);
