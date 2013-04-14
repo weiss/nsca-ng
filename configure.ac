@@ -141,7 +141,7 @@ AS_IF([test "x$nsca_enable_server" = xyes],
 
 # Communicate the PIPE_BUF value to Autotest.
 AC_COMPUTE_INT([nsca_pipe_buf], [PIPE_BUF], [[#include <limits.h>]],
-  [nsca_pipe_buf=unknown])
+  [nsca_pipe_buf=512])
 AC_SUBST([nsca_pipe_buf])
 
 # Spit out the results.
