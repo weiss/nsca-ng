@@ -244,7 +244,7 @@ open_cb(EV_P_ ev_timer *w, int revents)
 			warning("No process is reading the command file");
 		else
 			warning("Cannot open %s: %m", fifo->path);
-	} else if ((result = stat(fifo->path, &sb) == -1)
+	} else if ((result = fstat(fifo->fd, &sb) == -1)
 	    || !S_ISFIFO(sb.st_mode)) {
 		if (result == -1)
 			warning("Cannot get status of %s: %m", fifo->path);
