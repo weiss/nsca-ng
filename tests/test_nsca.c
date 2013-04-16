@@ -248,7 +248,10 @@ cat_fifo(long n_lines)
 		STATE_PRINT_COMMAND
 	} state = STATE_EAT_TIMESTAMP;
 
-	if ((fifo = fopen(COMMAND_FILE, "r")) == NULL)
+	do
+		fifo = fopen(COMMAND_FILE, "r");
+	while (fifo == NULL && errno == EINTR); /* Happens on GNU Hurd. */
+	if (fifo == NULL)
 		die("Cannot open %s: %s", COMMAND_FILE, strerror(errno));
 	while ((c = getc(fifo)) != EOF) {
 		if (state == STATE_EAT_TIMESTAMP) {
