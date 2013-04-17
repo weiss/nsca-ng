@@ -49,10 +49,9 @@ m4_define([NSCA_CHECK],
   m4_append([nsca_cmd_line], [test_nsca], [ ])
   m4_ifval([$9], [m4_append([nsca_cmd_line], [-l $9], [ ])])
 
-  dnl Optionally prepare the input file.
-  m4_ifval([$1],
-    [AT_CAPTURE_FILE([input])
-     AT_DATA([input], [m4_n([$1])])])
+  dnl Create the input file, unless $1 equals the literal string "input".
+  AT_CAPTURE_FILE([input])
+  m4_if([$1], [input], [], [AT_DATA([input], [m4_n([$1])])])
 
   dnl Optionally create configuration files.
   m4_ifval([$6],

@@ -30,48 +30,43 @@ NSCA_CHECK([jupiter	0	jupiter
 AT_CLEANUP
 
 AT_SETUP([Multiple check results])
-AT_CAPTURE_FILE([input])
 printf 'jupiter\t0\tresult 1\n' >input
 printf '\27' >>input
 printf 'jupiter\t0\tresult 2\n' >>input
 printf '\27' >>input
 printf 'jupiter\t0\tresult 3\n' >>input
-AT_CAPTURE_FILE([expout])
-printf 'PROCESS_HOST_CHECK_RESULT;jupiter;0;result 1\n' >expout
-printf 'PROCESS_HOST_CHECK_RESULT;jupiter;0;result 2\n' >>expout
-printf 'PROCESS_HOST_CHECK_RESULT;jupiter;0;result 3\n' >>expout
-NSCA_CHECK([], [expout], [], [], [], [], [], [0], [3])
+NSCA_CHECK([input], [dnl
+PROCESS_HOST_CHECK_RESULT;jupiter;0;result 1
+PROCESS_HOST_CHECK_RESULT;jupiter;0;result 2
+PROCESS_HOST_CHECK_RESULT;jupiter;0;result 3], [], [], [], [], [], [0], [3])
 AT_CLEANUP
 
 AT_SETUP([Multiple results, colon-separated])
-AT_CAPTURE_FILE([input])
 printf 'jupiter\t0\tresult 1\n' >input
 printf ':' >>input
 printf 'jupiter\t0\tresult 2\n' >>input
 printf ':' >>input
 printf 'jupiter\t0\tresult 3\n' >>input
-AT_CAPTURE_FILE([expout])
-printf 'PROCESS_HOST_CHECK_RESULT;jupiter;0;result 1\n' >expout
-printf 'PROCESS_HOST_CHECK_RESULT;jupiter;0;result 2\n' >>expout
-printf 'PROCESS_HOST_CHECK_RESULT;jupiter;0;result 3\n' >>expout
-NSCA_CHECK([], [expout], [], [-e :], [], [], [], [0], [3])
+NSCA_CHECK([input], [dnl
+PROCESS_HOST_CHECK_RESULT;jupiter;0;result 1
+PROCESS_HOST_CHECK_RESULT;jupiter;0;result 2
+PROCESS_HOST_CHECK_RESULT;jupiter;0;result 3], [], [-e :], [], [], [], [0], [3])
 AT_CLEANUP
 
 AT_SETUP([Multiple monitoring commands])
-AT_CAPTURE_FILE([input])
-printf 'PROCESS_HOST_CHECK_RESULT;saturn;0;result 1\n' >input
-printf 'PROCESS_HOST_CHECK_RESULT;saturn;0;result 2\n' >>input
-printf 'PROCESS_HOST_CHECK_RESULT;saturn;0;result 3\n' >>input
-AT_CAPTURE_FILE([expout])
+cat >input <<'NSCA_EOF'
+PROCESS_HOST_CHECK_RESULT;saturn;0;result 1
+PROCESS_HOST_CHECK_RESULT;saturn;0;result 2
+PROCESS_HOST_CHECK_RESULT;saturn;0;result 3
+NSCA_EOF
 ln input expout
-NSCA_CHECK([], [expout], [], [-C], [], [], [], [0], [3])
+NSCA_CHECK([input], [expout], [], [-C], [], [], [], [0], [3])
 AT_CLEANUP
 
 AT_SETUP([Result with trailing ETB and newline])
-AT_CAPTURE_FILE([input])
 printf 'jupiter\t0\tjupiter is alive\n' >input
 printf '\27\n' >>input
-NSCA_CHECK([], [PROCESS_HOST_CHECK_RESULT;jupiter;0;jupiter is alive])
+NSCA_CHECK([input], [PROCESS_HOST_CHECK_RESULT;jupiter;0;jupiter is alive])
 AT_CLEANUP
 
 AT_SETUP([Incorrect input format])
@@ -91,7 +86,6 @@ NSCA_CHECK([jupiter	0	jupiter is alive], [],
 AT_CLEANUP
 
 AT_SETUP([Data size exceeds PIPE_BUF])
-AT_CAPTURE_FILE([input])
 cat >input <<NSCA_EOF
 `printf "jupiter	0	%0${nsca_pipe_buf}d" 1`
 NSCA_EOF
@@ -104,7 +98,7 @@ authorize "*" {
   commands = ".*"
 }
 NSCA_EOF
-NSCA_CHECK([], [stdout])
+NSCA_CHECK([input], [stdout])
 AT_CHECK([[grep "^PROCESS_FILE;`pwd`/nsca\..\{6\};1$" stdout]], [0], [ignore])
 AT_CLEANUP
 
