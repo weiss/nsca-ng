@@ -120,7 +120,7 @@ main(int argc, char **argv)
 	    opt->delimiter,
 	    opt->separator);
 
-	ev_run(EV_DEFAULT_UC_ 0);
+	(void)ev_run(EV_DEFAULT_UC_ 0);
 
 	free(host_port);
 	free_options(opt);

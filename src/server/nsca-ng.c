@@ -185,7 +185,7 @@ main(int argc, char **argv)
 	ev_signal_start(EV_DEFAULT_UC_ &sigint_watcher);
 	ev_signal_start(EV_DEFAULT_UC_ &sigterm_watcher);
 
-	ev_run(EV_DEFAULT_UC_ 0);
+	(void)ev_run(EV_DEFAULT_UC_ 0);
 
 	server_stop(server);
 	free_options(opt);
