@@ -54,7 +54,7 @@ AC_DEFUN([NSCA_LIB_AIO],
   AS_IF([test "x$nsca_lib_posix_aio" = xyes],
     [AC_CACHE_CHECK([whether POSIX AIO works],
       [nsca_cv_lib_aio_enabled],
-      [save_LIBS=$LIBS
+      [nsca_save_LIBS=$LIBS
        LIBS=$AIOLIBS
        AC_RUN_IFELSE(
          [AC_LANG_PROGRAM(
@@ -98,7 +98,7 @@ AC_DEFUN([NSCA_LIB_AIO],
          [nsca_cv_lib_aio_enabled=yes],
          [nsca_cv_lib_aio_enabled=no],
          [nsca_cv_lib_aio_enabled=no])
-       LIBS=$save_LIBS])])
+       LIBS=$nsca_save_LIBS])])
   AS_IF([test "x$nsca_cv_lib_aio_enabled" = xyes],
     [AC_DEFINE([HAVE_POSIX_AIO], [1],
       [Define to 1 if you have the POSIX AIO API.])
