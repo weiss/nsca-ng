@@ -2,7 +2,35 @@
 
 use warnings;
 use strict;
+use open ':encoding(UTF-8)';
+use Encode;
 use Text::Wrap;
+
+#
+# We'd like to minimize the number of dependencies, otherwise we'd probably use
+# the Text::Unidecode module instead.
+#
+sub asciify {
+	my $text = shift;
+	my %charmap = (
+		ord "\N{LATIN CAPITAL LETTER A WITH DIAERESIS}" => 'Ae',
+		ord "\N{LATIN CAPITAL LETTER O WITH DIAERESIS}" => 'Oe',
+		ord "\N{LATIN CAPITAL LETTER U WITH DIAERESIS}" => 'Ue',
+		ord "\N{LATIN SMALL LETTER A WITH DIAERESIS}"   => 'ae',
+		ord "\N{LATIN SMALL LETTER O WITH DIAERESIS}"   => 'oe',
+		ord "\N{LATIN SMALL LETTER U WITH DIAERESIS}"   => 'ue',
+		ord "\N{LATIN SMALL LETTER SHARP S}"            => 'ss'
+	);
+
+	return encode('ascii', $text, sub {
+		my $char = shift;
+
+		foreach my $key (keys %charmap) {
+			return $charmap{$key} if $key == $char;
+		}
+		return sprintf('<U+%04X>', $char);
+	});
+}
 
 # The lines will have a length of no more than $columns - 1.
 $Text::Wrap::columns = 81;
@@ -33,14 +61,16 @@ while ($git_log =~ /$regex/gm) {
 	    or $commit{date} ne $prev_date
 	    or $commit{name} ne $prev_name
 	    or $commit{email} ne $prev_email) {
-		print "$commit{date}  $commit{name}  <$commit{email}>\n\n";
+		print $commit{date}, '  ';
+		print asciify($commit{name}), '  ';
+		print '<', $commit{email}, '>', "\n\n";
 	}
 	$prev_date = $commit{date};
 	$prev_name = $commit{name};
 	$prev_email = $commit{email};
 
 	my @files = split(/\n/, $commit{files});
-	my @message = map { s/^ {4}//r } split(/\n/, $commit{message});
+	my @message = map { s/^ {4}//r } split(/\n/, asciify($commit{message}));
 	my $first_line = shift(@message) =~ s/^$files[-1]: //r;
 	my $intro = sprintf('* %s: %s', join(', ', @files), $first_line);
 
