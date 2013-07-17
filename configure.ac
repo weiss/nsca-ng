@@ -137,7 +137,8 @@ AC_REPLACE_FUNCS([strdup strcasecmp strncasecmp])
 AS_IF([test "x$nsca_enable_client" = xyes],
   [AC_CHECK_FUNCS([nanosleep])])
 AS_IF([test "x$nsca_enable_server" = xyes],
-  [NSCA_FUNC_DAEMON])
+  [AC_CHECK_FUNCS([closefrom])
+   NSCA_FUNC_DAEMON])
 
 # Communicate the PIPE_BUF value to Autotest.
 AC_COMPUTE_INT([nsca_pipe_buf], [PIPE_BUF], [[#include <limits.h>]],

@@ -34,6 +34,7 @@
 #endif
 #include <sys/types.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <grp.h>
 #if HAVE_INTTYPES_H
 # include <inttypes.h>
@@ -77,6 +78,7 @@ static ev_signal sighup_watcher, sigint_watcher, sigterm_watcher;
 
 static options *get_options(int, char **);
 static void free_options(options *);
+static void close_descriptors(void);
 static void drop_privileges(const char *, const char *);
 static void remove_pidfile(void);
 static void forget_config(void);
@@ -91,8 +93,8 @@ main(int argc, char **argv)
 	pid_t other_pid;
 
 	setprogname(argv[0]);
-
 	log_set(LOG_LEVEL_INFO, LOG_TARGET_STDERR);
+	close_descriptors();
 
 	if (atexit(log_close) != 0 || atexit(forget_config) != 0)
 		die("Cannot register function to be called on exit");
@@ -290,6 +292,26 @@ free_options(options *opt)
 		free(opt->pid_file);
 
 	free(opt);
+}
+
+static void
+close_descriptors(void)
+{
+	int min_fd = STDERR_FILENO + 1;
+
+#if HAVE_CLOSEFROM /* BSD and Solaris. */
+	if (closefrom(min_fd) == -1)
+		die("Cannot close file descriptors >= %d: %m", min_fd);
+#elif defined(F_CLOSEM) /* AIX and IRIX. */
+	if (fcntl(min_fd, F_CLOSEM, 0) == -1)
+		die("Cannot close file descriptors >= %d: %m", min_fd);
+#else
+	int max_fd = MIN(sysconf(_SC_OPEN_MAX), /* Arbitrary limit: */ 1048576);
+	int fd;
+
+	for (fd = min_fd; fd < max_fd; fd++)
+		(void)close(fd);
+#endif
 }
 
 static void

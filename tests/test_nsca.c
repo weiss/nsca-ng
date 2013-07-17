@@ -132,13 +132,12 @@ main(int argc, char **argv)
 #endif
 	run_command(join(SERVER_COMMAND_LINE, getenv("NSCA_SERVER_FLAGS")));
 	xatexit(kill_server);
-#ifndef __gnu_hurd__
-	(void)close(fd);
-#endif
 
 	run_command(join(CLIENT_COMMAND_LINE, getenv("NSCA_CLIENT_FLAGS")));
 	cat_fifo(expected_num_lines);
-
+#ifndef __gnu_hurd__
+	(void)close(fd);
+#endif
 	return EXIT_SUCCESS;
 }
 
