@@ -30,6 +30,9 @@
 #endif
 
 #include <sys/types.h>
+#include <sys/stat.h>
+#include <errno.h>
+#include <ftw.h>
 #include <regex.h>
 #include <stdlib.h>
 #include <string.h>
@@ -41,6 +44,7 @@
 #include "system.h"
 #include "wrappers.h"
 
+#define MAX_INCLUDE 1000000UL
 #define DEFAULT_COMMAND_FILE LOCALSTATEDIR "/nagios/rw/nagios.cmd"
 #define DEFAULT_LISTEN "*"
 #define DEFAULT_LOG_LEVEL LOG_LEVEL_NOTICE
@@ -50,6 +54,12 @@
 #define DEFAULT_TIMEOUT 60.0 /* For considerations, see RFC 5482, section 6. */
 #define DEFAULT_TLS_CIPHERS \
     "PSK-AES256-CBC-SHA:PSK-AES128-CBC-SHA:PSK-3DES-EDE-CBC-SHA:PSK-RC4-SHA"
+
+static unsigned long n_included = 0;
+static struct {
+	cfg_t *cfg;
+	cfg_opt_t *opt;
+} include_args;
 
 static void hash_auth_blocks(cfg_t *);
 static char *service_to_command(const char *);
@@ -62,6 +72,10 @@ static int parse_command_pattern_cb(cfg_t * restrict, cfg_opt_t * restrict,
 static void free_auth_pattern_cb(void *);
 static int validate_unsigned_int_cb(cfg_t *, cfg_opt_t *);
 static int validate_unsigned_float_cb(cfg_t *, cfg_opt_t *);
+static int include_cb(cfg_t * restrict, cfg_opt_t * restrict, int,
+                      const char ** restrict);
+static int include_file_cb(const char *, const struct stat *, int,
+                           struct FTW *);
 
 /*
  * Exported functions.
@@ -81,7 +95,7 @@ conf_parse(const char *path)
 		CFG_END()
 	};
 	cfg_opt_t opts[] = {
-		CFG_FUNC("include", cfg_include),
+		CFG_FUNC("include", include_cb),
 		CFG_STR("chroot", NULL, CFGF_NODEFAULT),
 		CFG_STR("command_file", DEFAULT_COMMAND_FILE, CFGF_NONE),
 		CFG_STR("listen", DEFAULT_LISTEN, CFGF_NONE),
@@ -255,6 +269,79 @@ validate_unsigned_float_cb(cfg_t * restrict cfg, cfg_opt_t * restrict opt)
 		return -1; /* Abort. */
 	}
 	return 0;
+}
+
+static int
+include_cb(cfg_t * restrict cfg, cfg_opt_t * restrict opt, int argc,
+           const char ** restrict argv)
+{
+	struct stat sb;
+	const char *path;
+
+	if (++n_included > MAX_INCLUDE) {
+		cfg_error(cfg, "Processed too many `%s' directives", opt->name);
+		return 1;
+	}
+	if (argc != 1) {
+		cfg_error(cfg, "`%s' expects one argument", opt->name);
+		return 1;
+	}
+	if ((path = cfg_tilde_expand(argv[0])) == NULL) {
+		cfg_error(cfg, "Cannot tilde-expand %s", argv[0]);
+		return 1;
+	}
+	if (stat(path, &sb) == -1) {
+		cfg_error(cfg, "Cannot access %s: %s", path, strerror(errno));
+		return 1;
+	}
+
+	if (S_ISREG(sb.st_mode))
+		return cfg_include(cfg, opt, argc, argv);
+	else if (S_ISDIR(sb.st_mode)) {
+		include_args.cfg = cfg;
+		include_args.opt = opt;
+
+		switch (nftw(path, include_file_cb, /* Arbitrary: */ 20, 0)) {
+		case 0:
+			return 0;
+		case -1:
+			cfg_error(cfg, "Cannot traverse %s tree: %s", path,
+			    strerror(errno));
+			return 1;
+		default: /* An error message has been printed already. */
+			return 1;
+		}
+	} else {
+		cfg_error(cfg, "%s is not a file or directory", path);
+		return 1;
+	}
+}
+
+static int
+include_file_cb(const char *path,
+                const struct stat *sb __attribute__((__unused__)), int type,
+                struct FTW *info __attribute__((__unused__)))
+{
+	char *dot;
+
+	if (type != FTW_F) {
+		debug("Not including %s, as it's not a regular file", path);
+		return 0;
+	}
+	if ((dot = strrchr(path, '.')) == NULL
+	    || (strcmp(dot, ".cfg") != 0 && strcmp(dot, ".conf") != 0)) {
+		debug("Not including %s, as it's not a .cfg/.conf file", path);
+		return 0;
+	}
+	debug("Parsing %s", path);
+
+	/*
+	 * We use abs(3) to make sure we don't return -1, as a cfg_include()
+	 * error should be distinguishable from an nftw(3) error.  At least
+	 * libConfuse 2.7 returns 1 on error anyway, but they could always
+	 * change their mind.
+	 */
+	return abs(cfg_include(include_args.cfg, include_args.opt, 1, &path));
 }
 
 /* vim:set joinspaces noexpandtab textwidth=80 cinoptions=(4,u0: */

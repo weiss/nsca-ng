@@ -104,6 +104,14 @@ to treat the contents of the specified
 .I file
 as if those contents had appeared at the point where this directive
 appears.
+If a directory is specified instead of a
+.IR file ,
+all files with a
+.I .cfg
+or
+.I .conf
+extension in this directory and all subdirectories will be included.
+Symbolic links are followed.
 .
 .PP
 In the following subsections, the type of each value is denoted after an
