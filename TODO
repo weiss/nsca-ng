@@ -11,6 +11,11 @@ Wish List Items for NSCA-ng
   commands, as oppposed to simply matching them against the user-supplied
   regular expressions.
 
+- Let the server support a `clients` or `sources` directive that allows the
+  user to specify one or more subnets (globally and/or per-client).
+  Connections from source addresses outside these subnets should be
+  rejected.
+
 - Let the server support proxying of (selected or all) data (with `forward`
   blocks in the configuration, for example).
 
