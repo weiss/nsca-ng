@@ -56,11 +56,9 @@
     "PSK-AES256-CBC-SHA:PSK-AES128-CBC-SHA:PSK-3DES-EDE-CBC-SHA:PSK-RC4-SHA"
 
 static unsigned long n_included = 0;
-static struct {
-	cfg_t *cfg;
-	cfg_opt_t *opt;
-} include_args;
+static cfg_t *include_cfg;
 
+static void parse_include(cfg_t * restrict, const char * restrict);
 static void check_parse_success(int);
 static void hash_auth_blocks(cfg_t *);
 static char *service_to_command(const char *);
@@ -128,13 +126,9 @@ conf_parse(const char *path)
 
 	if (stat(path, &sb) == -1)
 		die("Cannot access %s: %m", path);
-	if (S_ISDIR(sb.st_mode)) {
-		char *include_statement;
-
-		xasprintf(&include_statement, "include(%s)", path);
-		check_parse_success(cfg_parse_buf(cfg, include_statement));
-		free(include_statement);
-	} else
+	if (S_ISDIR(sb.st_mode))
+		parse_include(cfg, path);
+	else
 		check_parse_success(cfg_parse(cfg, path));
 
 	hash_auth_blocks(cfg);
@@ -144,6 +138,16 @@ conf_parse(const char *path)
 /*
  * Static functions.
  */
+
+static void
+parse_include(cfg_t * restrict cfg, const char * restrict path)
+{
+	char *include_statement;
+
+	xasprintf(&include_statement, "include('%s')", path);
+	check_parse_success(cfg_parse_buf(cfg, include_statement));
+	free(include_statement);
+}
 
 static void
 check_parse_success(int status)
@@ -321,19 +325,14 @@ include_cb(cfg_t * restrict cfg, cfg_opt_t * restrict opt, int argc,
 	if (S_ISREG(sb.st_mode))
 		return cfg_include(cfg, opt, argc, argv);
 	else if (S_ISDIR(sb.st_mode)) {
-		include_args.cfg = cfg;
-		include_args.opt = opt;
+		include_cfg = cfg;
 
-		switch (nftw(path, include_file_cb, /* Arbitrary: */ 20, 0)) {
-		case 0:
-			return 0;
-		case -1:
+		if (nftw(path, include_file_cb, /* Arbitrary: */ 20, 0) == -1) {
 			cfg_error(cfg, "Cannot traverse %s tree: %s", path,
 			    strerror(errno));
 			return 1;
-		default: /* An error message has been printed already. */
-			return 1;
-		}
+		} else
+			return 0;
 	} else {
 		cfg_error(cfg, "%s is not a file or directory", path);
 		return 1;
@@ -357,14 +356,8 @@ include_file_cb(const char *path,
 		return 0;
 	}
 	debug("Parsing %s", path);
-
-	/*
-	 * We use abs(3) to make sure we don't return -1, as a cfg_include()
-	 * error should be distinguishable from an nftw(3) error.  At least
-	 * libConfuse 2.7 returns 1 on error anyway, but they could always
-	 * change their mind.
-	 */
-	return abs(cfg_include(include_args.cfg, include_args.opt, 1, &path));
+	parse_include(include_cfg, path);
+	return 0;
 }
 
 /* vim:set joinspaces noexpandtab textwidth=80 cinoptions=(4,u0: */
