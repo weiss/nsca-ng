@@ -303,7 +303,8 @@ include_cb(cfg_t * restrict cfg, cfg_opt_t * restrict opt, int argc,
            const char ** restrict argv)
 {
 	struct stat sb;
-	const char *path;
+	char *path;
+	int status;
 
 	if (++n_included > MAX_INCLUDE) {
 		cfg_error(cfg, "Processed too many `%s' directives", opt->name);
@@ -317,26 +318,28 @@ include_cb(cfg_t * restrict cfg, cfg_opt_t * restrict opt, int argc,
 		cfg_error(cfg, "Cannot tilde-expand %s", argv[0]);
 		return 1;
 	}
+
 	if (stat(path, &sb) == -1) {
 		cfg_error(cfg, "Cannot access %s: %s", path, strerror(errno));
-		return 1;
-	}
-
-	if (S_ISREG(sb.st_mode))
-		return cfg_include(cfg, opt, argc, argv);
-	else if (S_ISDIR(sb.st_mode)) {
+		status = 1;
+	} else if (S_ISREG(sb.st_mode)) {
+		status = cfg_include(cfg, opt, argc, argv);
+	} else if (S_ISDIR(sb.st_mode)) {
 		include_cfg = cfg;
 
 		if (nftw(path, include_file_cb, /* Arbitrary: */ 20, 0) == -1) {
 			cfg_error(cfg, "Cannot traverse %s tree: %s", path,
 			    strerror(errno));
-			return 1;
+			status = 1;
 		} else
-			return 0;
+			status = 0;
 	} else {
 		cfg_error(cfg, "%s is not a file or directory", path);
-		return 1;
+		status = 1;
 	}
+
+	free(path);
+	return status;
 }
 
 static int
