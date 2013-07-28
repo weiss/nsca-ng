@@ -403,7 +403,7 @@ usage(int status)
 	    "Options:\n"
 	    " -b <host[:port]> Bind to <host[:port]>.\n"
 	    " -C <fifo>        Submit commands into the specified <fifo>.\n"
-	    " -c <file>        Use the specified configuration <file>.\n"
+	    " -c <file|dir>    Use the specified configuration <file|dir>.\n"
 	    " -F               Don't detach from the controlling terminal.\n"
 	    " -h               Print this usage information and exit.\n"
 	    " -l <level>       Set the specified log <level>.\n"

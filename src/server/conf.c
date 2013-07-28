@@ -61,6 +61,7 @@ static struct {
 	cfg_opt_t *opt;
 } include_args;
 
+static void check_parse_success(int);
 static void hash_auth_blocks(cfg_t *);
 static char *service_to_command(const char *);
 static int parse_host_pattern_cb(cfg_t * restrict, cfg_opt_t * restrict,
@@ -84,6 +85,7 @@ static int include_file_cb(const char *, const struct stat *, int,
 cfg_t *
 conf_parse(const char *path)
 {
+	struct stat sb;
 	cfg_opt_t auth_opts[] = {
 		CFG_STR("password", NULL, CFGF_NODEFAULT),
 		CFG_PTR_LIST_CB("commands", NULL, CFGF_NODEFAULT,
@@ -124,10 +126,16 @@ conf_parse(const char *path)
 
 	debug("Parsing configuration file %s", path);
 
-	if (access(path, R_OK) == -1) /* libConfuse won't complain. */
-		die("Cannot read %s: %m", path);
-	if (cfg_parse(cfg, path) == CFG_PARSE_ERROR)
-		exit(EXIT_FAILURE);
+	if (stat(path, &sb) == -1)
+		die("Cannot access %s: %m", path);
+	if (S_ISDIR(sb.st_mode)) {
+		char *include_statement;
+
+		xasprintf(&include_statement, "include(%s)", path);
+		check_parse_success(cfg_parse_buf(cfg, include_statement));
+		free(include_statement);
+	} else
+		check_parse_success(cfg_parse(cfg, path));
 
 	hash_auth_blocks(cfg);
 	return cfg;
@@ -136,6 +144,21 @@ conf_parse(const char *path)
 /*
  * Static functions.
  */
+
+static void
+check_parse_success(int status)
+{
+	switch (status) {
+	case CFG_SUCCESS:
+		break;
+	case CFG_PARSE_ERROR: /* An error message has been printed already. */
+		exit(EXIT_FAILURE);
+	case CFG_FILE_ERROR:
+		die("Cannot open configuration file for reading");
+	default: /* Won't happen unless the libConfuse API changes. */
+		die("Cannot parse the configuration");
+	}
+}
 
 static void
 hash_auth_blocks(cfg_t *cfg)
