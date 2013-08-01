@@ -126,6 +126,14 @@ AS_IF([test "x$nsca_enable_server" = xyes],
   [AC_TYPE_SSIZE_T
    AC_TYPE_INTMAX_T
    AC_TYPE_PID_T])
+AC_CHECK_TYPES([struct sockaddr_storage, struct sockaddr_in6], [], [],
+  [[#include <sys/types.h>
+    #ifdef HAVE_SYS_SOCKET_H
+    #include <sys/socket.h>
+    #endif
+    #ifdef HAVE_NETINET_IN_H
+    #include <netinet/in.h>
+    #endif]])
 
 # Check for library functions.
 HW_FUNC_VSNPRINTF

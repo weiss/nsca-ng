@@ -107,6 +107,14 @@
 #include "tls.h"
 #include "wrappers.h"
 
+#if !HAVE_STRUCT_SOCKADDR_STORAGE
+# if HAVE_STRUCT_SOCKADDR_IN6
+#  define sockaddr_storage sockaddr_in6
+# else
+#  define sockaddr_storage sockaddr_in
+# endif
+#endif
+
 #ifndef INET6_ADDRSTRLEN
 # define INET6_ADDRSTRLEN 46
 #endif
