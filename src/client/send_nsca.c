@@ -282,8 +282,6 @@ parse_backslash_escape(const char *sequence)
 			case 'x': /* Fall through. */
 			case '0':
 				break;
-			default:
-				return (unsigned char)sequence[1];
 			}
 		/* Otherwise, fall through. */
 	case 3: /* Fall through. */
