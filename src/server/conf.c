@@ -58,7 +58,7 @@
 static unsigned long n_included = 0;
 static cfg_t *include_cfg;
 
-static void parse_include(cfg_t * restrict, const char * restrict);
+static int parse_include(cfg_t * restrict, const char * restrict);
 static void check_parse_success(int);
 static void hash_auth_blocks(cfg_t *);
 static char *service_to_command(const char *);
@@ -127,7 +127,7 @@ conf_parse(const char *path)
 	if (stat(path, &sb) == -1)
 		die("Cannot access %s: %m", path);
 	if (S_ISDIR(sb.st_mode))
-		parse_include(cfg, path);
+		check_parse_success(parse_include(cfg, path));
 	else
 		check_parse_success(cfg_parse(cfg, path));
 
@@ -139,14 +139,16 @@ conf_parse(const char *path)
  * Static functions.
  */
 
-static void
+static int
 parse_include(cfg_t * restrict cfg, const char * restrict path)
 {
 	char *include_statement;
+	int status;
 
 	xasprintf(&include_statement, "include('%s')", path);
-	check_parse_success(cfg_parse_buf(cfg, include_statement));
+	status = cfg_parse_buf(cfg, include_statement);
 	free(include_statement);
+	return status;
 }
 
 static void
@@ -359,7 +361,7 @@ include_file_cb(const char *path,
 		return 0;
 	}
 	debug("Parsing %s", path);
-	parse_include(include_cfg, path);
+	check_parse_success(parse_include(include_cfg, path));
 	return 0;
 }
 
