@@ -71,6 +71,7 @@ static int parse_command_pattern_cb(cfg_t * restrict, cfg_opt_t * restrict,
 static void free_auth_pattern_cb(void *);
 static int validate_unsigned_int_cb(cfg_t *, cfg_opt_t *);
 static int validate_unsigned_float_cb(cfg_t *, cfg_opt_t *);
+static int validate_authorization_cb(cfg_t *, cfg_opt_t *);
 static int include_cb(cfg_t * restrict, cfg_opt_t * restrict, int,
                       const char ** restrict);
 static int include_file_cb(const char *, const struct stat *, int,
@@ -121,6 +122,8 @@ conf_parse(const char *path)
 	    validate_unsigned_int_cb);
 	cfg_set_validate_func(cfg, "timeout",
 	    validate_unsigned_float_cb);
+	cfg_set_validate_func(cfg, "authorize",
+	    validate_authorization_cb);
 
 	debug("Parsing configuration file %s", path);
 
@@ -180,11 +183,7 @@ hash_auth_blocks(cfg_t *cfg)
 		cfg_t *auth = cfg_getnsec(cfg, "authorize", i);
 		const char *identity = cfg_title(auth);
 
-		debug("Parsing authorizations for %s", identity);
-
-		if (cfg_size(auth, "password") == 0)
-			die("No password specified for %s", identity);
-
+		debug("Hashing authorizations for %s", identity);
 		hash_insert(identity, auth);
 	}
 }
@@ -295,6 +294,19 @@ validate_unsigned_float_cb(cfg_t * restrict cfg, cfg_opt_t * restrict opt)
 
 	if (value < 0.0) {
 		cfg_error(cfg, "`%s' must be a positive value", opt->name);
+		return -1; /* Abort. */
+	}
+	return 0;
+}
+
+static int
+validate_authorization_cb(cfg_t * restrict cfg, cfg_opt_t * restrict opt)
+{
+	cfg_t *auth = cfg_opt_getnsec(opt, cfg_opt_size(opt) - 1);
+	const char *identity = cfg_title(auth);
+
+	if (cfg_size(auth, "password") == 0) {
+		cfg_error(cfg, "No password specified for %s", identity);
 		return -1; /* Abort. */
 	}
 	return 0;
