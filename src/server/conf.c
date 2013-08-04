@@ -113,11 +113,11 @@ conf_parse(const char *path)
 	};
 	cfg_t *cfg = cfg_init(opts, CFGF_NONE); /* Aborts on error. */
 
+	cfg_set_validate_func(cfg, "log_level",
+	    validate_unsigned_int_cb);
 	cfg_set_validate_func(cfg, "max_command_size",
 	    validate_unsigned_int_cb);
 	cfg_set_validate_func(cfg, "max_queue_size",
-	    validate_unsigned_int_cb);
-	cfg_set_validate_func(cfg, "log_level",
 	    validate_unsigned_int_cb);
 	cfg_set_validate_func(cfg, "timeout",
 	    validate_unsigned_float_cb);
