@@ -61,6 +61,7 @@ static cfg_t *include_cfg;
 static int parse_include(cfg_t * restrict, const char * restrict);
 static void check_parse_success(int);
 static void hash_auth_blocks(cfg_t *);
+static char *host_to_command(const char *);
 static char *service_to_command(const char *);
 static int parse_host_pattern_cb(cfg_t * restrict, cfg_opt_t * restrict,
                                  const char * restrict, void * restrict);
