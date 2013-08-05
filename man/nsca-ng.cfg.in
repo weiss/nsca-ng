@@ -52,7 +52,7 @@ subsection and the
 .B Authorizations
 subsection, respectively).
 They may appear in arbitrary order.
-Authorizations are specified using the
+An authorization is specified using the
 .B authorize
 keyword followed by a (possibly quoted) client identity string and a
 brace-enclosed block of corresponding authorization settings.
