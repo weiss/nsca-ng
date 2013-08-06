@@ -60,7 +60,9 @@ static cfg_t *include_cfg;
 
 static int parse_include(cfg_t * restrict, const char * restrict);
 static void check_parse_success(int);
-static void hash_auth_blocks(cfg_t *);
+static void process_auth_sections(cfg_t *);
+static void validate_auth_section(cfg_t *);
+static void fallback_to_defaults(cfg_t * restrict, cfg_t * restrict);
 static char *host_to_command(const char *);
 static char *service_to_command(const char *);
 static int parse_host_pattern_cb(cfg_t * restrict, cfg_opt_t * restrict,
@@ -72,7 +74,6 @@ static int parse_command_pattern_cb(cfg_t * restrict, cfg_opt_t * restrict,
 static void free_auth_pattern_cb(void *);
 static int validate_unsigned_int_cb(cfg_t *, cfg_opt_t *);
 static int validate_unsigned_float_cb(cfg_t *, cfg_opt_t *);
-static int validate_authorization_cb(cfg_t *, cfg_opt_t *);
 static int include_cb(cfg_t * restrict, cfg_opt_t * restrict, int,
                       const char ** restrict);
 static int include_file_cb(const char *, const struct stat *, int,
@@ -86,6 +87,14 @@ cfg_t *
 conf_parse(const char *path)
 {
 	struct stat sb;
+
+	/*
+	 * To let the user specify a global default value for an "authorize"
+	 * setting, also add the setting as a CFG_STR to the list of global
+	 * options, and add the setting's name to the "settings" array in the
+	 * fallback_to_defaults() function.  This should be done for all
+	 * authorization settings.
+	 */
 	cfg_opt_t auth_opts[] = {
 		CFG_STR("password", NULL, CFGF_NODEFAULT),
 		CFG_PTR_LIST_CB("commands", NULL, CFGF_NODEFAULT,
@@ -100,11 +109,15 @@ conf_parse(const char *path)
 		CFG_FUNC("include", include_cb),
 		CFG_STR("chroot", NULL, CFGF_NODEFAULT),
 		CFG_STR("command_file", DEFAULT_COMMAND_FILE, CFGF_NONE),
+		CFG_STR("commands", NULL, CFGF_NODEFAULT),
+		CFG_STR("hosts", NULL, CFGF_NODEFAULT),
 		CFG_STR("listen", DEFAULT_LISTEN, CFGF_NONE),
 		CFG_INT("log_level", DEFAULT_LOG_LEVEL, CFGF_NONE),
 		CFG_INT("max_command_size", DEFAULT_MAX_COMMAND_SIZE, CFGF_NONE),
 		CFG_INT("max_queue_size", DEFAULT_MAX_QUEUE_SIZE, CFGF_NONE),
+		CFG_STR("password", NULL, CFGF_NODEFAULT),
 		CFG_STR("pid_file", NULL, CFGF_NODEFAULT),
+		CFG_STR("services", NULL, CFGF_NODEFAULT),
 		CFG_STR("temp_directory", DEFAULT_TEMP_DIRECTORY, CFGF_NONE),
 		CFG_STR("tls_ciphers", DEFAULT_TLS_CIPHERS, CFGF_NONE),
 		CFG_FLOAT("timeout", DEFAULT_TIMEOUT, CFGF_NONE),
@@ -123,8 +136,6 @@ conf_parse(const char *path)
 	    validate_unsigned_int_cb);
 	cfg_set_validate_func(cfg, "timeout",
 	    validate_unsigned_float_cb);
-	cfg_set_validate_func(cfg, "authorize",
-	    validate_authorization_cb);
 
 	debug("Parsing configuration file %s", path);
 
@@ -135,7 +146,7 @@ conf_parse(const char *path)
 	else
 		check_parse_success(cfg_parse(cfg, path));
 
-	hash_auth_blocks(cfg);
+	process_auth_sections(cfg);
 	return cfg;
 }
 
@@ -171,7 +182,7 @@ check_parse_success(int status)
 }
 
 static void
-hash_auth_blocks(cfg_t *cfg)
+process_auth_sections(cfg_t *cfg)
 {
 	unsigned int i, n_auth_blocks;
 
@@ -184,8 +195,44 @@ hash_auth_blocks(cfg_t *cfg)
 		cfg_t *auth = cfg_getnsec(cfg, "authorize", i);
 		const char *identity = cfg_title(auth);
 
-		debug("Hashing authorizations for %s", identity);
+		debug("Processing authorizations for %s", identity);
+		fallback_to_defaults(cfg, auth);
+		validate_auth_section(auth);
 		hash_insert(identity, auth);
+	}
+}
+
+static void
+validate_auth_section(cfg_t *auth)
+{
+	const char *identity = cfg_title(auth);
+
+	if (cfg_size(auth, "password") == 0)
+		die("No password specified for %s", identity);
+}
+
+static void
+fallback_to_defaults(cfg_t * restrict cfg, cfg_t * restrict auth)
+{
+	const char *settings[] = {
+	    "hosts",
+	    "services",
+	    "commands",
+	    "password"
+	};
+	size_t i;
+
+	for (i = 0; i < sizeof(settings) / sizeof(*settings); i++) {
+		cfg_opt_t *global_opt = cfg_getopt(cfg, settings[i]);
+		unsigned int j;
+
+		if (cfg_size(auth, settings[i]) == 0
+		    && cfg_opt_size(global_opt) > 0)
+			for (j = 0; j < cfg_opt_size(global_opt); j++)
+				if (cfg_setopt(auth,
+				    cfg_getopt(auth, settings[i]),
+				    cfg_opt_getnstr(global_opt, j)) == NULL)
+					exit(EXIT_FAILURE);
 	}
 }
 
@@ -295,19 +342,6 @@ validate_unsigned_float_cb(cfg_t * restrict cfg, cfg_opt_t * restrict opt)
 
 	if (value < 0.0) {
 		cfg_error(cfg, "`%s' must be a positive value", opt->name);
-		return -1; /* Abort. */
-	}
-	return 0;
-}
-
-static int
-validate_authorization_cb(cfg_t * restrict cfg, cfg_opt_t * restrict opt)
-{
-	cfg_t *auth = cfg_opt_getnsec(opt, cfg_opt_size(opt) - 1);
-	const char *identity = cfg_title(auth);
-
-	if (cfg_size(auth, "password") == 0) {
-		cfg_error(cfg, "No password specified for %s", identity);
 		return -1; /* Abort. */
 	}
 	return 0;

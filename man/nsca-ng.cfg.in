@@ -56,6 +56,12 @@ An authorization is specified using the
 .B authorize
 keyword followed by a (possibly quoted) client identity string and a
 brace-enclosed block of corresponding authorization settings.
+However, an authorization setting may also be specified as a global
+setting outside of these
+.B authorize
+sections.
+In this case, it serves as a global fallback for authorization sections
+that don't define the setting in question.
 .
 .PP
 Global settings and authorization settings are defined by specifying a
