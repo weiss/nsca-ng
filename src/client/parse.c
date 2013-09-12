@@ -56,7 +56,8 @@ parse_command(const char *line)
 	if (line[0] == '[')
 		command = xstrdup(line);
 	else
-		xasprintf(&command, "[%lu] %s", time(NULL), line);
+		xasprintf(&command, "[%lu] %s", (unsigned long)time(NULL),
+		    line);
 
 	return command;
 }
@@ -97,7 +98,7 @@ parse_check_result(const char *input, char delimiter)
 		debug("Got host check result");
 		xasprintf(&command,
 		    "[%lu] PROCESS_HOST_CHECK_RESULT;%.*s;%.*s;%s",
-		    time(NULL),
+		    (unsigned long)time(NULL),
 		    lengths[0], fields[0],
 		    lengths[1], fields[1],
 		    fields[2]);
@@ -106,7 +107,7 @@ parse_check_result(const char *input, char delimiter)
 		debug("Got service check result");
 		xasprintf(&command,
 		    "[%lu] PROCESS_SERVICE_CHECK_RESULT;%.*s;%.*s;%.*s;%s",
-		    time(NULL),
+		    (unsigned long)time(NULL),
 		    lengths[0], fields[0],
 		    lengths[1], fields[1],
 		    lengths[2], fields[2],
