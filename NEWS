@@ -1,6 +1,29 @@
 NSCA-ng Release History
 =======================
 
+Changes in Release 1.2 (2013-11-06)
+-----------------------------------
+
+- Let nsca-ng.cfg(5)'s `include` directive and nsca-ng(8)'s `-c` flag accept
+  directory path names.  If a directory is specified, read the server
+  configuration from all `*.cfg` and `*.conf` files in the specified
+  directory and all subdirectories.
+- Let the client's `-d` and `-e` flags accept C-style escape sequences, so
+  that e.g. `-e '\n'` can be specified.  Octal and hexadecimal numbers are
+  also accepted.
+- Allow for specifying authorization settings outside of the `authorize`
+  sections in nsca-ng.cfg(5) files.  They will then serve as a fallback for
+  `authorize` sections that don't define these settings.
+- Fix a race condition in the case where the command file is recreated after
+  the NSCA-ng server had opened it.
+- Fix a crash of the client on 32-bit platforms that use 64-bit timestamps.
+- Don't use half-broken POSIX AIO implementations such as the one provided
+  by Debian GNU/kFreeBSD 7.
+- Apply test suite fixes for GNU Hurd.
+- Update our copy of libev from version 4.11 to version 4.15.  The new
+  release provides a number of bug fixes and minor enhancements.
+- Apply some minor cleanups.
+
 Changes in Release 1.1 (2013-04-12)
 -----------------------------------
 
