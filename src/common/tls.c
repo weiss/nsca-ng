@@ -107,6 +107,14 @@
 #include "tls.h"
 #include "wrappers.h"
 
+#if !HAVE_STRUCT_SOCKADDR_STORAGE
+# if HAVE_STRUCT_SOCKADDR_IN6
+#  define sockaddr_storage sockaddr_in6
+# else
+#  define sockaddr_storage sockaddr_in
+# endif
+#endif
+
 #ifndef INET6_ADDRSTRLEN
 # define INET6_ADDRSTRLEN 46
 #endif
@@ -395,10 +403,18 @@ initialize_openssl(const SSL_METHOD *method, const char *ciphers)
 
 	(void)SSL_library_init();
 	SSL_load_error_strings();
-	OPENSSL_config(NULL);
-
 	(void)atexit(ERR_free_strings);
-	(void)atexit(CONF_modules_free);
+
+	/*
+	 * In earlier versions, we called
+	 *
+	 * 	OPENSSL_config(NULL);
+	 * 	(void)atexit(CONF_modules_free);
+	 *
+	 * at this point.  The OPENSSL_config(3) man page claims that this
+	 * function "ignores all errors", but that's not true: at least OpenSSL
+	 * 1.0.1e exit(3)s in OPENSSL_config(3) on certain error conditions.
+	 */
 
 	if ((ssl_ctx = SSL_CTX_new(method)) == NULL)
 		die("Cannot create SSL context");

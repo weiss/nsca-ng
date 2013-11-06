@@ -148,7 +148,9 @@ instead of a horizontal tab to separate the fields when parsing host or
 service check results.
 The
 .I delimiter
-must be a single character.
+must be a single character, a C-style backslash escape sequence, the
+octal value of a character with a leading zero, or the hexadecimal value
+of a character prefixed with \(lq0x\(rq.
 Any
 .SM ASCII
 character other than a backslash, newline,
@@ -170,7 +172,9 @@ instead of an
 character to separate multiple host or service check results.
 The
 .I separator
-must be a single character.
+must be a single character, a C-style backslash escape sequence, the
+octal value of a character with a leading zero, or the hexadecimal value
+of a character prefixed with \(lq0x\(rq.
 Any
 .SM ASCII
 character is allowed, but note that multiline check result messages

@@ -24,12 +24,21 @@
 
 # NSCA_LIB_NETWORKING
 # -------------------
-# Check the availability of some networking header files.  Also, find out which
-# libraries define the networking functions we're interested in and add the
-# according flags to LIBS.  We bail out if any of these functions aren't found.
+# Check the availability of some networking header files and types.  Also, find
+# out which libraries define the networking functions we're interested in and
+# add the according flags to LIBS.  We bail out if any of these functions aren't
+# found.
 AC_DEFUN([NSCA_LIB_NETWORKING],
 [
   AC_CHECK_HEADERS([arpa/inet.h netinet/in.h sys/socket.h])
+  AC_CHECK_TYPES([struct sockaddr_storage, struct sockaddr_in6], [], [],
+    [[#include <sys/types.h>
+      #ifdef HAVE_SYS_SOCKET_H
+      #include <sys/socket.h>
+      #endif
+      #ifdef HAVE_NETINET_IN_H
+      #include <netinet/in.h>
+      #endif]])
   # Solaris 8 and newer provide the inet_ntop(3) function in libnsl, older
   # Solaris versions provide inet_ntop(3) in libresolv instead.
   AC_SEARCH_LIBS([inet_ntop], [nsl resolv], [],

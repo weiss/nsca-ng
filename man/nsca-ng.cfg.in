@@ -52,10 +52,16 @@ subsection and the
 .B Authorizations
 subsection, respectively).
 They may appear in arbitrary order.
-Authorizations are specified using the
+An authorization is specified using the
 .B authorize
 keyword followed by a (possibly quoted) client identity string and a
 brace-enclosed block of corresponding authorization settings.
+However, an authorization setting may also be specified as a global
+setting outside of these
+.B authorize
+sections.
+In this case, it serves as a global fallback for authorization sections
+that don't define the setting in question.
 .
 .PP
 Global settings and authorization settings are defined by specifying a
@@ -104,6 +110,14 @@ to treat the contents of the specified
 .I file
 as if those contents had appeared at the point where this directive
 appears.
+If a directory is specified instead of a
+.IR file ,
+all files with a
+.I .cfg
+or
+.I .conf
+extension in this directory and all subdirectories will be included.
+Symbolic links are followed.
 .
 .PP
 In the following subsections, the type of each value is denoted after an

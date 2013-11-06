@@ -29,9 +29,11 @@
 # include <config.h>
 #endif
 
+#include <ctype.h>
 #if HAVE_INTTYPES_H
 # include <inttypes.h>
 #endif
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -69,6 +71,7 @@ int exit_code = EXIT_SUCCESS;
 
 static options *get_options(int, char **);
 static void free_options(options *);
+static int parse_backslash_escape(const char *);
 static void delay_execution(unsigned int);
 static unsigned long random_number(unsigned long);
 static void forget_config(void);
@@ -120,7 +123,7 @@ main(int argc, char **argv)
 	    opt->delimiter,
 	    opt->separator);
 
-	ev_run(EV_DEFAULT_UC_ 0);
+	(void)ev_run(EV_DEFAULT_UC_ 0);
 
 	free(host_port);
 	free_options(opt);
@@ -155,7 +158,9 @@ get_options(int argc, char **argv)
 		}
 	}
 
-	while ((option = getopt(argc, argv, "Cc:D:d:e:H:ho:p:SstVv")) != -1)
+	while ((option = getopt(argc, argv, "Cc:D:d:e:H:ho:p:SstVv")) != -1) {
+		int character;
+
 		switch (option) {
 		case 'C':
 			opt->raw_commands = true;
@@ -171,18 +176,19 @@ get_options(int argc, char **argv)
 				die("-D argument must be a positive integer");
 			break;
 		case 'd':
-			if (strlen(optarg) != 1)
+			if ((character = parse_backslash_escape(optarg)) == EOF)
 				die("-d argument must be a single character");
-			if (*optarg == '\27'
-			    || *optarg == '\n'
-			    || *optarg == '\\')
+			if (character == '\27'
+			    || character == '\n'
+			    || character == '\0'
+			    || character == '\\')
 				die("Illegal delimiter specified with -d");
-			opt->delimiter = *optarg;
+			opt->delimiter = (char)character;
 			break;
 		case 'e':
-			if (strlen(optarg) != 1)
+			if ((character = parse_backslash_escape(optarg)) == EOF)
 				die("-e argument must be a single character");
-			opt->separator = *optarg;
+			opt->separator = (char)character;
 			break;
 		case 'H':
 			if (opt->server != NULL)
@@ -226,7 +232,7 @@ get_options(int argc, char **argv)
 		default:
 			usage(EXIT_FAILURE);
 		}
-
+	}
 	if (opt->delimiter == opt->separator)
 		die("Field delimiter must be different from record separator");
 	if (argc - optind > 0)
@@ -246,6 +252,62 @@ free_options(options *opt)
 		free(opt->server);
 
 	free(opt);
+}
+
+static int
+parse_backslash_escape(const char *sequence)
+{
+	char numeric[6]; /* Space for "0x345". */
+
+	switch (strlen(sequence)) {
+	case 1:
+		return (unsigned char)sequence[0];
+	case 2:
+		if (sequence[0] == '\\')
+			switch (sequence[1]) {
+			case 'a':
+				return '\a';
+			case 'b':
+				return '\b';
+			case 'f':
+				return '\f';
+			case 'n':
+				return '\n';
+			case 'r':
+				return '\r';
+			case 't':
+				return '\t';
+			case 'v':
+				return '\v';
+			case 'x': /* Fall through. */
+			case '0':
+				break;
+			}
+		/* Otherwise, fall through. */
+	case 3: /* Fall through. */
+	case 4: /* Fall through. */
+	case 5:
+		/*
+		 * We support octal numbers with a leading zero and hexadecimal
+		 * numbers prefixed with "0x" in addition to numeric backslash
+		 * escape sequences.
+		 */
+		if (sequence[0] == '0' || sequence[0] == '\\') {
+			char *end;
+			long value;
+
+			(void)strcpy(numeric, sequence);
+			if (numeric[0] == '\\') /* \x42 -> 0x42 */
+				numeric[0] = '0';
+			value = strtol(numeric, &end, 0);
+			if (*end == '\0' && value >= 0 && value <= CHAR_MAX)
+				return (unsigned char)value;
+			/* Otherwise, fall through. */
+		}
+		/* Otherwise, fall through. */
+	default:
+		return EOF;
+	}
 }
 
 static void

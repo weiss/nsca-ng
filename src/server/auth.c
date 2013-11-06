@@ -72,9 +72,10 @@ check_psk(SSL *ssl __attribute__((__unused__)), const char *identity,
 bool
 is_authorized(const char * restrict identity, const char * restrict command)
 {
+	const char *settings[] = { "hosts", "services", "commands" };
 	cfg_t *auth;
 	char *newline;
-	unsigned int i;
+	size_t i;
 
 	if ((auth = hash_lookup(identity)) == NULL
 	    && (auth = hash_lookup("*")) == NULL) {
@@ -100,23 +101,16 @@ is_authorized(const char * restrict identity, const char * restrict command)
 	}
 	command = skip_whitespace(command + 1);
 
-	for (i = 0; i < cfg_size(auth, "hosts"); i++) {
-		regex_t *pattern = cfg_getnptr(auth, "hosts", i);
+	for (i = 0; i < sizeof(settings) / sizeof(*settings); i++) {
+		cfg_opt_t *opt = cfg_getopt(auth, settings[i]);
+		unsigned int j;
 
-		if (match(pattern, command))
-			return true;
-	}
-	for (i = 0; i < cfg_size(auth, "services"); i++) {
-		regex_t *pattern = cfg_getnptr(auth, "services", i);
+		for (j = 0; j < cfg_opt_size(opt); j++) {
+			regex_t *pattern = cfg_opt_getnptr(opt, j);
 
-		if (match(pattern, command))
-			return true;
-	}
-	for (i = 0; i < cfg_size(auth, "commands"); i++) {
-		regex_t *pattern = cfg_getnptr(auth, "commands", i);
-
-		if (match(pattern, command))
-			return true;
+			if (match(pattern, command))
+				return true;
+		}
 	}
 	return false;
 }

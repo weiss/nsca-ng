@@ -27,7 +27,7 @@
 # Autotools initialization.
 AC_PREREQ([2.60]) dnl But Autoconf 2.63 is required for AC_INIT's URL parameter.
 AC_INIT([NSCA-ng],
-  [1.1],
+  [1.2],
   [developers@nsca-ng.org],
   [nsca-ng],
   [http://www.nsca-ng.org/])
@@ -42,7 +42,7 @@ AM_MAINTAINER_MODE([enable])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES]) dnl Automake 1.11 added this.
 
 # Set the release date.
-RELEASE_DATE='March 12, 2013'
+RELEASE_DATE='November 6, 2013'
 
 AC_SUBST([RELEASE_DATE])
 
@@ -137,11 +137,12 @@ AC_REPLACE_FUNCS([strdup strcasecmp strncasecmp])
 AS_IF([test "x$nsca_enable_client" = xyes],
   [AC_CHECK_FUNCS([nanosleep])])
 AS_IF([test "x$nsca_enable_server" = xyes],
-  [NSCA_FUNC_DAEMON])
+  [AC_CHECK_FUNCS([closefrom])
+   NSCA_FUNC_DAEMON])
 
 # Communicate the PIPE_BUF value to Autotest.
 AC_COMPUTE_INT([nsca_pipe_buf], [PIPE_BUF], [[#include <limits.h>]],
-  [nsca_pipe_buf=unknown])
+  [nsca_pipe_buf=512])
 AC_SUBST([nsca_pipe_buf])
 
 # Spit out the results.

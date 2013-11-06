@@ -98,7 +98,7 @@ PING Request
 
 The protocol `<version>` is a positive decimal number, currently always `1`.
 
-If a `PING` request is sent, it MUST be the first request of a NSCA-ng
+If a `PING` request is sent, it MUST be the first request of an NSCA-ng
 session; except that the `PING` request MAY be retried with different
 parameters after the server replied to a `PING` request with a `FAIL`
 response.

@@ -117,6 +117,14 @@ Read the configuration from the specified
 .I file
 instead of using the default configuration file
 .IR @sysconfdir@/nsca\-ng.cfg .
+If a directory is specified instead of a
+.IR file ,
+the configuration will be read from all files with a
+.I .cfg
+or
+.I .conf
+extension in this directory and all subdirectories.
+Symbolic links are followed.
 .
 .TP
 .B \-F

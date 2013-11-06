@@ -54,7 +54,7 @@ AC_DEFUN([NSCA_LIB_AIO],
   AS_IF([test "x$nsca_lib_posix_aio" = xyes],
     [AC_CACHE_CHECK([whether POSIX AIO works],
       [nsca_cv_lib_aio_enabled],
-      [save_LIBS=$LIBS
+      [nsca_save_LIBS=$LIBS
        LIBS=$AIOLIBS
        AC_RUN_IFELSE(
          [AC_LANG_PROGRAM(
@@ -62,12 +62,25 @@ AC_DEFUN([NSCA_LIB_AIO],
              #include <sys/stat.h>
              #include <fcntl.h>
              #include <aio.h>
+             #include <signal.h>
              #include <string.h>
-             #include <unistd.h>]],
-           [[struct aiocb cb;
-             const struct aiocb *cb_list[1];
+             #include <unistd.h>
+             static void signal_handler(int sig, siginfo_t *info, void *ctx) {
+               if (sig != SIGUSR1 || info->si_code != SI_ASYNCIO || ctx == NULL)
+                 _exit(1);
+               else {
+                 (void)close(info->si_value.sival_int);
+                 _exit(0);
+               }
+             }]],
+           [[struct sigaction action;
+             struct aiocb cb;
              char msg[] = "Hello, world!\n";
              int fd;
+             action.sa_sigaction = signal_handler;
+             action.sa_flags = SA_SIGINFO;
+             (void)sigemptyset(&action.sa_mask);
+             (void)sigaction(SIGUSR1, &action, NULL);
              if ((fd = open("/dev/null", O_WRONLY)) == -1)
                return 1;
              (void)memset(&cb, 0, sizeof(cb));
@@ -75,15 +88,17 @@ AC_DEFUN([NSCA_LIB_AIO],
              cb.aio_nbytes = sizeof(msg);
              cb.aio_fildes = fd;
              cb.aio_offset = 0;
-             cb.aio_sigevent.sigev_notify = SIGEV_NONE;
-             cb_list[0] = &cb;
-             if (aio_write(&cb) == -1 || aio_suspend(cb_list, 1, NULL) == -1)
-               return 1;
-             (void)close(fd);]])],
+             cb.aio_sigevent.sigev_notify = SIGEV_SIGNAL;
+             cb.aio_sigevent.sigev_signo = SIGUSR1;
+             cb.aio_sigevent.sigev_value.sival_int = fd;
+             (void)aio_write(&cb);
+             (void)sleep(10);
+             (void)close(fd);
+             return 1;]])],
          [nsca_cv_lib_aio_enabled=yes],
          [nsca_cv_lib_aio_enabled=no],
          [nsca_cv_lib_aio_enabled=no])
-       LIBS=$save_LIBS])])
+       LIBS=$nsca_save_LIBS])])
   AS_IF([test "x$nsca_cv_lib_aio_enabled" = xyes],
     [AC_DEFINE([HAVE_POSIX_AIO], [1],
       [Define to 1 if you have the POSIX AIO API.])
