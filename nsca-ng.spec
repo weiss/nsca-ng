@@ -38,8 +38,6 @@ Source: %{name}-%{version}.tar.gz
 URL: https://www.nsca-ng.org/
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
-BuildRequires: libconfuse-devel
-BuildRequires: openssl-devel >= 1.0.0
 BuildRequires: patch
 
 %description
@@ -48,8 +46,6 @@ NSCA-ng provides a client-server pair that makes the Nagios command file accessi
 %package server
 Summary:      NSCA-ng server
 Group:        Applications/System
-Requires:     libconfuse
-Requires:     openssl >= 1.0.0
 
 %description server
 NSCA-ng provides a client-server pair that makes the Nagios command file accessible to remote systems.
@@ -59,8 +55,6 @@ This is the server component of NSCA-ng.
 %package client
 Summary:      NSCA-ng client
 Group:        Applications/System
-Requires:     libconfuse
-Requires:     openssl >= 1.0.0
 
 %description client
 NSCA-ng provides a client-server pair that makes the Nagios command file accessible to remote systems.
@@ -71,7 +65,9 @@ This is the client component of NSCA-ng.
 %setup -q -n %{name}-%{version}
 
 %build
-%configure --enable-server
+./build-aux/make-confuse
+./build-aux/make-openssl
+%configure --enable-server --with-ev=embedded
 
 make %{?_smp_mflags}
 
