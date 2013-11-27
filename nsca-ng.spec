@@ -38,8 +38,6 @@ Source: %{name}-%{version}.tar.gz
 URL: https://www.nsca-ng.org/
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
-BuildRequires: automake
-BuildRequires: autoconf
 BuildRequires: libconfuse-devel
 BuildRequires: openssl-devel >= 1.0.0
 BuildRequires: patch
@@ -73,10 +71,6 @@ This is the client component of NSCA-ng.
 %setup -q -n %{name}-%{version}
 
 %build
-if [ ! -f configure ]; then
-  ./autogen.sh
-fi
-
 %configure --enable-server
 
 make %{?_smp_mflags}
