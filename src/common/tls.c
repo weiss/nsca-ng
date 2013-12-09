@@ -92,6 +92,7 @@
 #if HAVE_ARPA_INET_H
 # include <arpa/inet.h>
 #endif
+#include <errno.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
