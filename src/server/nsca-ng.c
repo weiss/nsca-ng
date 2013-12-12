@@ -82,7 +82,7 @@ static void close_descriptors(void);
 static void drop_privileges(const char *, const char *);
 static void remove_pidfile(void);
 static void forget_config(void);
-static void signal_cb(EV_P_ ev_signal *, int __attribute__((__unused__)));
+static void signal_cb(EV_P_ ev_signal *, int);
 static void usage(int) __attribute__((__noreturn__));
 
 int
