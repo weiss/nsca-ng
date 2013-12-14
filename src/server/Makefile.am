@@ -32,12 +32,14 @@ AM_CPPFLAGS =                           \
   -I$(top_srcdir)/lib                   \
   $(CONFUSECPPFLAGS)                    \
   $(EVCPPFLAGS)                         \
-  $(SSLCPPFLAGS)
+  $(SSLCPPFLAGS)                        \
+  $(SYSTEMDLDFLAGS)
 
 AM_LDFLAGS =                            \
   $(CONFUSELDFLAGS)                     \
   $(EVLDFLAGS)                          \
-  $(SSLLDFLAGS)
+  $(SSLLDFLAGS)                         \
+  $(SYSTEMDLDFLAGS)
 
 LDADD =                                 \
   ../common/libcommon.a                 \
@@ -45,6 +47,7 @@ LDADD =                                 \
   $(CONFUSELIBS)                        \
   $(EVLIBS)                             \
   $(SSLLIBS)                            \
+  $(SYSTEMDLIBS)                        \
   $(AIOLIBS)                            \
   $(PIDFILELIBS)
 

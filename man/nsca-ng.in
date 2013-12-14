@@ -72,6 +72,32 @@ hangup signal
 .SM (SIGHUP)
 by executing itself with the name and arguments it was started with.
 .
+.PP
+When compiled with
+.BR systemd (1)
+support, the
+.B nsca\-ng
+server auto-detects whether it was socket activated.
+If so, it behaves as if the
+.BR \-F
+option was specified, while it ignores the
+.BR \-b
+option and the
+.B listen
+setting in the
+.BR nsca\-ng.cfg (5)
+file.
+The
+.B nsca\-ng
+server supports
+.BR systemd (1)'s
+.B notify
+process startup type as well as the
+.B WatchdogSec
+feature (see the
+.BR systemd.service(5)
+manual).
+.
 .SH OPTIONS
 .
 .TP

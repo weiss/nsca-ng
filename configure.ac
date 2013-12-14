@@ -102,6 +102,7 @@ NSCA_LIB_EV
 NSCA_LIB_OPENSSL
 AS_IF([test "x$nsca_enable_server" = xyes],
   [NSCA_LIB_CONFUSE
+   NSCA_LIB_SYSTEMD
    NSCA_LIB_PIDFILE
    AS_IF([test "x$nsca_enable_posix_aio" = xyes],
      [NSCA_LIB_AIO])])

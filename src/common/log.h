@@ -40,6 +40,7 @@
 
 # define LOG_TARGET_SYSLOG 0x1
 # define LOG_TARGET_STDERR 0x2
+# define LOG_TARGET_SYSTEMD 0x4
 
 enum {
 	LOG_LEVEL_CRITICAL,
