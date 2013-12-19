@@ -1,5 +1,5 @@
 [Unit]
-Description=Monitoring command acceptor
+Description=Monitoring Command Acceptor
 Documentation=man:nsca-ng(8) man:nsca-ng.cfg(5)
 
 [Service]
