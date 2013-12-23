@@ -56,7 +56,7 @@ concat(const char *str1, const char *str2)
 	size_t size;
 	char *catenated;
 
-	if ((size = len1 + len2 + 1) < len1)
+	if ((size = len1 + len2 + 1) <= len1)
 		die("String concatenation would overflow");
 
 	catenated = xmalloc(size);
