@@ -11,3 +11,6 @@ NonBlocking=true
 Restart=on-failure
 # Don't use this with systemd < 207 (see Red Hat bug #982379):
 WatchdogSec=30
+
+[Install]
+Also=nsca-ng.socket
