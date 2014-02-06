@@ -128,7 +128,8 @@ main(int argc, char **argv)
 	 * doesn't like this trick, though.
 	 */
 #ifndef __gnu_hurd__
-	fd = open(COMMAND_FILE, O_RDONLY | O_NONBLOCK);
+	if ((fd = open(COMMAND_FILE, O_RDONLY | O_NONBLOCK)) == -1)
+		die("Cannot open %s: %s", COMMAND_FILE, strerror(errno));
 #endif
 	run_command(join(SERVER_COMMAND_LINE, getenv("NSCA_SERVER_FLAGS")));
 	xatexit(kill_server);
