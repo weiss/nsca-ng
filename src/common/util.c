@@ -171,7 +171,7 @@ get_openssl_version(void)
 	size_t i, spaces = 0;
 
 	for (i = 0, p = SSLeay_version(SSLEAY_VERSION);
-	    i < sizeof(version_string) - 1 && *p != '\0';
+	    i < sizeof(version_string) - 2 && *p != '\0';
 	    i++, p++) {
 		if (*p == ' ')
 			spaces++;
