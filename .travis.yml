@@ -1,13 +1,33 @@
 language: c
 
-compiler:
-  - gcc
-  - clang
-
 before_install:
+  - sudo add-apt-repository -y ppa:pitti/systemd
   - sudo apt-get -qq update
   - sudo apt-get -qq install libconfuse-dev
+  - sudo apt-get install libsystemd-daemon-dev
 
 before_script: ./autogen.sh
 
 script: ./configure --enable-server && make check
+
+#
+# Trigger Coverity Scan whenever we push into the "coverity" branch.
+#
+
+env:
+  global:
+    # This is the encrypted COVERITY_SCAN_TOKEN, created via the "travis
+    # encrypt" command using the project repository's public key.
+    - secure: "exX2eoF7QqazwvGrY+NoG/Q3xuMQORX0SB8buWYBIkGm3g/2BOYOWcP0f0TvMySW7Jnop+YIukJCxlrn8qlxyBhHD+TL+Lp5ehVECxsGT5Ls+fYW+35CQoHt/92i8ELiKeMrWghzLq5tstFjdQa6XEv8bKi35XwMHQlX8XuRFvU="
+
+addons:
+  coverity_scan:
+    project:
+      name: "weiss/nsca-ng"
+      description: "An add-on for transferring monitoring data"
+    notification_email: holger@weiss.in-berlin.de
+    build_command_prepend: ./autogen.sh && ./configure --enable-server
+    build_command: make
+    branch_pattern: coverity
+
+# vim:set nowrap:
