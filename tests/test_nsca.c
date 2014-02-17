@@ -296,10 +296,13 @@ kill_server(void)
 	 * following test(s), we KILL the process instead of using the TERM
 	 * signal.
 	 */
-	if ((f = fopen(SERVER_PID_FILE, "r")) == NULL)
+	if ((f = fopen(SERVER_PID_FILE, "r")) == NULL) {
 		(void)fprintf(stderr, "%s: Cannot open %s: %s\n", PROGRAM_NAME,
 		    SERVER_PID_FILE, strerror(errno));
-	else if (fgets(buf, sizeof(buf), f) == NULL)
+		return;
+	}
+
+	if (fgets(buf, sizeof(buf), f) == NULL)
 		(void)fprintf(stderr, "%s: Cannot read %s: %s\n", PROGRAM_NAME,
 		    SERVER_PID_FILE, ferror(f) ? strerror(errno) : "EOF");
 	else if ((pid = (pid_t)atol(buf)) < 1)
@@ -308,7 +311,8 @@ kill_server(void)
 	else if (kill(pid, SIGKILL) == -1)
 		(void)fprintf(stderr, "%s: Cannot kill server PID %lu: %s\n",
 		    PROGRAM_NAME, (unsigned long)pid, strerror(errno));
-	else if (fclose(f) == EOF)
+
+	if (fclose(f) == EOF)
 		(void)fprintf(stderr, "%s: Cannot close %s: %s\n", PROGRAM_NAME,
 		    SERVER_PID_FILE, strerror(errno));
 }
