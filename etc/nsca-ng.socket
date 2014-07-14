@@ -1,0 +1,10 @@
+[Unit]
+Description=NSCA-ng Socket
+Documentation=man:nsca-ng(8) man:nsca-ng.cfg(5)
+
+[Socket]
+ListenStream=5668
+BindIPv6Only=both
+
+[Install]
+WantedBy=sockets.target

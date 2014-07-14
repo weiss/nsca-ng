@@ -76,6 +76,17 @@ typedef bool _Bool;
 # define MIN(x, y) ((x) < (y) ? (x) : (y))
 
 /*
+ * For building without systemd(1) support.
+ */
+# ifndef SD_LISTEN_FDS_START
+#  define SD_LISTEN_FDS_START 3
+# endif
+# ifndef HAVE_SYSTEMD_SD_DAEMON_H
+#  define sd_notify(a, b) 0
+#  define sd_listen_fds(a) 0
+# endif
+
+/*
  * Declare replacement functions (if necessary).
  */
 # ifndef HAVE_DAEMON

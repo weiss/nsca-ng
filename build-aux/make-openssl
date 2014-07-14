@@ -31,7 +31,7 @@ fi
 for browser in 'lynx -width=1024' 'elinks' 'links'
 do
 	if type `expr "$browser" : '\([^ ]*\)'` >/dev/null 2>&1 &&
-	    $browser -dump 'http://nagios-plugins.org/' >/dev/null 2>&1
+	    $browser -dump 'http://www.openssl.org/' >/dev/null 2>&1
 	then
 		found_browser=yes
 		break

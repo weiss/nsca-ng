@@ -102,6 +102,8 @@ AC_DEFUN([NSCA_LIB_AIO],
   AS_IF([test "x$nsca_cv_lib_aio_enabled" = xyes],
     [AC_DEFINE([HAVE_POSIX_AIO], [1],
       [Define to 1 if you have the POSIX AIO API.])
+     nsca_save_LIBS=$LIBS
+     LIBS=$AIOLIBS
      AC_CHECK_FUNCS([aio_init],
        [AC_CHECK_MEMBERS([struct aioinit.aio_threads,
          struct aioinit.aio_num,
@@ -110,7 +112,8 @@ AC_DEFUN([NSCA_LIB_AIO],
          struct aioinit.aio_debug,
          struct aioinit.aio_numusers,
          struct aioinit.aio_idle_time], [], [],
-         [[#include <aio.h>]])])],
+         [[#include <aio.h>]])])
+     LIBS=$nsca_save_LIBS],
     [nsca_lib_posix_aio=no])
   AC_SUBST([AIOLIBS])
 ])# NSCA_LIB_AIO

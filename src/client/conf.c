@@ -301,14 +301,18 @@ read_conf_line(FILE *f)
 			line = xrealloc(line, size *= 2);
 		else {
 			line_number++;
-			if (pos >= 2 && line[pos - 2] == '\r') {
-				line[pos - 2] = '\n';
-				pos--;
+			if (pos >= 2) {
+				if (line[pos - 2] == '\\') {
+					pos -= 2;
+					continue;
+				}
+				if (line[pos - 2] == '\r') {
+					line[pos - 2] = '\n';
+					line[pos - 1] = '\0';
+					pos--;
+				}
 			}
-			if (pos >= 2 && line[pos - 2] == '\\')
-				pos -= 2;
-			else
-				break;
+			break;
 		}
 	}
 	if (pos == 0) { /* EOF */

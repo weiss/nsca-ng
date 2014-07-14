@@ -91,7 +91,7 @@ cat >input <<NSCA_EOF
 NSCA_EOF
 AT_CAPTURE_FILE([server.cfg])
 cat >server.cfg <<NSCA_EOF
-temp_directory=`pwd`
+temp_directory = "`pwd`"
 max_command_size = 0
 authorize "*" {
   password = "forty-two"

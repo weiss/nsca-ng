@@ -27,6 +27,9 @@ Wish List Items for NSCA-ng
   daemon mode with poor man's check scheduling (i.e., add `check_interval`
   and `retry_interval` directives to the client configuration).
 
+- If the server is not available, let the client queue commands and results
+  using local storage and submit them as soon as the server comes up again.
+
 - Let the client talk to multiple servers.
 
 - Port the client to Microsoft Windows.

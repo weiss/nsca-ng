@@ -56,7 +56,7 @@ concat(const char *str1, const char *str2)
 	size_t size;
 	char *catenated;
 
-	if (((size = len1 + len2) <= len1 && len2 != 0) || ++size == 0)
+	if ((size = len1 + len2 + 1) <= len1)
 		die("String concatenation would overflow");
 
 	catenated = xmalloc(size);
@@ -171,7 +171,7 @@ get_openssl_version(void)
 	size_t i, spaces = 0;
 
 	for (i = 0, p = SSLeay_version(SSLEAY_VERSION);
-	    i < sizeof(version_string) - 1 && *p != '\0';
+	    i < sizeof(version_string) - 2 && *p != '\0';
 	    i++, p++) {
 		if (*p == ' ')
 			spaces++;
