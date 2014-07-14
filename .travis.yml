@@ -1,7 +1,7 @@
 language: c
 
 before_install:
-  - sudo add-apt-repository -y ppa:pitti/systemd
+  - sudo add-apt-repository -y "deb ftp://ftp.fu-berlin.de/linux/ubuntu/ trusty main"
   - sudo apt-get -qq update
 
 install:
