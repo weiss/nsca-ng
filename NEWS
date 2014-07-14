@@ -1,6 +1,22 @@
 NSCA-ng Release History
 =======================
 
+Changes in Release 1.3 (2014-07-15)
+-----------------------------------
+
+- Make the server play nicely with systemd by providing a systemd.service(5)
+  file and adding optional support for socket activation as well as other
+  systemd features, such as watchdog supervision.  When compiled with
+  systemd support, the server enables these features automatically if it was
+  socket activated.
+- Fix an issue that prevented compilation on (at least) Solaris and FreeBSD
+  and caused a fatal startup error on (at least) NetBSD and OpenBSD.
+- Make sure our copy of FreeBSD's pidfile(3) code isn't used if the system
+  provides it.  The Autoconf test got this wrong in certain cases.
+- Don't buffer log output written to the standard error output.
+- Accept CRLF-terminated client configuration files.
+- Apply a few minor fixes.
+
 Changes in Release 1.2 (2013-11-06)
 -----------------------------------
 
