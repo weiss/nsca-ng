@@ -30,7 +30,7 @@
 
 Summary: NSCA-ng
 Name: nsca-ng
-Version: 1.2
+Version: 1.3
 Release: %{revision}%{?dist}
 License: BSD
 Group: Applications/System
