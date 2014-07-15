@@ -41,7 +41,8 @@ AC_DEFUN([NSCA_LIB_PIDFILE],
         [AC_CHECK_LIB([util], [pidfile_open],
           [PIDFILELIBS='-lutil'
            nsca_lib_pidfile_embedded=no],
-          [nsca_lib_pidfile_embedded=yes])])])],
+          [nsca_lib_pidfile_embedded=yes])])])
+     break],
     [nsca_lib_pidfile_embedded=yes],
     [[#if HAVE_SYS_PARAM_H
       #include <sys/param.h>

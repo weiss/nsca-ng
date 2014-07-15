@@ -92,7 +92,7 @@ pidfile_read(const char *path, pid_t *pidptr)
 	if (fd == -1)
 		return (errno);
 
-	i = read(fd, buf, sizeof(buf) - 1);
+	i = (int)read(fd, buf, sizeof(buf) - 1);
 	error = errno;	/* Remember errno in case close() wants to change it. */
 	close(fd);
 	if (i == -1)
@@ -101,7 +101,7 @@ pidfile_read(const char *path, pid_t *pidptr)
 		return (EAGAIN);
 	buf[i] = '\0';
 
-	*pidptr = strtol(buf, &endptr, 10);
+	*pidptr = (pid_t)strtol(buf, &endptr, 10);
 	if (endptr != &buf[i])
 		return (EINVAL);
 

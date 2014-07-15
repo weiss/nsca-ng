@@ -179,7 +179,8 @@ The specified value will be ignored if
 .BR nsca\-ng (8)
 is called with the
 .B \-b
-option.
+option, of if it is socket activated by
+.BR systemd (1).
 .
 .TP
 \fBlog_level\fP\ =\ <\fIinteger\fP>

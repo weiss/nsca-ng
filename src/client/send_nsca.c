@@ -113,7 +113,7 @@ main(int argc, char **argv)
 	if (conf_getint(cfg, "delay") != 0)
 		delay_execution((unsigned int)conf_getint(cfg, "delay"));
 
-	(void)xasprintf(&host_port, "%s:%s", conf_getstr(cfg, "server"),
+	xasprintf(&host_port, "%s:%s", conf_getstr(cfg, "server"),
 	    conf_getstr(cfg, "port"));
 
 	(void)client_start(host_port,

@@ -1,0 +1,17 @@
+[Unit]
+Description=Monitoring Command Acceptor
+Documentation=man:nsca-ng(8) man:nsca-ng.cfg(5)
+Requires=nsca-ng.socket
+
+[Service]
+ExecStart=/usr/sbin/nsca-ng
+Type=notify
+User=nagios
+StandardError=syslog
+NonBlocking=true
+Restart=on-failure
+# Don't use this with systemd < 207 (see Red Hat bug #982379):
+WatchdogSec=30
+
+[Install]
+Also=nsca-ng.socket

@@ -121,9 +121,15 @@ vlog(int level, const char *in_fmt, va_list ap)
 	    > (int)sizeof(message) - 1)
 		(void)memcpy(message + sizeof(message) - 7, " [...]", 7);
 
-	if (log_target & LOG_TARGET_STDERR)
+	if (log_target & LOG_TARGET_SYSTEMD) {
+		(void)fprintf(stderr, "<%d>%s\n", level, message);
+		(void)fflush(stderr);
+	}
+	if (log_target & LOG_TARGET_STDERR) {
 		(void)fprintf(stderr, "%s: [%s] %s\n", getprogname(),
 		    level_to_string(level), message);
+		(void)fflush(stderr);
+	}
 	if (log_target & LOG_TARGET_SYSLOG)
 		syslog(level, "[%s] %s", level_to_string(level), message);
 }

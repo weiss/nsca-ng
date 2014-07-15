@@ -33,6 +33,9 @@
 # include <sys/param.h>
 #endif
 #include <sys/types.h>
+#if HAVE_SYSTEMD_SD_DAEMON_H
+# include <systemd/sd-daemon.h>
+#endif
 #include <errno.h>
 #include <fcntl.h>
 #include <grp.h>
@@ -74,6 +77,7 @@ static cfg_t *cfg = NULL;
 static struct pidfh *pfh = NULL;
 static char *pid_file = NULL;
 static bool restart = false;
+static ev_timer keep_alive_watcher;
 static ev_signal sighup_watcher, sigint_watcher, sigterm_watcher;
 
 static options *get_options(int, char **);
@@ -82,7 +86,10 @@ static void close_descriptors(void);
 static void drop_privileges(const char *, const char *);
 static void remove_pidfile(void);
 static void forget_config(void);
-static void signal_cb(EV_P_ ev_signal *, int __attribute__((__unused__)));
+static void stop_keep_alive(void);
+static void notify_systemd(void);
+static void keep_alive_cb(EV_P_ ev_timer *, int);
+static void signal_cb(EV_P_ ev_signal *, int);
 static void usage(int) __attribute__((__noreturn__));
 
 int
@@ -91,10 +98,19 @@ main(int argc, char **argv)
 	server_state *server;
 	options *opt;
 	pid_t other_pid;
+	int socket_activated;
 
 	setprogname(argv[0]);
 	log_set(LOG_LEVEL_INFO, LOG_TARGET_STDERR);
-	close_descriptors();
+
+	if ((socket_activated = sd_listen_fds(0)) < 0)
+		die("Cannot receive socket from init system: %m");
+	else if (socket_activated > 1)
+		die("Received too many sockets from init system");
+	else if (socket_activated == 1)
+		log_set(-1, LOG_TARGET_SYSTEMD);
+	else /* socket_activated == 0 */
+		close_descriptors();
 
 	if (atexit(log_close) != 0 || atexit(forget_config) != 0)
 		die("Cannot register function to be called on exit");
@@ -112,10 +128,14 @@ main(int argc, char **argv)
 		    cfg_size(cfg, "chroot") > 0 ?
 		    cfg_getstr(cfg, "chroot") : NULL);
 
-	if (opt->log_target == -1)
-		opt->log_target = opt->foreground ?
-		    LOG_TARGET_STDERR : LOG_TARGET_SYSLOG;
-	else if (!opt->foreground && opt->log_target & LOG_TARGET_STDERR)
+	if (opt->log_target == -1) {
+		if (socket_activated)
+			opt->log_target = LOG_TARGET_SYSTEMD;
+		else if (opt->foreground)
+			opt->log_target = LOG_TARGET_STDERR;
+		else
+			opt->log_target = LOG_TARGET_SYSLOG;
+	} else if (!opt->foreground && opt->log_target & LOG_TARGET_STDERR)
 		die("The `-S' option may not be specified without `-F'");
 
 	if (opt->log_level != -1)
@@ -134,10 +154,21 @@ main(int argc, char **argv)
 	pid_file = cfg_size(cfg, "pid_file") > 0 ?
 	    cfg_getstr(cfg, "pid_file") : NULL;
 
-	log_set((int)cfg_getint(cfg, "log_level"),
-	    opt->log_target | LOG_TARGET_STDERR);
+	if (opt->log_target & (LOG_TARGET_STDERR | LOG_TARGET_SYSTEMD))
+		log_set((int)cfg_getint(cfg, "log_level"), -1);
+	else
+		log_set((int)cfg_getint(cfg, "log_level"),
+		    opt->log_target | LOG_TARGET_STDERR);
 
-	if (strchr(cfg_getstr(cfg, "listen"), ':') == NULL) {
+	if (socket_activated) {
+		char *descriptor;
+
+		if (strcmp(cfg_getstr(cfg, "listen"), "*") != 0)
+			notice("Ignoring `-b'/`listen' when socket activated");
+		xasprintf(&descriptor, "descriptor=%d", SD_LISTEN_FDS_START);
+		cfg_setstr(cfg, "listen", descriptor);
+		free(descriptor);
+	} else if (strchr(cfg_getstr(cfg, "listen"), ':') == NULL) {
 		char *host_port;
 
 		xasprintf(&host_port, "%s:%s", cfg_getstr(cfg, "listen"),
@@ -167,7 +198,7 @@ main(int argc, char **argv)
 	    (size_t)cfg_getint(cfg, "max_queue_size"),
 	    cfg_getfloat(cfg, "timeout"));
 
-	if (!opt->foreground) {
+	if (!opt->foreground && !socket_activated) {
 		if (daemon(0, 0) == -1)
 			die("Cannot daemonize: %m");
 		ev_loop_fork(EV_DEFAULT_UC);
@@ -187,6 +218,8 @@ main(int argc, char **argv)
 	ev_signal_start(EV_DEFAULT_UC_ &sigint_watcher);
 	ev_signal_start(EV_DEFAULT_UC_ &sigterm_watcher);
 
+	notify_systemd();
+
 	(void)ev_run(EV_DEFAULT_UC_ 0);
 
 	server_stop(server);
@@ -196,6 +229,7 @@ main(int argc, char **argv)
 		/* The atexit(3) functions won't be called on exec(3). */
 		remove_pidfile();
 		forget_config();
+		stop_keep_alive();
 		execvp(argv[0], argv);
 		die("Cannot restart myself: %m");
 	}
@@ -361,6 +395,47 @@ forget_config(void)
 		}
 		cfg_free(cfg);
 	}
+}
+
+static void
+stop_keep_alive(void)
+{
+	if (ev_is_active(&keep_alive_watcher))
+		ev_timer_stop(EV_DEFAULT_UC_ &keep_alive_watcher);
+}
+
+static void
+notify_systemd(void)
+{
+	char *usec;
+	ev_tstamp sec;
+
+	if ((usec = getenv("WATCHDOG_USEC")) != NULL
+	    && (sec = (ev_tstamp)atol(usec) / 1000 / 1000) > 0.0) {
+		/*
+		 * The sd_notify() man page says: "It is recommended to send
+		 * this message if the WATCHDOG_USEC= environment variable has
+		 * been set for the service process, in every half the time
+		 * interval that is specified in the variable."  Due to our
+		 * paranoia, we use an even shorter interval.
+		 */
+		sec /= 2.5;
+		ev_timer_set(&keep_alive_watcher, sec, sec);
+		ev_timer_start(EV_DEFAULT_UC_ &keep_alive_watcher);
+		if (atexit(stop_keep_alive) != 0)
+			die("Cannot register function to be called on exit");
+		debug("Sending keep-alive messages every %.1f seconds",
+		    (double)sec);
+	}
+	(void)sd_notify(0, "READY=1");
+}
+
+static void
+keep_alive_cb(EV_P_ ev_timer *w  __attribute__((__unused__)),
+              int revents __attribute__((__unused__)))
+{
+	debug("Sending keep-alive message to init system");
+	(void)sd_notify(0, "WATCHDOG=1");
 }
 
 static void

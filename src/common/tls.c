@@ -92,7 +92,9 @@
 #if HAVE_ARPA_INET_H
 # include <arpa/inet.h>
 #endif
+#include <errno.h>
 #include <signal.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -183,11 +185,25 @@ tls_server_start(const char * restrict host_port,
                                         unsigned int))
 {
 	tls_server_state *ctx = xmalloc(sizeof(tls_server_state));
+	int listen_socket;
 
 	debug("Starting TLS server");
 
 	ctx->ssl = initialize_openssl(SSLv23_server_method(), ciphers);
 	SSL_CTX_set_psk_server_callback(ctx->ssl, check_psk);
+
+	if (sscanf(host_port, "descriptor=%d", &listen_socket) != 1)
+		listen_socket = -1;
+
+	if (listen_socket == -1) {
+		if ((ctx->bio = BIO_new_accept((char *)host_port)) == NULL)
+			die("Cannot create socket: %m");
+		(void)BIO_set_bind_mode(ctx->bio, BIO_BIND_REUSEADDR);
+	} else {
+		if ((ctx->bio = BIO_new(BIO_s_accept())) == NULL)
+			die("Cannot create BIO object");
+		(void)BIO_set_fd(ctx->bio, listen_socket, BIO_NOCLOSE);
+	}
 
 	/*
 	 * We call BIO_set_nbio() in addition to BIO_set_nbio_accept() in order
@@ -196,15 +212,15 @@ tls_server_start(const char * restrict host_port,
 	 *
 	 * http://permalink.gmane.org/gmane.comp.encryption.openssl.user/27438
 	 */
-	if ((ctx->bio = BIO_new_accept((char *)host_port)) == NULL)
-		die("Cannot create socket: %m");
-	(void)BIO_set_bind_mode(ctx->bio, BIO_BIND_REUSEADDR);
 	(void)BIO_set_nbio_accept(ctx->bio, 1);
 	(void)BIO_set_nbio(ctx->bio, 1); /* For the *accepted* sockets. */
-	if (BIO_do_accept(ctx->bio) <= 0)
-		log_tls_message(die, "Cannot bind to %s", host_port);
 
-	debug("Listening on %s", host_port);
+	if (listen_socket == -1) {
+		if (BIO_do_accept(ctx->bio) <= 0)
+			log_tls_message(die, "Cannot bind to %s", host_port);
+		debug("Listening on %s", host_port);
+	} else
+		debug("Listening on file descriptor %d", listen_socket);
 
 	ctx->connect_handler = handle_connect;
 	ctx->timeout = timeout;
