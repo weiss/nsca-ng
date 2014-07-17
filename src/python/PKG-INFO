@@ -1,0 +1,11 @@
+Metadata-Version: 1.0
+Name: python-nscang
+Version: 1.0
+Summary: Python NSCA-ng client.
+Home-page: UNKNOWN
+Author: Alexander Golovko
+Author-email: alexandro@onsec.ru
+License: BSD
+Description:
+        Python NSCA-ng.
+Platform: UNKNOWN

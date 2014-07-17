@@ -1,0 +1,21 @@
+This is the README file of python-nscang.
+
+Description
+-----------
+
+The python NSCA-ng client allow to send host or service check results to
+NSCA-ng servers.
+
+Examples
+----------
+
+from nscang import NSCAngNotifyer
+
+n = NSCAngNotifyer( host="nagios.example.com", port=5668,
+                    identity="srv01.local", psk="secret")
+
+n.svc_result( host_name="srv01.local",
+              svc_description="RAID status",
+              return_code=0,
+              plugin_output="OK: md126[raid1], md127[raid1]",
+              timeout=5)
