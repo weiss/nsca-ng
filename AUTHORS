@@ -1,1 +1,5 @@
-Holger Weiss <holger@weiss.in-berlin.de>
+Holger Weiss <holger@weiss.in-berlin.de> wrote most of the NSCA-ng client
+and server code.
+
+Alexander Golovko <alexandro@onsec.ru> wrote the (technically separate)
+Python client module distributed with NSCA-ng.

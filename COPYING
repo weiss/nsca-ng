@@ -51,4 +51,8 @@ If the file `lib/pidfile/flock.c' is used during compilation:
 
 | Copyright (c) 2001 The NetBSD Foundation, Inc.
 
+If any files in the `python' directory (except for `uthash.h') are used:
+
+| Copyright (c) 2014 Alexander Golovko
+
 Additional requirements may be imposed by external libraries.
