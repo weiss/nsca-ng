@@ -7,20 +7,19 @@
 #include "uthash.h"
 
 typedef struct {
-  SSL_CTX *ssl_ctx;
-  BIO     *bio;
-  SSL     *ssl;
-  int     state;
+	SSL_CTX *ssl_ctx;
+	BIO *bio;
+	SSL *ssl;
+	int state;
 
-  char *identity;
-  char *psk;
+	char *identity;
+	char *psk;
 
-  int _errno;
-  char errstr[1024];
+	int _errno;
+	char errstr[1024];
 
-  UT_hash_handle hh;
+	UT_hash_handle hh;
 } nscang_client_t;
-
 
 #define NSCANG_STATE_NONE 0
 #define NSCANG_STATE_NEW  1
@@ -46,20 +45,14 @@ typedef struct {
 #define NSCANG_ERROR_SSL_CREATE         104
 #define NSCANG_ERROR_SSL                105
 
-
-int nscang_client_init( nscang_client_t *c, char *host, int port,
-                        char *ciphers, char *identity, char *psk);
-void nscang_client_free( nscang_client_t *c);
-
-void nscang_client_disconnect( nscang_client_t *c);
-
-int nscang_client_send_moin( nscang_client_t *c, int timeout);
-int nscang_client_send_push( nscang_client_t *c, char *host, char *service,
-                             int status, char *message, int timeout);
-int nscang_client_send_quit( nscang_client_t *c);
-
-
-char * nscang_client_errstr( nscang_client_t *c, char *buf, int buf_size);
+int nscang_client_init(nscang_client_t *c, char *host, int port,
+                       char *ciphers, char *identity, char *psk);
+void nscang_client_free(nscang_client_t *c);
+void nscang_client_disconnect(nscang_client_t *c);
+int nscang_client_send_moin(nscang_client_t *c, int timeout);
+int nscang_client_send_push(nscang_client_t *c, char *host, char *service,
+                            int status, char *message, int timeout);
+int nscang_client_send_quit(nscang_client_t *c);
+char *nscang_client_errstr(nscang_client_t *c, char *buf, int buf_size);
 
 #endif /* __NSCANG_CLIENT_H */
-
