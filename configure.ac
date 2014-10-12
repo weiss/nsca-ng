@@ -157,6 +157,7 @@ AC_CONFIG_FILES([
   lib/ev/Makefile
   lib/pidfile/Makefile
   man/Makefile
+  python/Makefile
   src/Makefile
   src/client/Makefile
   src/common/Makefile
