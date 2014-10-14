@@ -1,6 +1,6 @@
 ## Process this file with automake(1) to produce Makefile.in.
 
-## Copyright (c) 2013 Holger Weiss <holger@weiss.in-berlin.de>
+## Copyright (c) 2014 Holger Weiss <holger@weiss.in-berlin.de>
 ## All rights reserved.
 ##
 ## Redistribution and use in source and binary forms, with or without
@@ -25,14 +25,7 @@
 ## ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 ## POSSIBILITY OF SUCH DAMAGE.
 
-ACLOCAL_AMFLAGS = -I m4
-EXTRA_DIST = ChangeLog PROTOCOL autogen.sh
+EXTRA_DIST = PKG-INFO client.c client.h nscang.c setup.py uthash.h
 
-SUBDIRS = lib src man etc build-aux contrib python tests
-
-#
-# The ChangeLog file is auto-generated from the Git history.  We let it depend
-# on configure.ac, as we bump our version number in that file.
-#
-ChangeLog: configure.ac
-	$(AM_V_GEN)$(top_srcdir)/build-aux/generate-change-log > $@
+clean-local:
+	-rm -rf build

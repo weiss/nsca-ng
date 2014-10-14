@@ -420,7 +420,7 @@ notify_systemd(void)
 		 * paranoia, we use an even shorter interval.
 		 */
 		sec /= 2.5;
-		ev_timer_set(&keep_alive_watcher, sec, sec);
+		ev_timer_init(&keep_alive_watcher, keep_alive_cb, sec, sec);
 		ev_timer_start(EV_DEFAULT_UC_ &keep_alive_watcher);
 		if (atexit(stop_keep_alive) != 0)
 			die("Cannot register function to be called on exit");
