@@ -33,6 +33,7 @@
 /man/*.ps
 /nsca-ng-*.tar.gz
 /openssl-*
+/python/build/
 /src/client/send_nsca
 /src/server/nsca-ng
 /stamp-h1

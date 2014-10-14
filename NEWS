@@ -1,6 +1,13 @@
 NSCA-ng Release History
 =======================
 
+Changes in Release 1.4 (2014-10-14)
+-----------------------------------
+
+- Fix NSCA-ng's systemd support: Actually send the keep-alive packets
+  expected by the watchdog.
+- Include an experimental NSCA-ng client module for Python.
+
 Changes in Release 1.3 (2014-07-15)
 -----------------------------------
 
