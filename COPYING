@@ -38,7 +38,7 @@ them.
 
 If any files in the `lib/ev' directory are used during compilation:
 
-| Copyright (c) 2007, 2008, 2009, 2010, 2011, 2012
+| Copyright (c) 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014
 | 	Marc Alexander Lehmann <libev@schmorp.de>
 | Copyright (c) 2011 Emanuele Giaquinta
 
