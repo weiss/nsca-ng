@@ -24,11 +24,11 @@
 
 # NSCA_LIB_SYSTEMD
 # ----------------
-# Check the availability of systemd.  If the systemd-daemon library is found, we
-# define HAVE_SYSTEMD_SD_DAEMON_H to 1.  We then also set the output variables
-# SYSTEMDCPPFLAGS, SYSTEMDLDFLAGS, and SYSTEMDLIBS to appropriate values.  (Why
-# are there no underscores in these variable names?  Because Automake treats
-# names like "foo_CPPFLAGS" specially.)
+# Check the availability of systemd.  If the systemd (or the old systemd-daemon)
+# library is found, we define HAVE_SYSTEMD_SD_DAEMON_H to 1.  We then also set
+# the output variables SYSTEMDCPPFLAGS, SYSTEMDLDFLAGS, and SYSTEMDLIBS to
+# appropriate values.  (Why are there no underscores in these variable names?
+# Because Automake treats names like "foo_CPPFLAGS" specially.)
 AC_DEFUN([NSCA_LIB_SYSTEMD],
 [
   nsca_save_CPPFLAGS=$CPPFLAGS
@@ -71,9 +71,11 @@ AC_DEFUN([NSCA_LIB_SYSTEMD],
        LDFLAGS="$SYSTEMDLDFLAGS $LDFLAGS"])
      AC_CHECK_HEADERS([systemd/sd-daemon.h], [],
        [AC_MSG_ERROR([systemd header file not found])])
-     AC_CHECK_LIB([systemd-daemon], [sd_notify],
-       [SYSTEMDLIBS='-lsystemd-daemon'],
-       [AC_MSG_FAILURE([cannot link with systemd-daemon library])])])
+     AC_CHECK_LIB([systemd], [sd_notify],
+       [SYSTEMDLIBS='-lsystemd'],
+       [AC_CHECK_LIB([systemd-daemon], [sd_notify],
+         [SYSTEMDLIBS='-lsystemd-daemon'],
+         [AC_MSG_FAILURE([cannot link with systemd-daemon library])])])])
   AC_SUBST([SYSTEMDCPPFLAGS])
   AC_SUBST([SYSTEMDLDFLAGS])
   AC_SUBST([SYSTEMDLIBS])
