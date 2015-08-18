@@ -29,33 +29,20 @@
 #include <openssl/err.h>
 #include <string.h>
 #include <time.h>
-#include <pthread.h>
 
 #include "client.h"
 #include "uthash.h"
 
 static nscang_client_t *nscang_client_instances;
 
-static pthread_rwlock_t nscang_client_instances_lock =
-    PTHREAD_RWLOCK_INITIALIZER;
-
 unsigned int
 set_psk(SSL *ssl, const char *hint, char *identity,
         unsigned int max_identity_length, unsigned char *psk,
         unsigned int max_psk_length)
 {
-	int rc;
 	nscang_client_t *c = NULL;
 
-	while (1) {
-		rc = pthread_rwlock_rdlock(&nscang_client_instances_lock);
-		if ((rc != EBUSY) && (rc != EAGAIN))
-			break;
-	}
-	if (rc == 0) {
-		HASH_FIND_PTR(nscang_client_instances, &ssl, c);
-		pthread_rwlock_unlock(&nscang_client_instances_lock);
-	}
+   HASH_FIND_PTR(nscang_client_instances, &ssl, c);
 	if (c != NULL) {
 		strncpy(identity, c->identity, max_identity_length);
 		identity[max_identity_length - 1] = 0x00;
@@ -74,8 +61,6 @@ int
 nscang_client_init(nscang_client_t *c, char *host, int port, char *ciphers,
                    char *identity, char *psk)
 {
-	int rc;
-
 	memset(c, 0x00, sizeof(nscang_client_t));
 
 	c->ssl_ctx = SSL_CTX_new(SSLv23_client_method());
@@ -124,19 +109,7 @@ nscang_client_init(nscang_client_t *c, char *host, int port, char *ciphers,
 	strcpy(c->identity, identity);
 	strcpy(c->psk, psk);
 
-	/* Busyloop until we get an rw lock. */
-	while (1) {
-		rc = pthread_rwlock_wrlock(&nscang_client_instances_lock);
-		if (rc != EBUSY)
-			break;
-	}
-	if (rc != 0) {
-		c->_errno = NSCANG_ERROR_LOCKING;
-		return 0;
-	}
-
 	HASH_ADD_PTR(nscang_client_instances, ssl, c);
-	pthread_rwlock_unlock(&nscang_client_instances_lock);
 
 	c->state = NSCANG_STATE_NEW;
 
@@ -150,19 +123,7 @@ nscang_client_free(nscang_client_t *c)
 		nscang_client_disconnect(c);
 
 	if (c->ssl != NULL) {
-		int rc;
-
-		/* Busyloop until we get an rw lock. */
-		while (1) {
-			rc = pthread_rwlock_wrlock
-			    (&nscang_client_instances_lock);
-			if (rc != EBUSY)
-				break;
-		}
-		if (rc == 0) {
-			HASH_DEL(nscang_client_instances, c);
-			pthread_rwlock_unlock(&nscang_client_instances_lock);
-		}
+      HASH_DEL(nscang_client_instances, c);
 	}
 	if (c->ssl != NULL) {
 		SSL_free(c->ssl);
@@ -428,26 +389,32 @@ nscang_client_send_quit(nscang_client_t *c)
 	return 1;
 }
 
+void
+nscang_client_ssl_error(char *buf, int buf_size, const char *msg) {
+   strncpy(buf, msg, buf_size);
+   buf_size--;
+   strncat(buf, ":", buf_size);
+   strncat(buf, ERR_reason_error_string(ERR_peek_error()), buf_size);
+}
+
 char *
 nscang_client_errstr(nscang_client_t *c, char *buf, int buf_size)
 {
 	switch (c->_errno) {
 	case NSCANG_ERROR_SSL_CTX_CREATE:
-		strncpy(buf, "Can't create SSL context", buf_size);
+		nscang_client_ssl_error(buf, buf_size, "Can't create SSL context");
 		break;
 	case NSCANG_ERROR_SSL_CIPHERS:
-		strncpy(buf, "Bad ciphers list", buf_size);
+		nscang_client_ssl_error(buf, buf_size, "Bad ciphers list");
 		break;
 	case NSCANG_ERROR_SSL_BIO_CREATE:
-		strncpy(buf, "Can't create BIO socket", buf_size);
+		nscang_client_ssl_error(buf, buf_size, "Can't create BIO socket");
 		break;
 	case NSCANG_ERROR_SSL_CREATE:
-		strncpy(buf, "Can't create SSL", buf_size);
+		nscang_client_ssl_error(buf, buf_size, "Can't create SSL");
 		break;
 	case NSCANG_ERROR_SSL:
-		snprintf(buf, buf_size, "SSL error - %s - %s",
-		    ERR_reason_error_string(ERR_peek_last_error()),
-		    ERR_reason_error_string(ERR_peek_error()));
+		nscang_client_ssl_error(buf, buf_size, "SSL error");
 		break;
 	case NSCANG_ERROR_MALLOC:
 		strncpy(buf, "Can't allocate memory", buf_size);
@@ -479,9 +446,6 @@ nscang_client_errstr(nscang_client_t *c, char *buf, int buf_size)
 	case NSCANG_ERROR_BAD_STATE:
 		snprintf(buf, buf_size, "Operation not permitted in state %d",
 		    c->state);
-		break;
-	case NSCANG_ERROR_LOCKING:
-		strncpy(buf, "Can't obtain lock for instances list", buf_size);
 		break;
 	default:
 		buf[0] = 0x00;
