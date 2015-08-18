@@ -1,0 +1,8 @@
+Changes
+Client.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Net-NSCAng-Client.t
+lib/Net/NSCAng/Client.pm

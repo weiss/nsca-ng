@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::NSCAng::Client.
+
+0.01  Tue Aug 18 13:26:01 2015
+	- original version; created by h2xs 1.23 with options
+		-b 5.10.1 -O -A -n Net::NSCAng::Client
+
