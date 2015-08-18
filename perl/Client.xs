@@ -8,6 +8,8 @@
 
 #include "client.h"
 
+#define SV_OR_DIE(var) { if(!SvOK(var)) croak("%s must not be undef", #var); }
+
 struct nscang_object {
    nscang_client_t client;
 };
@@ -36,12 +38,10 @@ _new(class, host, port, identity, psk, ciphers)
       if(!RETVAL)
          croak("no memory for %s", class);
 
-      if(!SvOK(host))
-         croak("%s must not be undef", "host");
-      if(!SvOK(identity))
-         croak("%s must not be undef", "identity");
-      if(!SvOK(psk))
-         croak("%s must not be undef", "psk");
+      SV_OR_DIE(host);
+      SV_OR_DIE(identity);
+      SV_OR_DIE(psk);
+
       if(!nscang_client_init(
          &(RETVAL->client),
          SvOK(host) ? SvPV_nolen(host) : NULL,
