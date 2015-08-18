@@ -77,9 +77,10 @@ DESTROY(self)
          Safefree(self);
       }
 
-void
-_svc_result(self, node_name, svc_description, return_code, plugin_output)
+SV *
+_result(self, is_host_result, node_name, svc_description, return_code, plugin_output)
    Net::NSCAng::Client self
+   int is_host_result
    SV * node_name
    SV * svc_description
    int return_code
@@ -90,17 +91,26 @@ _svc_result(self, node_name, svc_description, return_code, plugin_output)
    char *csvc_description = self->svc_description;
    char errstr[1024];
    nscang_client_t *client = &self->client;
+
    if(SvOK(node_name)) cnode_name = SvPV_nolen(node_name);
-   if(SvOK(svc_description)) cnode_name = SvPV_nolen(svc_description);
+   if(is_host_result) {
+      csvc_description = NULL;
+   } else {
+      if(SvOK(svc_description))
+         csvc_description = SvPV_nolen(svc_description);
+   }
 
 	if(nscang_client_send_push(client,
       cnode_name, csvc_description, return_code, plugin_output, self->timeout))
-		return;
+      XSRETURN_UNDEF;
 
 	nscang_client_disconnect(client);
 
 	if(nscang_client_send_push(client,
       cnode_name, csvc_description, return_code, plugin_output, self->timeout))
-		return;
+      XSRETURN_UNDEF;
 
-   croak("svc_result: %s", nscang_client_errstr(client, errstr, sizeof(errstr)));
+   nscang_client_errstr(client, errstr, sizeof(errstr));
+   RETVAL = newSVpv(errstr, 0);
+   OUTPUT:
+      RETVAL

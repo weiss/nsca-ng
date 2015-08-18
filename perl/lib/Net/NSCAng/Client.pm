@@ -3,6 +3,7 @@ package Net::NSCAng::Client;
 use 5.010001;
 use strict;
 use warnings;
+use Carp;
 
 require Exporter;
 
@@ -40,14 +41,23 @@ sub new {
 sub svc_result {
     my $self = shift;
     my %args = @_%2 ? %{$_[0]} : @_;
-    $self->_svc_result(
+    my $err = $self->_result(0,
         @args{qw/ node_name svc_description return_code plugin_output /}
     );
+    $err and croak("svc_result: $err");
+}
+
+sub host_result {
+    my $self = shift;
+    my %args = @_%2 ? %{$_[0]} : @_;
+    my $err = $self->_result(1,
+        $args{node_name}, '', @args{qw/ return_code plugin_output /}
+    );
+    $err and croak("host_result: $err");
 }
 
 1;
 __END__
-# Below is stub documentation for your module. You'd better edit it!
 
 =head1 NAME
 
