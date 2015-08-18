@@ -33,44 +33,39 @@
 
 #include "uthash.h"
 
+typedef enum { NSCANG_STATE_NONE=0, NSCANG_STATE_NEW, NSCANG_STATE_MOIN } nscang_state_t;
+typedef enum { NSCANG_RESP_MOIN=1, NSCANG_RESP_OKAY } nscang_response_t;
+typedef enum {
+	NSCANG_ERROR_MALLOC=1,
+	NSCANG_ERROR_TIMEOUT,
+	NSCANG_ERROR_TOO_LONG_RESPONSE,
+	NSCANG_ERROR_BAD_PROTO_VERSION,
+	NSCANG_ERROR_PROTOCOL_MISMATCH,
+	NSCANG_ERROR_UNKNOWN_RESPONSE,
+	NSCANG_ERROR_BAIL,
+	NSCANG_ERROR_FAIL,
+	NSCANG_ERROR_BAD_STATE,
+	NSCANG_ERROR_SSL_CTX_CREATE=101,
+	NSCANG_ERROR_SSL_CIPHERS,
+	NSCANG_ERROR_SSL_BIO_CREATE,
+	NSCANG_ERROR_SSL_CREATE,
+	NSCANG_ERROR_SSL
+} nscang_error_t;
+
 typedef struct {
 	SSL_CTX *ssl_ctx;
 	BIO *bio;
 	SSL *ssl;
-	int state;
+	nscang_state_t state;
 
 	char *identity;
 	char *psk;
 
-	int _errno;
+	nscang_error_t _errno;
 	char errstr[1024];
 
 	UT_hash_handle hh;
 } nscang_client_t;
-
-#define NSCANG_STATE_NONE 0
-#define NSCANG_STATE_NEW  1
-#define NSCANG_STATE_MOIN 2
-
-#define NSCANG_RESP_MOIN 1
-#define NSCANG_RESP_OKAY 2
-
-#define NSCANG_ERROR_MALLOC             1
-#define NSCANG_ERROR_TIMEOUT            2
-#define NSCANG_ERROR_TOO_LONG_RESPONSE  3
-#define NSCANG_ERROR_BAD_PROTO_VERSION  4
-#define NSCANG_ERROR_PROTOCOL_MISMATCH  5
-#define NSCANG_ERROR_UNKNOWN_RESPONSE   6
-#define NSCANG_ERROR_BAIL               7
-#define NSCANG_ERROR_FAIL               8
-#define NSCANG_ERROR_BAD_STATE          9
-#define NSCANG_ERROR_LOCKING            10
-
-#define NSCANG_ERROR_SSL_CTX_CREATE     101
-#define NSCANG_ERROR_SSL_CIPHERS        102
-#define NSCANG_ERROR_SSL_BIO_CREATE     103
-#define NSCANG_ERROR_SSL_CREATE         104
-#define NSCANG_ERROR_SSL                105
 
 int nscang_client_init(nscang_client_t *c, char *host, int port,
                        char *ciphers, char *identity, char *psk);
