@@ -1,0 +1,9 @@
+*.sw[pqr]
+*.o
+*.tar.gz
+*.tar.bz2
+MYMETA.*
+Makefile.old
+Client.c
+pm_to_blib
+
