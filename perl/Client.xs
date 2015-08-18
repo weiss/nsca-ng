@@ -9,9 +9,13 @@
 #include "client.h"
 
 #define SV_OR_DIE(var) { if(!SvOK(var)) croak("%s must not be undef", #var); }
+#define SV_OR_NULL(var) (SvOK(var) ? SvPV_nolen(var) : NULL)
 
 struct nscang_object {
    nscang_client_t client;
+   char *node_name;
+   char *svc_description;
+   int timeout;
 };
 typedef struct nscang_object nscang_object_t;
 
@@ -24,29 +28,35 @@ BOOT:
 	SSL_load_error_strings();
 
 Net::NSCAng::Client
-_new(class, host, port, identity, psk, ciphers)
+_new(class, server, port, identity, psk, ciphers, node_name, svc_description, timeout)
    char * class
-   SV * host
+   SV * server
    int port
    SV * identity
    SV * psk
    SV * ciphers
+   SV * node_name
+   SV * svc_description
+   int timeout
 
-   PROTOTYPE: DISABLE
    CODE:
       Newxz(RETVAL, 1, nscang_object_t);
       if(!RETVAL)
          croak("no memory for %s", class);
 
-      SV_OR_DIE(host);
+      SV_OR_DIE(server);
       SV_OR_DIE(identity);
       SV_OR_DIE(psk);
 
+      RETVAL->node_name = SV_OR_NULL(node_name);
+      RETVAL->svc_description = SV_OR_NULL(svc_description);
+      RETVAL->timeout = timeout;
+
       if(!nscang_client_init(
          &(RETVAL->client),
-         SvOK(host) ? SvPV_nolen(host) : NULL,
+         SvPV_nolen(server),
          port,
-         SvOK(ciphers) ? SvPV_nolen(ciphers) : NULL,
+         SV_OR_NULL(ciphers),
          SvPV_nolen(identity),
          SvPV_nolen(psk)
       )) {
@@ -68,14 +78,29 @@ DESTROY(self)
       }
 
 void
-svc_result(self, host, svc_description, return_code, plugin_output, timeout)
+_svc_result(self, node_name, svc_description, return_code, plugin_output)
    Net::NSCAng::Client self
-   char * host
-   char * svc_description
+   SV * node_name
+   SV * svc_description
    int return_code
    char * plugin_output
-   int timeout
 
    CODE:
-      printf("a");
+   char *cnode_name = self->node_name;
+   char *csvc_description = self->svc_description;
+   char errstr[1024];
+   nscang_client_t *client = &self->client;
+   if(SvOK(node_name)) cnode_name = SvPV_nolen(node_name);
+   if(SvOK(svc_description)) cnode_name = SvPV_nolen(svc_description);
 
+	if(nscang_client_send_push(client,
+      cnode_name, csvc_description, return_code, plugin_output, self->timeout))
+		return;
+
+	nscang_client_disconnect(client);
+
+	if(nscang_client_send_push(client,
+      cnode_name, csvc_description, return_code, plugin_output, self->timeout))
+		return;
+
+   croak("svc_result: %s", nscang_client_errstr(client, errstr, sizeof(errstr)));
