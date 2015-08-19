@@ -99,6 +99,10 @@ _result(self, is_host_result, node_name, svc_description, return_code, plugin_ou
       if(SvOK(svc_description))
          csvc_description = SvPV_nolen(svc_description);
    }
+   if(!(is_host_result || csvc_description))
+      croak("svc_description missing");
+   if(!cnode_name)
+      croak("node_name missing");
 
 	if(nscang_client_send_push(client,
       cnode_name, csvc_description, return_code, plugin_output, self->timeout))
