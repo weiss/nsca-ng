@@ -1,18 +1,38 @@
-# Before 'make install' is performed this script should be runnable with
-# 'make test'. After 'make install' it should work as 'perl Net-NSCAng-Client.t'
-
-#########################
-
-# change 'tests => 1' to 'tests => last_test_to_print';
-
 use strict;
 use warnings;
 
-use Test::More tests => 1;
-BEGIN { use_ok('Net::NSCAng::Client') };
+use Test::More;
+use Test::Exception;
+BEGIN { use_ok('Net::NSCAng::Client', ':all') };
 
-#########################
+my @cparams = qw/ localhost myid s3cr3t /;
+my @nn = (node_name => 'here');
+my @sd = (svc_description => 'bogus');
+my $n;
 
-# Insert your test code below, the Test::More module is use()ed here so read
-# its man page ( perldoc Test::More ) for help writing this test script.
+lives_ok(sub { $n = Net::NSCAng::Client->new(@cparams) }, 'Simple constructor');
+dies_ok(sub { $n->host_result(0, "OK") }, 'host_result() dies w/o node_name');
+dies_ok(sub { $n->svc_result(0, "OK") }, 'svc_result() dies w/o node_name');
+lives_ok(sub { crf(sub { $n->host_result(0, "OK", @nn) })}, 'host_result() with local node_name');
+dies_ok(sub { $n->svc_result(0, "OK", @nn) }, 'svc_result() still dies with local node_name');
 
+lives_ok(sub { $n = Net::NSCAng::Client->new(@cparams, @nn) }, 'Constructor with node_name');
+lives_ok(sub {crf(sub { $n->host_result(0, "OK") })}, 'host_result() with node_name from constructor');
+dies_ok(sub { $n->svc_result(0, "OK") }, 'svc_result() dies w/o svc_description');
+lives_ok(sub {crf(sub { $n->svc_result(0, "OK", @sd) })}, 'svc_result() with local svc_description');
+
+lives_ok(sub { $n = Net::NSCAng::Client->new(@cparams, @nn, @sd) }, 'Constructor with node_name');
+lives_ok(sub { crf(sub { $n->host_result(0, "OK") })}, 'host_result() OK w/o local params');
+lives_ok(sub { crf(sub { $n->svc_result(0, "OK") })}, 'svc_result() OK w/o local params');
+
+done_testing;
+
+# Connection-refused-filter
+# Supresses exceptions with a "connection refused" error as this is expected
+sub crf {
+    my $sub = shift;
+    eval { $sub->() };
+    if($@) {
+        die $@ unless $@ =~ /: SSL error:Connection refused/;
+    }
+}
