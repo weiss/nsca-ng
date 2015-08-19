@@ -5,5 +5,5 @@
 MYMETA.*
 Makefile.old
 Client.c
+Client.bs
 pm_to_blib
-
