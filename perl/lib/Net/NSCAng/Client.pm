@@ -37,6 +37,10 @@ Net::NSCAng::Client - Submit NSCA results using the NSCA-ng protocol
 
 =head1 DESCRIPTION
 
+Net::NSCAng::Client provides a means of sending host or service check results
+to an L<NCSA-ng|http://www.nsca-ng.org/> server. It is derived from the Python
+code written by Alexander Golovko <alexandro@onsec.ru> but with a more perlish
+interface.
 
 =head2 EXPORT
 
@@ -63,7 +67,7 @@ regular login.
 
 =back
 
-The following keys are optional:
+The following tags are optional:
 
 =over 4
 
@@ -151,7 +155,7 @@ Perl threads that don't work well in the first place.
 
 =head1 SEE ALSO
 
-send_nsca(8)
+L<send_nsca(8)>
 
 =head1 AUTHOR
 
@@ -160,6 +164,7 @@ Matthias Bethke, E<lt>matthias@towiski.deE<gt>
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2015 by Matthias Bethke
+Portions Copyright (C) by Alexander Golovko <alexandro@onsec.ru> 
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.20.2 or,
