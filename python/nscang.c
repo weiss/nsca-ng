@@ -70,7 +70,7 @@ nscang_host_result(PyObject *self, PyObject *args, PyObject *kwds)
 		return Py_None;
 	}
 
-	PyErr_Format(PyExc_RuntimeError, "svc_result: %s",
+	PyErr_Format(PyExc_RuntimeError, "host_result: %s",
 	    nscang_client_errstr(client, errstr, sizeof(errstr)));
 	return NULL;
 }
