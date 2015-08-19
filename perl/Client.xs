@@ -1,4 +1,6 @@
+// vim:set cindent:
 #include <openssl/ssl.h>
+#include <string.h>
 #define PERL_NO_GET_CONTEXT
 #include "EXTERN.h"
 #include "perl.h"
@@ -10,6 +12,7 @@
 
 #define SV_OR_DIE(var) { if(!SvOK(var)) croak("%s must not be undef", #var); }
 #define SV_OR_NULL(var) (SvOK(var) ? SvPV_nolen(var) : NULL)
+#define SVdup_OR_NULL(var) (SvOK(var) ? strdup(SvPV_nolen(var)) : NULL)
 
 struct nscang_object {
    nscang_client_t client;
@@ -28,37 +31,31 @@ BOOT:
 	SSL_load_error_strings();
 
 Net::NSCAng::Client
-_new(class, server, port, identity, psk, ciphers, node_name, svc_description, timeout)
+_new(class, host, port, identity, psk, ciphers, node_name, svc_description, timeout)
    char * class
-   SV * server
+   char * host
    int port
-   SV * identity
-   SV * psk
+   char * identity
+   char * psk
    SV * ciphers
    SV * node_name
    SV * svc_description
    int timeout
 
    CODE:
+      // Alloc new object
       Newxz(RETVAL, 1, nscang_object_t);
       if(!RETVAL)
          croak("no memory for %s", class);
 
-      SV_OR_DIE(server);
-      SV_OR_DIE(identity);
-      SV_OR_DIE(psk);
-
-      RETVAL->node_name = SV_OR_NULL(node_name);
-      RETVAL->svc_description = SV_OR_NULL(svc_description);
+      // Copy/duplicate values to object attributes
+      RETVAL->node_name = SVdup_OR_NULL(node_name);
+      RETVAL->svc_description = SVdup_OR_NULL(svc_description);
       RETVAL->timeout = timeout;
 
+      // Initialize the client library
       if(!nscang_client_init(
-         &(RETVAL->client),
-         SvPV_nolen(server),
-         port,
-         SV_OR_NULL(ciphers),
-         SvPV_nolen(identity),
-         SvPV_nolen(psk)
+         &(RETVAL->client), host, port, SV_OR_NULL(ciphers), identity, psk
       )) {
 	      char errstr[1024];
          croak("nscang_client_init: %s",
@@ -74,6 +71,10 @@ DESTROY(self)
    CODE:
       if(self) {
 	      nscang_client_free(&(self->client));
+         if(self->node_name)
+            free(self->node_name);
+         if(self->svc_description)
+            free(self->svc_description);
          Safefree(self);
       }
 
