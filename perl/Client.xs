@@ -58,6 +58,7 @@ _new(class, host, port, identity, psk, ciphers, node_name, svc_description, time
          &(RETVAL->client), host, port, SV_OR_NULL(ciphers), identity, psk
       )) {
 	      char errstr[1024];
+         nscang_client_free(&(RETVAL->client));
          croak("nscang_client_init: %s",
             nscang_client_errstr(&(RETVAL->client), errstr, sizeof(errstr))
          );
