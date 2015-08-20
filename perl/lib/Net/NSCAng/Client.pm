@@ -42,6 +42,8 @@ to an L<NCSA-ng|http://www.nsca-ng.org/> server. It is derived from the Python
 code written by Alexander Golovko <alexandro@onsec.ru> but with a more perlish
 interface.
 
+See L<BUGS> for caveats regarding exception handling!
+
 =head2 EXPORT
 
 Nothing by default. The standard Nagios return codes C<OK>, C<WARNING>,
@@ -152,6 +154,14 @@ The original Python library uses pthreads to get around that but due to Perl's
 different threading model this would probably not work. Using the C<MY_CXT>
 macros is a possibility but frankly I'm too lazy to try just for supporting
 Perl threads that don't work well in the first place.
+
+Note that an exception during any call may or may not mean that the object has
+been left in an inconsistent state. E.g. if OpenSSL thinks an operation has
+failed beyond retrying, you may receive a SIGPIPE if you retry anyway, killing
+your process. The object should thus be thrown away and reconstructed if you
+intend to retry what you were doing. It would make sense to fix this by
+internally doing a teardown and reconstruction if an error occurred, alas it
+hasn't been done yet.
 
 =head1 SEE ALSO
 
