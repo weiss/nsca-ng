@@ -24,7 +24,7 @@ XSLoader::load('Net::NSCAng::Client', $VERSION);
 
 =head1 NAME
 
-Net::NSCAng::Client - Submit NSCA results using the NSCA-ng protocol
+Net::NSCAng::Client - Submit host and service monitoring results using the NSCA-ng protocol
 
 =head1 SYNOPSIS
 
