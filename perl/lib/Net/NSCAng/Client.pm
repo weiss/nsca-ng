@@ -11,7 +11,7 @@ our @ISA = qw(Exporter);
 our %EXPORT_TAGS = ( 'all' => [ qw/ OK WARNING CRITICAL UNKNOWN DEPENDENT / ] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use constant OK         => 0;
 use constant WARNING    => 1;
@@ -86,6 +86,9 @@ specify this at construction time and not worry about it later.
 =item C<svc_description>: The service description as configured in your
 monitoring system. Same rationale as C<node_name> above.
 
+=item C<timeout>: The timeout in seconds to wait for server responses and
+connection setup. Default is 10.
+
 =back
 
 The constructor dies with an error message if anything should go wrong, so use
@@ -102,7 +105,7 @@ sub new {
     );
 }
 
-=head2 svc_result(%tags)
+=head2 svc_result($return_code, $plugin_output, %tags)
 
 Submit a service check result. C<$return_code> is a Nagios-style plugin return
 code between 0 and 4, and C<$plugin_output> is a human-readable description.
@@ -125,9 +128,9 @@ sub svc_result {
     $err and croak("svc_result: $err");
 }
 
-=head2 host_result(%tags)
+=head2 host_result($return_code, $plugin_output, %tags)
 
-Submit a host check result. This is the same as L<svc_result()>, te only
+Submit a host check result. This is the same as L<svc_result()>, the only
 exception being that the C<svc_description> argument obviously makes no sense
 for a host check and is thus not supported. If an C<svc_description> should
 have been set in the constructor, it is ignored for this call.
