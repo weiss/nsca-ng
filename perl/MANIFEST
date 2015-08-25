@@ -6,3 +6,7 @@ ppport.h
 README
 t/Net-NSCAng-Client.t
 lib/Net/NSCAng/Client.pm
+client.c
+client.h
+typemap
+uthash.h
