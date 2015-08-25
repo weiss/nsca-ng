@@ -42,8 +42,6 @@ to an L<NCSA-ng|http://www.nsca-ng.org/> server. It is derived from the Python
 code written by Alexander Golovko <alexandro@onsec.ru> but with a more perlish
 interface.
 
-See L<BUGS> for caveats regarding exception handling!
-
 =head2 EXPORT
 
 Nothing by default. The standard Nagios return codes C<OK>, C<WARNING>,
