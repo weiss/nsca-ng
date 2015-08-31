@@ -1,5 +1,8 @@
 Revision history for Perl extension Net::NSCAng::Client.
 
+0.03  2015-08-31
+	- Fix spurious test failures on non-English locales
+
 0.02  2015-08-26
 	- Doc fix: *_results method documentation had wrong arguments
 	- Doc fix: "timeout" tag for the constructor was missing
