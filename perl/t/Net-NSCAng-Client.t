@@ -1,9 +1,13 @@
 use strict;
 use warnings;
-
+use POSIX qw(setlocale LC_ALL);
 use Test::More;
 use Test::Exception;
-BEGIN { use_ok('Net::NSCAng::Client', ':all') };
+
+BEGIN {
+    setlocale(LC_ALL, "C");
+    use_ok('Net::NSCAng::Client', ':all');
+};
 
 my @cparams = qw/ localhost myid s3cr3t /;
 my @nn = (node_name => 'here');
