@@ -32,5 +32,6 @@ WriteMakefile(
             web => 'https://github.com/mbethke/nsca-ng/tree/perl-module/perl',
         },
     },
-
+    dist              => { COMPRESS => 'bzip2', SUFFIX => 'bz2', },
+    clean             => { FILES => 'Net-NSCAng-Client-*' },
 );

@@ -1,7 +1,11 @@
 Revision history for Perl extension Net::NSCAng::Client.
 
+0.04
+	- CPAN: add MIN_PERL_VERSION and repository info
+	- CPAN: change archive to bzip2 format
+
 0.03  2015-08-31
-	- Fix spurious test failures on non-English locales
+	- Test suite: fix spurious failures on non-English locales
 
 0.02  2015-08-26
 	- Doc fix: *_results method documentation had wrong arguments
