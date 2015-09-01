@@ -8,6 +8,7 @@ die "OpenSSL must be v1.0 or higher" unless ExtUtils::PkgConfig->atleast_version
 WriteMakefile(
     NAME              => 'Net::NSCAng::Client',
     VERSION_FROM      => 'lib/Net/NSCAng/Client.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
+    MIN_PERL_VERSION  => '5.10.1',
     PREREQ_PM         => {},
     CONFIGURE_REQUIRES    => {
         'ExtUtils::MakeMaker' => 6.52,
@@ -24,4 +25,12 @@ WriteMakefile(
     DEFINE            => '',
     INC               => '-I.',
     OBJECT            => '$(O_FILES)',
+    META_ADD          => {
+        repository => {
+            type => 'git',
+            url => 'git@github.com:mbethke/nsca-ng.git',
+            web => 'https://github.com/mbethke/nsca-ng/tree/perl-module/perl',
+        },
+    },
+
 );
