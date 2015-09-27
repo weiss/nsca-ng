@@ -1,12 +1,12 @@
 use strict;
 use warnings;
 use POSIX qw(setlocale LC_ALL);
-use Test::More;
+use Test::More tests => 13;
 use Test::Exception;
 
 BEGIN {
     setlocale(LC_ALL, "C");
-    use_ok('Net::NSCAng::Client', ':all');
+    use_ok('Net::NSCAng::Client', ':all') or BAIL_OUT "Can't load module";
 };
 
 my @cparams = qw/ localhost myid s3cr3t /;
@@ -28,8 +28,6 @@ lives_ok(sub {crf(sub { $n->svc_result(0, "OK", @sd) })}, 'svc_result() with loc
 lives_ok(sub { $n = Net::NSCAng::Client->new(@cparams, @nn, @sd) }, 'Constructor with node_name');
 lives_ok(sub { crf(sub { $n->host_result(0, "OK") })}, 'host_result() OK w/o local params');
 lives_ok(sub { crf(sub { $n->svc_result(0, "OK") })}, 'svc_result() OK w/o local params');
-
-done_testing;
 
 # Connection-refused-filter
 # Supresses exceptions with a "connection refused" error as this is expected
