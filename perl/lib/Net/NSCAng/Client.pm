@@ -11,7 +11,7 @@ our @ISA = qw(Exporter);
 our %EXPORT_TAGS = ( 'all' => [ qw/ OK WARNING CRITICAL UNKNOWN DEPENDENT / ] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use constant OK         => 0;
 use constant WARNING    => 1;

@@ -1,6 +1,9 @@
 Revision history for Perl extension Net::NSCAng::Client.
 
-0.04
+0.04  2015-09-27
+	- Fix: on systems such as OpnBSD that use LibreSSL without support for
+	  RFC4279 PSK authentication, try `libeopenssl' (the original) first.
+	- Test: emit warning on threaded perls
 	- CPAN: add MIN_PERL_VERSION and repository info
 	- CPAN: change archive to bzip2 format
 
