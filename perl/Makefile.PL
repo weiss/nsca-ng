@@ -21,7 +21,7 @@ WriteMakefile(
     ABSTRACT_FROM     => 'lib/Net/NSCAng/Client.pm', # retrieve abstract from module
     AUTHOR            => 'Matthias Bethke <matthias@towiski.de>',
     LICENSE           => 'perl',
-    LIBS              => [ ExtUtils::PkgConfig->libs('openssl') ],
+    LIBS              => [ ExtUtils::PkgConfig->libs($openssl_info{pkg}) ],
     DEFINE            => '',
     INC               => '-I.',
     OBJECT            => '$(O_FILES)',
