@@ -3,10 +3,13 @@ use warnings;
 use POSIX qw(setlocale LC_ALL);
 use Test::More tests => 13;
 use Test::Exception;
+use Config;
 
 BEGIN {
     setlocale(LC_ALL, "C");
     use_ok('Net::NSCAng::Client', ':all') or BAIL_OUT "Can't load module";
+    $Config{useithreads}
+        and warn "WARNING: Net::NSCAng::Client is not thread safe but your perl has threads enabled!\n";
 };
 
 my @cparams = qw/ localhost myid s3cr3t /;
