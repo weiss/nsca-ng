@@ -1,5 +1,9 @@
 Revision history for Perl extension Net::NSCAng::Client.
 
+0.05  2015-10-06
+	- Fix: use Devel::CheckLib in the build script to verify that the
+	  OpenSSL found is actually usable.
+
 0.04  2015-09-27
 	- Fix: on systems such as OpnBSD that use LibreSSL without support for
 	  RFC4279 PSK authentication, try `libeopenssl' (the original) first.
