@@ -42,6 +42,7 @@ WriteMakefile(
         'ExtUtils::MakeMaker' => 6.52,
         'ExtUtils::PkgConfig' => 0,
         'Devel::CheckLib' => 0,
+        'version' => 0.77,
     },
     TEST_REQUIRES     => {
         'Test::More'        => 0,
