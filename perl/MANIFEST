@@ -5,6 +5,8 @@ MANIFEST
 ppport.h
 README
 t/Net-NSCAng-Client.t
+t/manifest.t
+t/pod.t 
 lib/Net/NSCAng/Client.pm
 client.c
 client.h
