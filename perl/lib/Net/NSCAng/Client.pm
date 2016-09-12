@@ -8,10 +8,13 @@ use Carp;
 require Exporter;
 our @ISA = qw(Exporter);
 
-our %EXPORT_TAGS = ( 'all' => [ qw/ OK WARNING CRITICAL UNKNOWN DEPENDENT / ] );
-our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
+our %EXPORT_TAGS = (
+    all => [ qw/ OK WARNING CRITICAL UNKNOWN DEPENDENT / ],
+    rcodes => [ qw/ OK WARNING CRITICAL UNKNOWN DEPENDENT / ],
+);
+our @EXPORT_OK = ( @{ $EXPORT_TAGS{all} } );
 
-our $VERSION = '0.05';
+use version 0.77; our $VERSION = qv('v1.0.0');
 
 use constant OK         => 0;
 use constant WARNING    => 1;
@@ -28,7 +31,7 @@ Net::NSCAng::Client - Submit host and service monitoring results using the NSCA-
 
 =head1 SYNOPSIS
 
-  use Net::NSCAng::Client ':all';
+  use Net::NSCAng::Client ':rcodes';
   my $c = Net::NSCAng::Client->new('icinga.mydomain.org', 'myid', 's3cr3t',
     node_name => 'server_name',
   );
@@ -45,11 +48,17 @@ interface.
 =head2 EXPORT
 
 Nothing by default. The standard Nagios return codes C<OK>, C<WARNING>,
-C<CRITICAL>, C<UNKNOWN> and C<DEPENDENT> are available.
+C<CRITICAL>, C<UNKNOWN> and C<DEPENDENT> are available. If you don't use
+something like L<Monitoring::Plugin> that exports the same values, use
+C<:rcodes> as above to import them. The C<:all> tag is currently synonymous
+with C<:rcodes> but might export more things in te future.
 
 =head1 METHODS
 
-=head2 new($host, $identity, $psk, %tags)
+=head2 new
+
+  $o = new($host, $identity, $psk, %tags);
+  $o = new("icinga.local", "ID", "s3cr3t", node_name => hostname());
 
 The constructor takes three mandatory positional arguments and a number of
 optional ones that may be passed as hash-style arguments inline or as a
@@ -57,7 +66,7 @@ hashref. The mandatory ones:
 
 =over 4
 
-=item C<$host>: The host name of the NSCA-ng server
+=item C<$host>: The host name or IP address of the NSCA-ng server
 
 =item C<$identity>: An arbitrary identity string that is used by the server to
 find the corrent PSK. You can think of this as the "user name" part of a
@@ -71,7 +80,7 @@ The following tags are optional:
 
 =over 4
 
-=item C<port>: the TCP port the NSCA-ng srver runs on. Defaults to 5668.
+=item C<port>: the TCP port the NSCA-ng server runs on. Defaults to 5668.
 
 =item C<ciphers>: A list of ciphers for OpenSSL to use. See ciphers(1) for
 details and don't mess with this unless you know what you're doing. The default
@@ -81,7 +90,7 @@ is fine.
 system. This is almost always the host name. You may pass this as an argument
 to any of the result methods, but considering that a single host or service
 check hardly ever submits results for more than one host, it makes sense to
-specify this at construction time and not worry about it later.
+specify this at construction time and not to worry about it later.
 
 =item C<svc_description>: The service description as configured in your
 monitoring system. Same rationale as C<node_name> above.
@@ -105,13 +114,16 @@ sub new {
     );
 }
 
-=head2 svc_result($return_code, $plugin_output, %tags)
+=head2 svc_result
+
+  svc_result($return_code, $plugin_output, %tags);
+  svc_result(WARNING, "Warning: foo is purple!");
 
 Submit a service check result. C<$return_code> is a Nagios-style plugin return
 code between 0 and 4, and C<$plugin_output> is a human-readable description.
 The optional arguments may be passed hash-style inline or as a hashref just
 like for the constructor. The supported keys are C<node_name> and
-C<svc_description>, see L<new()> for their use. If specified here, the values
+C<svc_description>, see L</new()> for their use. If specified here, the values
 override anything that may have been set in the constructor. If you haven't set
 them in the constructor, you MUST set them here though!
 
@@ -128,9 +140,12 @@ sub svc_result {
     $err and croak("svc_result: $err");
 }
 
-=head2 host_result($return_code, $plugin_output, %tags)
+=head2 host_result
 
-Submit a host check result. This is the same as L<svc_result()>, the only
+  host_result($return_code, $plugin_output, %tags);
+  host_result(OK, "Everything is peachy");
+
+Submit a host check result. This is the same as L</svc_result()>, the only
 exception being that the C<svc_description> argument obviously makes no sense
 for a host check and is thus not supported. If an C<svc_description> should
 have been set in the constructor, it is ignored for this call.
