@@ -324,62 +324,87 @@ nscang_client_send_moin(nscang_client_t *c, int timeout)
 	return 1;
 }
 
+/* Check whether a string's prefix matches /\[\d{1,9}\]/
+ * Returns 1 for match, 0 for no match, -1 for incomplete/bad match
+ */
+static int
+has_timestamp_prefix(const char *s)
+{
+   char *end;
+
+   if(*s++ != '[') return 0;
+   if((*s < '0') || (*s > '9')) return -1; // counter strtol's skip-whitespace and sign permissiveness
+   (void)strtol(s, &end, 10); // discard result
+   if(errno) return -1;
+   if(*end == ']') return 1;
+   return -1;
+}
+
 int
 nscang_client_send_command(nscang_client_t *c, const char *command, int timeout)
 {
+   const int command_len = strlen(command);
+	char command_buf[1024];
 	char cmd[32];
-	int rc, result = 0;
-   int len = strlen(command); // length of command plus optional LF
-   char *command_buf = malloc(len + 2);   // include space for '\n\0'
+	int rc, len;
 
-   if(!command_buf)
-      goto finish;
+   switch( has_timestamp_prefix(command) ) {
+      case 0 :
+         // There was no timestamp. Add one.
+         snprintf(command_buf, sizeof(command_buf)-1, "[%u] %s", (unsigned int)time(NULL), command);
+         break;
+      case 1 :
+         // Timestamp found, just copy everything
+         strncpy(command_buf, command, sizeof(command_buf)-1);
+         command_buf[sizeof(command_buf)-1] = '\0';
+         break;
+      default :
+         // Malformed timestamp
+         c->_errno = NSCANG_ERROR_FAIL;
+         snprintf(c->errstr, sizeof(c->errstr), "invalid time stamp format in command `%s'", command);
+         return 0;
+   }
 
-   strncpy(command_buf, command, len+1);
    /* make sure command_buf is newline-terminated */
+   len = strlen(command_buf);
    if(command_buf[len-1] != '\n') {
-      command_buf[len++] = '\n';
+      command_buf[len] = '\n';
+      len++;
       command_buf[len] = '\0';
    }
    fprintf(stderr, "COMMAND: %s", command_buf);
 
 	if (!nscang_client_send_moin(c, timeout))
-      goto finish;
+      return 0;
 
    snprintf(cmd, sizeof(cmd), "PUSH %d\r\n", len);
 	if (!nscang_client_write(c, cmd, strlen(cmd), timeout))
-      goto finish;
+      return 0;
 
 	rc = nscang_client_response(c, timeout);
 
 	if (!rc)
-      goto finish;
+      return 0;
 
 	if (rc != NSCANG_RESP_OKAY) {
 		c->_errno = NSCANG_ERROR_PROTOCOL_MISMATCH;
-      goto finish;
+      return 0;
 	}
 
 	if (!nscang_client_write(c, command_buf, len, timeout))
-      goto finish;
+      return 0;
 
 	rc = nscang_client_response(c, timeout);
 
 	if (!rc)
-      goto finish;
+      return 0;
 
 	if (rc != NSCANG_RESP_OKAY) {
 		c->_errno = NSCANG_ERROR_PROTOCOL_MISMATCH;
-      goto finish;
+      return 0;
 	}
 
-   result = 1;
-
-finish:
-   if(command_buf)
-      free(command_buf);
-
-   return result;
+   return 1;
 }
 
 int
@@ -388,17 +413,14 @@ nscang_client_send_push(nscang_client_t *c, char *host, char *service,
 {
 	char command[1024];
 
-	if (!nscang_client_send_moin(c, timeout))
-		return 0;
-
 	if (service == NULL)
       snprintf(command, sizeof(command) - 1,
-            "[%u] PROCESS_HOST_CHECK_RESULT;%s;%d;%s",
-            (unsigned int)time(NULL), host, status, message);
+            "PROCESS_HOST_CHECK_RESULT;%s;%d;%s",
+            host, status, message);
 	else
       snprintf(command, sizeof(command) - 1,
-            "[%u] PROCESS_SERVICE_CHECK_RESULT;%s;%s;%d;%s",
-            (unsigned int)time(NULL), host, service, status, message);
+            "PROCESS_SERVICE_CHECK_RESULT;%s;%s;%d;%s",
+            host, service, status, message);
 
    return nscang_client_send_command(c, command, timeout);
 }

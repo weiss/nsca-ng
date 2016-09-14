@@ -162,9 +162,17 @@ sub host_result {
 =head2 command
 
   command($cmd);
-  command();
+  command(
+    sprintf("SCHEDULE_HOST_DOWNTIME;myserver;%d;%d;1;0;0;root;Hooray for NSCA-ng!",
+        0+time, 3600+time
+    )
+  );
 
-Submit an arbitrary command to your monitoring host.
+Submit an arbitrary command to your monitoring host. Commands have to be
+prefixed by a timestamp in seconds since the Unix epoch enclosed in angle
+brackets to be accepted by the server; if you leave this off, the method will
+add it for you. Refer to the Nagios/Icinga documentiation for available
+commands and the format to follow for each command.
 
 =cut
 
