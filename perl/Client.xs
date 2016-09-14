@@ -186,3 +186,36 @@ _result(self, is_host_result, node_name, svc_description, return_code, plugin_ou
    RETVAL = newSVpv(errstr, 0);
    OUTPUT:
       RETVAL
+
+SV *
+command(self, command)
+   Net::NSCAng::Client self
+   SV * command
+
+   CODE:
+   char errstr[1024];
+   char *ccommand;
+   nscang_client_t *client = &self->client;
+
+   if(!self->client_initialized)
+      init_client(self);
+
+   if(SvOK(command)) {
+      ccommand = SvPV_nolen(command);
+   } else {
+      croak("command missing");
+   }
+
+	if(nscang_client_send_command(client, ccommand, self->timeout))
+      XSRETURN_UNDEF;
+
+   if(client->_errno == NSCANG_ERROR_TIMEOUT)
+	   nscang_client_disconnect(client);
+
+   // Retrieve the error description
+   nscang_client_errstr(client, errstr, sizeof(errstr));
+   // Remember to reinitialize the client text time through
+   self->client_initialized = 0;
+   nscang_client_free(&(self->client));
+
+   croak(errstr);

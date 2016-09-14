@@ -14,7 +14,7 @@ our %EXPORT_TAGS = (
 );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{all} } );
 
-use version 0.77; our $VERSION = qv('v1.0.0');
+use version 0.77; our $VERSION = qv('v2.0.0');
 
 use constant OK         => 0;
 use constant WARNING    => 1;
@@ -158,6 +158,15 @@ sub host_result {
     my $err = $self->_result(1, $args{node_name}, '', $return_code, $plugin_output);
     $err and croak("host_result: $err");
 }
+
+=head2 command
+
+  command($cmd);
+  command();
+
+Submit an arbitrary command to your monitoring host.
+
+=cut
 
 1;
 __END__

@@ -325,54 +325,82 @@ nscang_client_send_moin(nscang_client_t *c, int timeout)
 }
 
 int
+nscang_client_send_command(nscang_client_t *c, const char *command, int timeout)
+{
+	char cmd[32];
+	int rc, result = 0;
+   int len = strlen(command); // length of command plus optional LF
+   char *command_buf = malloc(len + 2);   // include space for '\n\0'
+
+   if(!command_buf)
+      goto finish;
+
+   strncpy(command_buf, command, len+1);
+   /* make sure command_buf is newline-terminated */
+   if(command_buf[len-1] != '\n') {
+      command_buf[len++] = '\n';
+      command_buf[len] = '\0';
+   }
+   fprintf(stderr, "COMMAND: %s", command_buf);
+
+	if (!nscang_client_send_moin(c, timeout))
+      goto finish;
+
+	snprintf(cmd, sizeof(cmd), "PUSH %d\n", len);
+	if (!nscang_client_write(c, cmd, strlen(cmd), timeout))
+      goto finish;
+
+	rc = nscang_client_response(c, timeout);
+
+	if (!rc)
+      goto finish;
+
+	if (rc != NSCANG_RESP_OKAY) {
+		c->_errno = NSCANG_ERROR_PROTOCOL_MISMATCH;
+      goto finish;
+	}
+
+	if (!nscang_client_write(c, command_buf, len, timeout))
+      goto finish;
+
+	rc = nscang_client_response(c, timeout);
+
+	if (!rc)
+      goto finish;
+
+	if (rc != NSCANG_RESP_OKAY) {
+		c->_errno = NSCANG_ERROR_PROTOCOL_MISMATCH;
+      goto finish;
+	}
+
+   result = 1;
+
+finish:
+   if(command_buf)
+      free(command_buf);
+
+   return result;
+}
+
+int
 nscang_client_send_push(nscang_client_t *c, char *host, char *service,
                         int status, char *message, int timeout)
 {
-	char cmd[64], command[1024];
-	int len, rc;
+	char command[1024];
 
 	if (!nscang_client_send_moin(c, timeout))
 		return 0;
 
 	if (service == NULL)
-		len = snprintf(command, sizeof(command) - 1,
-		    "[%u] PROCESS_HOST_CHECK_RESULT;%s;%d;%s",
-		    (unsigned int)time(NULL), host, status, message);
+      snprintf(command, sizeof(command) - 1,
+            "[%u] PROCESS_HOST_CHECK_RESULT;%s;%d;%s",
+            (unsigned int)time(NULL), host, status, message);
 	else
-		len = snprintf(command, sizeof(command) - 1,
-		    "[%u] PROCESS_SERVICE_CHECK_RESULT;%s;%s;%d;%s",
-		    (unsigned int)time(NULL), host, service, status, message);
+      snprintf(command, sizeof(command) - 1,
+            "[%u] PROCESS_SERVICE_CHECK_RESULT;%s;%s;%d;%s",
+            (unsigned int)time(NULL), host, service, status, message);
 
-	command[len++] = '\n';
-
-	snprintf(cmd, sizeof(cmd), "PUSH %d\n", len);
-	if (!nscang_client_write(c, cmd, strlen(cmd), timeout))
-		return 0;
-
-	rc = nscang_client_response(c, timeout);
-
-	if (!rc)
-		return 0;
-
-	if (rc != NSCANG_RESP_OKAY) {
-		c->_errno = NSCANG_ERROR_PROTOCOL_MISMATCH;
-		return 0;
-	}
-
-	if (!nscang_client_write(c, command, len, timeout))
-		return 0;
-
-	rc = nscang_client_response(c, timeout);
-
-	if (!rc)
-		return 0;
-
-	if (rc != NSCANG_RESP_OKAY) {
-		c->_errno = NSCANG_ERROR_PROTOCOL_MISMATCH;
-		return 0;
-	}
-
-	return 1;
+   return nscang_client_send_command(c, command, timeout);
 }
 
 int

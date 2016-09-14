@@ -73,6 +73,7 @@ int nscang_client_init(nscang_client_t *c, char *host, int port,
 void nscang_client_free(nscang_client_t *c);
 void nscang_client_disconnect(nscang_client_t *c);
 int nscang_client_send_moin(nscang_client_t *c, int timeout);
+int nscang_client_send_command(nscang_client_t *c, const char *command, int timeout);
 int nscang_client_send_push(nscang_client_t *c, char *host, char *service,
                             int status, char *message, int timeout);
 int nscang_client_send_quit(nscang_client_t *c);

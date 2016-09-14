@@ -35,7 +35,7 @@ EOF
 
 WriteMakefile(
     NAME              => 'Net::NSCAng::Client',
-    VERSION_FROM      => 'lib/Net/NSCAng/Client.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
+    VERSION_FROM      => 'lib/Net/NSCAng/Client.pm',
     MIN_PERL_VERSION  => '5.10.1',
     PREREQ_PM         => {},
     CONFIGURE_REQUIRES    => {
