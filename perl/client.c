@@ -346,7 +346,7 @@ nscang_client_send_command(nscang_client_t *c, const char *command, int timeout)
 	if (!nscang_client_send_moin(c, timeout))
       goto finish;
 
-	snprintf(cmd, sizeof(cmd), "PUSH %d\n", len);
+   snprintf(cmd, sizeof(cmd), "PUSH %d\r\n", len);
 	if (!nscang_client_write(c, cmd, strlen(cmd), timeout))
       goto finish;
 
