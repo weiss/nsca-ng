@@ -32,12 +32,14 @@ lives_ok(sub { $n = Net::NSCAng::Client->new(@cparams, @nn, @sd) }, 'Constructor
 lives_ok(sub { crf(sub { $n->host_result(0, "OK") })}, 'host_result() OK w/o local params');
 lives_ok(sub { crf(sub { $n->svc_result(0, "OK") })}, 'svc_result() OK w/o local params');
 
+dies_ok(sub { $n->command("BOGUS_COMMAND;1;2;3") }, 'command() dies w/o argument');
+lives_ok(sub {crf(sub { $n->command("BOGUS_COMMAND;1;2;3") })}, 'command() works');
 # Connection-refused-filter
 # Supresses exceptions with a "connection refused" error as this is expected
 sub crf {
     my $sub = shift;
     eval { $sub->() };
     if($@) {
-        die $@ unless $@ =~ /: SSL error:Connection refused/;
+        die $@ unless $@ =~ /SSL error:Connection refused/;
     }
 }
