@@ -372,7 +372,6 @@ nscang_client_send_command(nscang_client_t *c, const char *command, int timeout)
       len++;
       command_buf[len] = '\0';
    }
-   fprintf(stderr, "COMMAND: %s", command_buf);
 
 	if (!nscang_client_send_moin(c, timeout))
       return 0;
