@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use POSIX qw(setlocale LC_ALL);
-use Test::More tests => 13;
+use Test::More tests => 15;
 use Test::Exception;
 use Config;
 
