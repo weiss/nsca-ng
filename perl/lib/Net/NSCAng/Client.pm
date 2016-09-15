@@ -40,10 +40,12 @@ Net::NSCAng::Client - Submit host and service monitoring results using the NSCA-
 
 =head1 DESCRIPTION
 
-Net::NSCAng::Client provides a means of sending host or service check results
-to an L<NSCA-ng|http://www.nsca-ng.org/> server. It is derived from the Python
-code written by Alexander Golovko <alexandro@onsec.ru> but with a more perlish
-interface.
+Net::NSCAng::Client provides a means of submitting host or service check
+results to an L<NSCA-ng|http://www.nsca-ng.org/> server, and to remote-control
+your monitoring system using L<external commands|http://docs.icinga.org/latest/en/extcommands2.html>.
+It is derived from the Python module written by Alexander Golovko but with a
+more perlish interface and additional functionality for sending arbitrary
+external commands.
 
 =head2 EXPORT
 
