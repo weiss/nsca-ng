@@ -48,6 +48,7 @@ WriteMakefile(
         'Test::Exception' => 0,
         'Test::More' => 0,
         'Test::Pod' => 0,
+        'Test::CheckManifest' => 0,
     },
     ABSTRACT_FROM     => 'lib/Net/NSCAng/Client.pm', # retrieve abstract from module
     AUTHOR            => 'Matthias Bethke <matthias@towiski.de>',

@@ -4,6 +4,7 @@ Makefile.PL
 MANIFEST
 ppport.h
 README
+t/001_load.t
 t/Net-NSCAng-Client.t
 t/manifest.t
 t/pod.t 
