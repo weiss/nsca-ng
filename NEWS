@@ -1,6 +1,18 @@
 NSCA-ng Release History
 =======================
 
+Changes in Release 1.5 (2016-11-15)
+-----------------------------------
+
+- Include an experimental NSCA-ng client module for Perl.
+- Link against libsystemd instead of libsystemd-daemon when using systemd
+  version 210 or newer, where the latter library has been merged into the
+  former.
+- Include the systemd.service(5) and systemd.socket(5) files with the
+  release tarball.
+- Update our copy of libev from version 4.15 to version 4.22.  The new
+  release provides a number of bug fixes and small enhancements.
+
 Changes in Release 1.4 (2014-10-14)
 -----------------------------------
 
