@@ -417,9 +417,11 @@ initialize_openssl(const SSL_METHOD *method, const char *ciphers)
 {
 	SSL_CTX *ssl_ctx;
 
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 	(void)SSL_library_init();
 	SSL_load_error_strings();
 	(void)atexit(ERR_free_strings);
+#endif
 
 	/*
 	 * In earlier versions, we called
