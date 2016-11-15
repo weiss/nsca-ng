@@ -1,0 +1,15 @@
+Changes
+Client.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/001_load.t
+t/Net-NSCAng-Client.t
+t/manifest.t
+t/pod.t
+lib/Net/NSCAng/Client.pm
+client.c
+client.h
+typemap
+uthash.h

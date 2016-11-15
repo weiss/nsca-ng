@@ -3,3 +3,6 @@ and server code.
 
 Alexander Golovko <alexandro@onsec.ru> wrote the (technically separate)
 Python client module distributed with NSCA-ng.
+
+Matthias Bethke <matthias.bethke@financial.com> wrote the (technically
+separate) Perl client module distributed with NSCA-ng.

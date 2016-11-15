@@ -55,4 +55,8 @@ If any files in the `python' directory (except for `uthash.h') are used:
 
 | Copyright (c) 2014 Alexander Golovko
 
+If any files in the `perl' directory are used:
+
+| Copyright (c) 2015 Matthias Bethke
+
 Additional requirements may be imposed by external libraries.

@@ -1,0 +1,31 @@
+Revision history for Perl extension Net::NSCAng::Client.
+
+v1.0.0  2016-09-12
+	- New: provide :rcodes tag to only import return codes
+	- New: version numbering scheme changed to use version->declare()
+	- Doc fix: properly hyperlink to methods by separating method name and
+	  argument template.
+
+0.05  2015-10-06
+	- Fix: use Devel::CheckLib in the build script to verify that the
+	  OpenSSL found is actually usable.
+
+0.04  2015-09-27
+	- Fix: on systems such as OpnBSD that use LibreSSL without support for
+	  RFC4279 PSK authentication, try `libeopenssl' (the original) first.
+	- Test: emit warning on threaded perls
+	- CPAN: add MIN_PERL_VERSION and repository info
+	- CPAN: change archive to bzip2 format
+
+0.03  2015-08-31
+	- Test suite: fix spurious failures on non-English locales
+
+0.02  2015-08-26
+	- Doc fix: *_results method documentation had wrong arguments
+	- Doc fix: "timeout" tag for the constructor was missing
+
+0.01  2015-08-25
+	- original version; created by h2xs 1.23 with options
+		-b 5.10.1 -O -A -n Net::NSCAng::Client
+
+vim:set noet  ts=8:

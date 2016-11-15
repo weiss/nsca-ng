@@ -1,0 +1,26 @@
+Net-NSCAng-Client version 0.01
+==============================
+
+This is a Perl interface to Alexander Golovko's NSCA-ng client library.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None. Testing requires Test::Exception though.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015 by Matthias Bethke
+Portions Copyright (C) by Alexander Golovko <alexandro@onsec.ru>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.20.2 or,
+at your option, any later version of Perl 5 you may have available.
