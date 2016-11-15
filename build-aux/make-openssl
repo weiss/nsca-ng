@@ -28,7 +28,7 @@ then
 	fi
 fi
 
-for browser in 'lynx -width=1024' 'elinks' 'links'
+for browser in 'lynx' 'elinks' 'links'
 do
 	if type `expr "$browser" : '\([^ ]*\)'` >/dev/null 2>&1 &&
 	    $browser -dump 'http://www.openssl.org/' >/dev/null 2>&1
@@ -43,7 +43,7 @@ test "$found_browser" = yes ||
 
 install_dir=`pwd`/lib/ssl
 tarball=`$browser -dump 'http://www.openssl.org/source/' |
-    awk '$NF == "[LATEST]" {sub("\\\[.*\\\]", "", $6); print $6}'`
+    sed -n 's/.*\(openssl-[1-9].*\.tar\.gz\).*/\1/p' | head -1`
 
 if [ ! -f "$tarball" ]
 then
