@@ -36,7 +36,6 @@ Net::NSCAng::Client - Submit host and service monitoring results using the NSCA-
     node_name => 'server_name',
   );
   $c->svc_result(WARNING, 'BogusService is bogus!', { svc_description => 'bogus' });
-    
 
 =head1 DESCRIPTION
 

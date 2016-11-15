@@ -19,10 +19,8 @@ None. Testing requires Test::Exception though.
 COPYRIGHT AND LICENCE
 
 Copyright (C) 2015 by Matthias Bethke
-Portions Copyright (C) by Alexander Golovko <alexandro@onsec.ru> 
+Portions Copyright (C) by Alexander Golovko <alexandro@onsec.ru>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.20.2 or,
 at your option, any later version of Perl 5 you may have available.
-
-

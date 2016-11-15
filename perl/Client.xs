@@ -81,7 +81,7 @@ static void free_object(nscang_object_t *o) {
    FREE_IF_SET(o->host);
 }
 
-MODULE = Net::NSCAng::Client		PACKAGE = Net::NSCAng::Client		
+MODULE = Net::NSCAng::Client		PACKAGE = Net::NSCAng::Client
 
 PROTOTYPES: DISABLE
 
