@@ -61,7 +61,7 @@
 typedef struct tls_state_s {
 /* public: */
 	void *data;     /* Can freely be used by the caller. */
-	const char *id; /* Client ID (e.g., "foo"). */
+	char *id;       /* Client ID (e.g., "foo"). */
 	char *addr;     /* Client IP address (e.g., "192.0.2.2"). */
 	char *peer;     /* Client ID and IP address (e.g., "foo@192.0.2.2"). */
 

@@ -530,6 +530,8 @@ tls_free(tls_state *tls)
 		free(tls->output);
 	if (tls->addr != NULL)
 		free(tls->addr);
+	if (tls->id != NULL)
+		free(tls->id);
 	if (tls->peer != NULL)
 		free(tls->peer);
 	if (tls->ssl != NULL)
@@ -632,7 +634,7 @@ accept_ssl_cb(EV_P_ ev_io *w, int revents __attribute__((__unused__)))
 		debug("TLS handshake with %s not (yet) successful", tls->addr);
 		check_tls_error(EV_A_ w, result);
 	} else { /* The TLS connection is established. */
-		if ((tls->id = SSL_get_psk_identity(tls->ssl)) == NULL) {
+		if ((tls->id = SSL_get_app_data(tls->ssl)) == NULL) {
 			error("Cannot retrieve client identity");
 			tls_free(tls);
 		} else {

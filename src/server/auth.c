@@ -41,6 +41,7 @@
 #include "log.h"
 #include "system.h"
 #include "util.h"
+#include "wrappers.h"
 
 static bool match(regex_t * restrict, const char * restrict);
 
@@ -49,8 +50,8 @@ static bool match(regex_t * restrict, const char * restrict);
  */
 
 unsigned int
-check_psk(SSL *ssl __attribute__((__unused__)), const char *identity,
-          unsigned char *password, unsigned int max_password_len)
+check_psk(SSL *ssl, const char *identity, unsigned char *password,
+          unsigned int max_password_len)
 {
 	cfg_t *auth;
 	const char *configured_pw;
@@ -62,6 +63,15 @@ check_psk(SSL *ssl __attribute__((__unused__)), const char *identity,
 		return 0;
 	}
 	debug("Verifying key provided by %s", identity);
+
+	/*
+	 * With (at least) OpenSSL 1.1.1b, SSL_get_psk_identity(3) returns NULL
+	 * when TLSv1.3 is used.  As a workaround, we store the ID ourselves:
+	 */
+	if (SSL_set_app_data(ssl, xstrdup(identity)) != 1) {
+		error("Cannot store client-supplied ID (`%s')", identity);
+		return 0;
+	}
 
 	configured_pw = cfg_getstr(auth, "password");
 	password_len = MIN(strlen(configured_pw), max_password_len);
