@@ -1,6 +1,15 @@
 NSCA-ng Release History
 =======================
 
+Changes in Release 1.6 (2019-03-19)
+-----------------------------------
+
+- Work around TLSv1.3 PSK bug in (at least) OpenSSL 1.1.1b.
+- Fix static linking against recent OpenSSL versions.
+- Update our copy of libev from version 4.22 to version 4.25.  The new
+  release provides a few platform compatibilty fixes and small enhancements.
+- Apply a few minor improvements.
+
 Changes in Release 1.5 (2016-11-15)
 -----------------------------------
 
