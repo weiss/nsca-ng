@@ -75,6 +75,10 @@ AC_DEFUN([NSCA_LIB_OPENSSL],
         [AC_MSG_FAILURE([cannot link with OpenSSL])],
         [-lcrypto -ldl -lpthread])],
       [-lcrypto -ldl])])
+  AC_CHECK_LIB([crypto], [RAND_bytes],
+    [AC_DEFINE([HAVE_RAND_BYTES], [1],
+      [Define to 1 if you have the `RAND_bytes' function.])], [],
+    [$SSLLIBS])
   AC_CHECK_LIB([ssl], [SSL_new],
     [SSLLIBS="-lssl $SSLLIBS"],
     [AC_MSG_FAILURE([cannot link with OpenSSL])],

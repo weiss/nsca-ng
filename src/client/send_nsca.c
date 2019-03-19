@@ -334,9 +334,13 @@ random_number(unsigned long range)
 {
 	unsigned long random_value;
 
+#if HAVE_RAND_BYTES
+	(void)RAND_bytes((unsigned char *)&random_value,
+	    sizeof(random_value));
+#else
 	(void)RAND_pseudo_bytes((unsigned char *)&random_value,
 	    sizeof(random_value));
-
+#endif
 	/* See http://c-faq.com/lib/randrange.html for some caveats. */
 	return random_value % range;
 }

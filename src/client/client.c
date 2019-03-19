@@ -305,7 +305,11 @@ generate_session_id(void)
 {
 	unsigned char random_bytes[NUM_SESSION_ID_BYTES];
 
+#if HAVE_RAND_BYTES
+	(void)RAND_bytes(random_bytes, sizeof(random_bytes));
+#else
 	(void)RAND_pseudo_bytes(random_bytes, sizeof(random_bytes));
+#endif
 	return base64(random_bytes, sizeof(random_bytes));
 }
 
