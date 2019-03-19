@@ -20,7 +20,7 @@ if [ $# -eq 1 ]
 then
 	version=$1
 else
-	version=2.7
+	version=3.2.2
 fi
 
 if [ ! -f lib/system.h ]
@@ -49,7 +49,7 @@ then
 		die "Please download '$tarball' into `pwd`"
 	fi
 
-	$get "http://download.savannah.gnu.org/releases/confuse/$tarball"
+	$get "https://github.com/martinh/libconfuse/releases/download/v$version/$tarball"
 	test -f "$tarball" || die "Downloading '$tarball' failed"
 fi
 
