@@ -242,7 +242,7 @@ static void
 cat_fifo(long n_lines)
 {
 	FILE *fifo;
-	int c;
+	int c, error;
 	enum {
 		STATE_EAT_TIMESTAMP,
 		STATE_PRINT_COMMAND
@@ -271,7 +271,9 @@ cat_fifo(long n_lines)
 			}
 		}
 	}
-	if (ferror(fifo))
+	error = ferror(fifo);
+	(void)close(fifo);
+	if (error)
 		die("Cannot read %s: %s", COMMAND_FILE,
 		    got_signal ? "Interrupted" : strerror(errno));
 }
