@@ -156,7 +156,7 @@ subscription required).  For usage support, please subscribe to the
 [1]: http://www.nagios.org/developerinfo/externalcommands/
 [2]: http://tools.ietf.org/html/rfc4279
 [3]: http://www.openssl.org/
-[4]: http://www.nongnu.org/confuse/
+[4]: https://github.com/libconfuse/libconfuse
 [5]: http://libev.schmorp.de/
 [6]: http://www.freedesktop.org/wiki/Software/systemd/
 [7]: http://www.nsca-ng.org/
