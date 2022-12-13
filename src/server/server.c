@@ -73,6 +73,7 @@ static void bail(tls_state * restrict, const char * restrict, ...)
                  __attribute__((__format__(__printf__, 2, 3)));
 static bool client_exited(tls_state * restrict, const char * restrict);
 static void connection_stop(tls_state *);
+static char *unescape(char *, size_t);
 
 /*
  * Exported functions.
@@ -227,19 +228,19 @@ static void
 handle_push(tls_state * restrict tls, char * restrict data)
 {
 	connection_state *connection = tls->data;
-	int width = connection->input_length > 0
+	int len = connection->input_length > 0
 	    && data[connection->input_length - 1] == '\n'
 	    ? (int)connection->input_length - 1 : (int)connection->input_length;
 
-	info("%s C: %.*s", tls->peer, width, data);
+	info("%s C: %.*s", tls->peer, len, data);
 
 	if (is_authorized(tls->id, data)) {
-		notice("Queuing data from %s: %.*s", tls->peer, width, data);
-		fifo_write(connection->ctx->fifo, data,
+		notice("Queuing data from %s: %.*s", tls->peer, len, data);
+		fifo_write(connection->ctx->fifo, unescape(data, len),
 		    connection->input_length, free);
 		send_response(tls, "OKAY");
 	} else {
-		warning("Refusing data from %s: %.*s", tls->peer, width, data);
+		warning("Refusing data from %s: %.*s", tls->peer, len, data);
 		free(data);
 		send_response(tls, "FAIL You're not authorized");
 	}
@@ -315,6 +316,24 @@ connection_stop(tls_state *tls)
 	connection_state *connection = tls->data;
 
 	free(connection);
+}
+
+static char *
+unescape(char *input, size_t len)
+{
+	char *output = xmalloc(len);
+	int i, j;
+
+	for (i = 0, j = 0; i <= len; i++, j++) {
+		if (i < len - 1 && input[i] == '\\' && input[i + 1] == 'n') {
+			output[j] = '\n';
+			i++;
+		} else
+			output[j] = input[i];
+		j++;
+	}
+	free(input);
+	return j < len ? xrealloc(output, j) : output;
 }
 
 /* vim:set joinspaces noexpandtab textwidth=80 cinoptions=(4,u0: */
