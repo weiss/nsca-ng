@@ -272,7 +272,7 @@ cat_fifo(long n_lines)
 		}
 	}
 	error = ferror(fifo);
-	(void)close(fifo);
+	(void)fclose(fifo);
 	if (error)
 		die("Cannot read %s: %s", COMMAND_FILE,
 		    got_signal ? "Interrupted" : strerror(errno));
