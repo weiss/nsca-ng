@@ -107,7 +107,8 @@ vlog(int level, const char *in_fmt, va_list ap)
 					out_fmt[out_pos++] = err_str[err_pos];
 				state = STATE_NORMAL;
 				break;
-			} /* Otherwise, fall through. */
+			}
+			/* FALLTHROUGH */
 		default:
 			if (state == STATE_PERCENT)
 				out_fmt[out_pos++] = '%';

@@ -285,7 +285,7 @@ write_cb(EV_P_ ev_io *w, int revents __attribute__((__unused__)))
 		    == -1)
 			switch (errno) {
 #if defined(EWOULDBLOCK) && EWOULDBLOCK != EAGAIN
-			case EWOULDBLOCK: /* Fall through. */
+			case EWOULDBLOCK: /* FALLTHROUGH */
 #endif
 			case EAGAIN:
 				debug("Writing to command file failed: %m");

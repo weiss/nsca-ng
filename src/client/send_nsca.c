@@ -279,13 +279,13 @@ parse_backslash_escape(const char *sequence)
 				return '\t';
 			case 'v':
 				return '\v';
-			case 'x': /* Fall through. */
+			case 'x': /* FALLTHROUGH */
 			case '0':
 				break;
 			}
-		/* Otherwise, fall through. */
-	case 3: /* Fall through. */
-	case 4: /* Fall through. */
+		/* FALLTHROUGH */
+	case 3: /* FALLTHROUGH */
+	case 4: /* FALLTHROUGH */
 	case 5:
 		/*
 		 * We support octal numbers with a leading zero and hexadecimal
@@ -302,9 +302,9 @@ parse_backslash_escape(const char *sequence)
 			value = strtol(numeric, &end, 0);
 			if (*end == '\0' && value >= 0 && value <= CHAR_MAX)
 				return (unsigned char)value;
-			/* Otherwise, fall through. */
+			/* FALLTHROUGH */
 		}
-		/* Otherwise, fall through. */
+		/* FALLTHROUGH */
 	default:
 		return EOF;
 	}
