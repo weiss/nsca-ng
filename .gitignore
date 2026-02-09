@@ -28,6 +28,7 @@
 /nsca-ng-*.tar.gz
 /openssl-*
 /python/build/
+/python/nscang.*.so
 /src/client/send_nsca
 /src/server/nsca-ng
 /stamp-h1
