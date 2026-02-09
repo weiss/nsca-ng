@@ -1,6 +1,15 @@
 NSCA-ng Release History
 =======================
 
+Changes in Release 1.7 (2026-02-09)
+-----------------------------------
+
+- Update the Perl module code to work with recent OpenSSL versions.
+- Update the Python module code to work with recent OpenSSL versions.
+- Port the Python module code to Python 3.
+- Update our copy of libev from version 4.25 to version 4.33.
+- Apply a few minor bug fixes.
+
 Changes in Release 1.6 (2019-03-19)
 -----------------------------------
 
