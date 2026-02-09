@@ -442,11 +442,18 @@ nscang_client_send_quit(nscang_client_t *c)
 }
 
 void
-nscang_client_ssl_error(char *buf, int buf_size, const char *msg) {
-   strncpy(buf, msg, buf_size);
-   buf_size--;
-   strncat(buf, ":", buf_size);
-   strncat(buf, ERR_reason_error_string(ERR_peek_error()), buf_size);
+nscang_client_ssl_error(char *buf, int buf_size, const char *msg)
+{
+	const char *ssl_err;
+
+	strncpy(buf, msg, buf_size);
+	buf_size--;
+
+	ssl_err = ERR_reason_error_string(ERR_peek_error());
+	if (ssl_err != NULL) {
+		strncat(buf, ":", buf_size);
+		strncat(buf, ssl_err, buf_size);
+	}
 }
 
 char *
