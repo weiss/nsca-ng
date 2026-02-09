@@ -74,8 +74,10 @@ int
 nscang_client_init(nscang_client_t *c, char *host, int port, char *ciphers,
                    char *identity, char *psk)
 {
+	char port_str[6];
 	int rc;
 
+	snprintf(port_str, sizeof(port_str), "%d", port);
 	memset(c, 0x00, sizeof(nscang_client_t));
 
 	c->ssl_ctx = SSL_CTX_new(SSLv23_client_method());
@@ -99,7 +101,7 @@ nscang_client_init(nscang_client_t *c, char *host, int port, char *ciphers,
 		return 0;
 	}
 	BIO_set_conn_hostname(c->bio, host);
-	BIO_set_conn_int_port(c->bio, &port);
+	BIO_set_conn_port(c->bio, port_str);
 	BIO_set_nbio(c->bio, 1);
 
 	c->ssl = SSL_new(c->ssl_ctx);
