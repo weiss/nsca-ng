@@ -152,6 +152,10 @@ get_ev_backend(EV_P)
 		return "poll";
 	case EVBACKEND_EPOLL:
 		return "epoll";
+	case EVBACKEND_LINUXAIO:
+		return "Linux AIO";
+	case EVBACKEND_IOURING:
+		return "io_uring";
 	case EVBACKEND_KQUEUE:
 		return "kqueue";
 	case EVBACKEND_DEVPOLL:
