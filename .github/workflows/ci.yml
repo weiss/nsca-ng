@@ -35,3 +35,18 @@ jobs:
       run: make check
     - name: Perform CodeQL analysis
       uses: github/codeql-action/analyze@v4
+    # Perl module
+    - name: Install Perl module prerequisites
+      run: sudo apt-get -qq install libextutils-pkgconfig-perl libdevel-checklib-perl
+    - name: Build Perl module
+      run: |
+        cd perl
+        perl Makefile.PL
+        make
+    # Python module
+    - name: Install Python module prerequisites
+      run: sudo apt-get -qq install python3-dev python3-setuptools
+    - name: Build Python module
+      run: |
+        cd python
+        python3 setup.py build_ext --inplace
