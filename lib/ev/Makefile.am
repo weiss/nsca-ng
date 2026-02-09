@@ -32,6 +32,6 @@ endif
 
 noinst_LIBRARIES = libev.a
 libev_a_SOURCES = ev.c ev.h ev_vars.h ev_wrap.h
-EXTRA_libev_a_SOURCES = ev_epoll.c ev_iouring.c ev_kqueue.c ev_linuxaio \
+EXTRA_libev_a_SOURCES = ev_epoll.c ev_iouring.c ev_kqueue.c ev_linuxaio.c \
                         ev_poll.c ev_port.c ev_select.c ev_win32.c
 EXTRA_DIST = libev.m4
