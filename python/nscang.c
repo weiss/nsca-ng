@@ -25,6 +25,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define PY_SSIZE_T_CLEAN
 #include <Python.h>
 #include "structmember.h"
 
@@ -33,7 +34,8 @@
 #include "client.h"
 
 typedef struct {
-	PyObject_HEAD char *host;
+	PyObject_HEAD
+	char *host;
 	unsigned int port;
 	char *identity;
 	char *psk;
@@ -148,6 +150,7 @@ static void
 NSCAngNotifyer_dealloc(NSCAngNotifyer *self)
 {
 	nscang_client_free(self->client);
+	Py_TYPE(self)->tp_free((PyObject *)self);
 }
 
 static PyMemberDef NSCAngNotifyer_members[] = {
@@ -167,53 +170,35 @@ static PyMethodDef NSCAngNotifyer_methods[] = {
 };
 
 static PyTypeObject NSCAngNotifyerType = {
-	PyObject_HEAD_INIT(NULL) 0,             /* ob_size */
-	"nscang.NSCAngNotifyer",                /* tp_name */
-	sizeof(NSCAngNotifyer),                 /* tp_basicsize */
-	0,                                      /* tp_itemsize */
-	(destructor) NSCAngNotifyer_dealloc,    /* tp_dealloc */
-	0,                                      /* tp_print */
-	0,                                      /* tp_getattr */
-	0,                                      /* tp_setattr */
-	0,                                      /* tp_compare */
-	0,                                      /* tp_repr */
-	0,                                      /* tp_as_number */
-	0,                                      /* tp_as_sequence */
-	0,                                      /* tp_as_mapping */
-	0,                                      /* tp_hash  */
-	0,                                      /* tp_call */
-	0,                                      /* tp_str */
-	0,                                      /* tp_getattro */
-	0,                                      /* tp_setattro */
-	0,                                      /* tp_as_buffer */
-	Py_TPFLAGS_DEFAULT,                     /* tp_flags */
-	"NSCAngNotifyer objects",               /* tp_doc */
-	0,                                      /* tp_traverse */
-	0,                                      /* tp_clear */
-	0,                                      /* tp_richcompare */
-	0,                                      /* tp_weaklistoffset */
-	0,                                      /* tp_iter */
-	0,                                      /* tp_iternext */
-	NSCAngNotifyer_methods,                 /* tp_methods */
-	NSCAngNotifyer_members,                 /* tp_members */
-	0,                                      /* tp_getset */
-	0,                                      /* tp_base */
-	0,                                      /* tp_dict */
-	0,                                      /* tp_descr_get */
-	0,                                      /* tp_descr_set */
-	0,                                      /* tp_dictoffset */
-	(initproc) NSCAngNotifyer_init,         /* tp_init */
-	PyType_GenericAlloc,                    /* tp_alloc */
-	PyType_GenericNew,                      /* tp_new */
-	_PyObject_Del                           /* tp_free */
+	PyVarObject_HEAD_INIT(NULL, 0)
+	.tp_name = "nscang.NSCAngNotifyer",
+	.tp_basicsize = sizeof(NSCAngNotifyer),
+	.tp_itemsize = 0,
+	.tp_dealloc = (destructor) NSCAngNotifyer_dealloc,
+	.tp_flags = Py_TPFLAGS_DEFAULT,
+	.tp_doc = "NSCAngNotifyer objects",
+	.tp_methods = NSCAngNotifyer_methods,
+	.tp_members = NSCAngNotifyer_members,
+	.tp_init = (initproc) NSCAngNotifyer_init,
+	.tp_alloc = PyType_GenericAlloc,
+	.tp_new = PyType_GenericNew,
+	.tp_free = PyObject_Del,
 };
 
 static PyMethodDef module_methods[] = {
 	{ NULL }
 };
 
-DL_EXPORT(void)
-initnscang(void)
+static struct PyModuleDef nscangmodule = {
+	PyModuleDef_HEAD_INIT,
+	"nscang",
+	NULL,
+	-1,
+	module_methods
+};
+
+PyMODINIT_FUNC
+PyInit_nscang(void)
 {
 	PyObject *m;
 
@@ -221,13 +206,19 @@ initnscang(void)
 	SSL_load_error_strings();
 
 	if (PyType_Ready(&NSCAngNotifyerType) < 0)
-		return;
+		return NULL;
 
-	m = Py_InitModule("nscang", module_methods);
+	m = PyModule_Create(&nscangmodule);
 	if (m == NULL)
-		return;
+		return NULL;
 
 	Py_INCREF(&NSCAngNotifyerType);
-	PyModule_AddObject(m, "NSCAngNotifyer",
-	    (PyObject *)&NSCAngNotifyerType);
+	if (PyModule_AddObject(m, "NSCAngNotifyer",
+	    (PyObject *)&NSCAngNotifyerType) < 0) {
+		Py_DECREF(&NSCAngNotifyerType);
+		Py_DECREF(m);
+		return NULL;
+	}
+
+	return m;
 }

@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from distutils.core import setup, Extension
+from setuptools import setup, Extension
 
 VERSION = "1.1"
 
