@@ -1,4 +1,0 @@
-configurationVersion: 1
-
-filters:
-  - filePath: /tests/test_nsca.c
