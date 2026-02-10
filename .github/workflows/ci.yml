@@ -24,7 +24,7 @@ jobs:
     - name: Install prerequisites
       run: |
         sudo apt-get -qq update
-        sudo apt-get -qq install libssl-dev libev-dev libconfuse-dev
+        sudo apt-get -qq install libssl-dev libconfuse-dev
     - name: Bootstrap and configure
       run: |
         ./autogen.sh
