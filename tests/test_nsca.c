@@ -334,8 +334,12 @@ print_usage(FILE *stream)
 static void
 print_version(void)
 {
-	(void)system("send_nsca -V");
-	(void)system("nsca-ng -V");
+	int result;
+
+	result = system("send_nsca -V");
+	(void)result;
+	result = system("nsca-ng -V");
+	(void)result;
 #if HAVE_POSIX_AIO
 	(void)puts("The NSCA-ng server uses the POSIX AIO API on this system.");
 #endif
