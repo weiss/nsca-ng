@@ -43,7 +43,7 @@ xmalloc(size_t size)
 	void *new;
 
 	if ((new = malloc(size)) == NULL)
-		die("Error: Cannot allocate %zu bytes", size);
+		die("Cannot allocate %zu bytes", size);
 
 	return new;
 }
