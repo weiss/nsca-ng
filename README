@@ -149,9 +149,9 @@ For copyright and license information, see the file `COPYING`.
 Support
 -------
 
-Bug reports and patches can be sent to the <developers@nsca-ng.org> list (no
-subscription required).  For usage support, please subscribe to the
-<users@nsca-ng.org> list.  See the [NSCA-ng][7] website for details.
+Please use [our issue tracker][7] for bug reports and feature requests. Feel
+free to (ab)use it for usage questions as well.  Security issues can be
+reported privately to <developers@nsca-ng.org>.
 
 [1]: http://www.nagios.org/developerinfo/externalcommands/
 [2]: http://tools.ietf.org/html/rfc4279
@@ -159,6 +159,6 @@ subscription required).  For usage support, please subscribe to the
 [4]: https://github.com/libconfuse/libconfuse
 [5]: http://libev.schmorp.de/
 [6]: http://www.freedesktop.org/wiki/Software/systemd/
-[7]: http://www.nsca-ng.org/
+[7]: https://github.com/weiss/nsca-ng/issues
 
 <!-- vim:set filetype=markdown textwidth=76 joinspaces: -->
